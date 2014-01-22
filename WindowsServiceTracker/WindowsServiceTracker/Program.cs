@@ -9,6 +9,11 @@ using System.Reflection; //used for Assembly class
 
 namespace WindowsServiceTracker
 {
+    /***********************************************************************
+     * This class's primary purpose is to function as a driver program. It 
+     * can call multiple "services" to run. I'm not sure if those services
+     * are ran in parallel or simply in order.
+     ***********************************************************************/
     static class Program
     {
         /// <summary>
@@ -16,14 +21,14 @@ namespace WindowsServiceTracker
         /// </summary>
         static void Main(string[] args)
         {
-            /**********************************************
+            /**********************************************************************
              * Since we have to install the service every time we test it I found
              * this code online to help with that. Run the WindowsServiceTracker.exe
              * from command line and either use the argument "--install" to install
              * the service or use "--uninstall" to uninstall the service. Don't use
              * any arguments if you just want to run the service normally once it's
              * been installed.
-             *********************************************/
+             **********************************************************************/
             if (Environment.UserInteractive)
             {
                 string parameter = string.Concat(args);

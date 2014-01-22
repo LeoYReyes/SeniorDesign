@@ -13,6 +13,11 @@ using System.Threading;
 
 namespace WindowsServiceTracker
 {
+    /***********************************************************************
+     * This class is where the majority of the work of the service is done.
+     * We may possibly want to split up our different functions into different
+     * classes.
+     ***********************************************************************/
     public partial class Tracker : ServiceBase
     {
         //Constants

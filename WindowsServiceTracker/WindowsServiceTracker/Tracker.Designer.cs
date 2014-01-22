@@ -1,6 +1,6 @@
 ﻿namespace WindowsServiceTracker
 {
-    partial class Service1
+    partial class Tracker
     {
         /// <summary> 
         /// Required designer variable.

@@ -10,9 +10,9 @@ using System.Threading.Tasks;
 
 namespace WindowsServiceTracker
 {
-    public partial class Service1 : ServiceBase
+    public partial class Tracker : ServiceBase
     {
-        public Service1()
+        public Tracker()
         {
             InitializeComponent();
         }

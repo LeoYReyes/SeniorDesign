@@ -7,8 +7,8 @@
     <ProjectGuid>{59E732EF-ECA5-4386-924D-6EA3DE411C6E}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TestWindowsService</RootNamespace>
-    <AssemblyName>TestWindowsService</AssemblyName>
+    <RootNamespace>WindowsServiceTracker</RootNamespace>
+    <AssemblyName>WindowsServiceTracker</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

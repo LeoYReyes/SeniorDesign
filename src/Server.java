@@ -3,6 +3,18 @@
  * version: 1/20/2014
  */
 
-public class Server {
+import java.net.ServerSocket;
+import java.net.Socket;
 
+public class Server {
+	
+	private ServerSocket serverSock;
+	private Socket deviceSock;
+	
+	public Server() {
+		
+	}
+	
+	
+	
 }

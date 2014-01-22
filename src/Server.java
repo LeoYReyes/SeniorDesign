@@ -2,11 +2,13 @@
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 public class Server {
 
 	private static ServerSocket serverSock;
 	private static Socket deviceSock;
+	private static ArrayList<Socket> deviceConnections = new ArrayList<Socket>();
 	
 	public Server() {
 		
@@ -24,7 +26,9 @@ public class Server {
 		while(true) {
 			try {
 				deviceSock = serverSock.accept();
-			} catch (IOException e) {
+				deviceConnections.add(deviceSock);
+			} 
+			catch (IOException e) {
 				System.out.println(e);
 			}
 		}

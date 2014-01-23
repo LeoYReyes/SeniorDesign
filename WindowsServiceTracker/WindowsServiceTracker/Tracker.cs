@@ -37,7 +37,7 @@ namespace WindowsServiceTracker
         {
             //Use the following line to launch an instance of visual studio to debug
             //with. You can also just run the service and then attach the debugger
-            //to the process
+            //to the process.
             //System.Diagnostics.Debugger.Launch();
 
             //Keep the service running for 15 seconds

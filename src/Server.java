@@ -17,9 +17,10 @@ public class Server {
 	public Server() {
 		try {
 			serverSock = new ServerSocket(10000);
+			new Thread(requestHandler).start();
 		}
 		catch(IOException e) {
-			
+			System.out.println(e);
 		}
 	}
 	
@@ -33,12 +34,17 @@ public class Server {
 		
 		while(true) {
 			try {
+				System.out.println("\nwaiting for connection");
 				// Listen for a connection to server
 				deviceSock = serverSock.accept();
-				// Create new thread for connection and add to list
-				deviceConnections.add(new TCPDeviceThread(deviceSock, requestHandler));
-			} 
-			catch (IOException e) {
+				// Create new thread for connection
+				TCPDeviceThread newThread = new TCPDeviceThread(deviceSock, requestHandler);
+				// Add new connection thread to list
+				deviceConnections.add(newThread);
+				// Start thread
+				newThread.start();
+				Thread.sleep(1000);
+			} catch (Exception e) {
 				System.out.println(e);
 			}
 		}

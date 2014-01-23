@@ -44,8 +44,17 @@ namespace WindowsServiceTracker
             Thread.Sleep(15000);
 
             //Some test tcp connection stuff
-            //tcp = new TcpClient();
-            //tcp.Connect(IPPort);
+            tcp = new TcpClient();
+            tcp.Connect(IPPort);
+            NetworkStream tcpStream = tcp.GetStream();
+            if (tcpStream.CanWrite)
+            {
+                Byte[] machineName = Encoding.UTF8.GetBytes(Environment.MachineName + "\n");
+                tcpStream.Write(machineName, 0, machineName.Length);
+            }
+
+            tcp.Close();
+            tcpStream.Close();
         }
 
         protected override void OnStop()

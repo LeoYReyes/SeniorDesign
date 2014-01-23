@@ -354,3 +354,68 @@ Affected parameters are:
 Removing EventLog source WindowsServiceTracker.
 Service WindowsServiceTracker is being removed from the system...
 Service WindowsServiceTracker was successfully removed from the system.
+Installing assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Service WindowsServiceTracker has been successfully installed.
+Creating EventLog source WindowsServiceTracker in log Application...
+Committing assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.
+Installing assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.
+Installing assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.
+Installing assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.

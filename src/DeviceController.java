@@ -23,4 +23,19 @@ public class DeviceController {
 		System.out.println("New device created and added");
 		System.out.println("DeviceList: " + deviceList.toString());
 	}
+	
+	/*
+	 * Searches through ArrayList<Device> and returns a Device object with specified id if it exists
+	 * 
+	 * @param id	Device id used to search through the ArrayList
+	 * @return		Returns the Device with matching id, otherwise return null
+	 */
+	public Device getDevice(int id) {
+		for(int i = 0; i < deviceList.size(); i++) {
+			if(deviceList.get(i).getId() == id) {
+				return deviceList.get(i);
+			}
+		}
+		return null;
+	}
 }

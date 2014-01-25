@@ -36,14 +36,22 @@ public class RequestHandler implements Observer, Runnable {
 				// Execute operation based on request type
 				switch(currRequest.getRequestType()) {
 					case Request.GEOGRAMDATA:
+						System.out.println("Request: GEOGRAM DATA");
 						break;
 					case Request.LAPTOPDATA:
+						System.out.println("Request: LAPTOP DATA");
 						break;
 					case Request.LOADDEVICE:
+						System.out.println("Request: LOAD DEVICE");
+						//TODO: Load Device object from database
 						break;
 					case Request.DEVICEINFO:
+						System.out.println("Request: DEVICE INFO");
+						//TODO: Return Device object to requester, most likely view controller
 						break;
 					case Request.NEWDEVICE:
+						System.out.println("Request: NEW DEVICE");
+						//TODO: Create new device with a unique ID system
 						deviceController.newDevice(currRequest.getId());
 						break;
 					default:

@@ -10,6 +10,10 @@ public class Device {
 		this.id = id;
 	}
 	
+	public int getId() {
+		return id;
+	}
+	
 	public String toString() {
 		return "Device" + id;
 	}

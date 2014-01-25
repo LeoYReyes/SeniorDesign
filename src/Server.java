@@ -48,7 +48,7 @@ public class Server {
 				// Listen for a connection to server
 				deviceSock = serverSock.accept();
 				// Create new thread for connection
-				TCPDeviceThread newThread = new TCPDeviceThread(deviceSock, requestHandler);
+				TCPDeviceThread newThread = new TCPDeviceThread(deviceSock, requestHandler, deviceController);
 				// Add new connection thread to list
 				deviceConnections.add(newThread);
 				// Start thread

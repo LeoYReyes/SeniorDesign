@@ -4,8 +4,8 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 /*
- * Thread for a connection over TCP. Parses message received and creates a request 
- * that will be handled by the server.
+ * Thread for a connection over TCP. Parses messages received and creates a request 
+ * that will be handled by the RequestHandler.
  */
 public class TCPDeviceThread extends Thread {
 
@@ -14,9 +14,15 @@ public class TCPDeviceThread extends Thread {
 	private Device device = null;
 	// Request
 	private Request request = null;
-	// RequestHandler, will be assigned server's request handler
+	// RequestHandler
 	private RequestHandler requestHandler = null;
 	
+	/*
+	 * Creates a TCPDeviceThread referencing to a specified Socket and RequestHandler
+	 * 
+	 * @param deviceSock		Socket connection that this thread will connected to
+	 * @param requestHandler	Reference to the Server's RequestHandler
+	 */
 	public TCPDeviceThread(Socket deviceSock, RequestHandler requestHandler) {
 		this.deviceSock = deviceSock;
 		this.requestHandler = requestHandler;
@@ -32,7 +38,8 @@ public class TCPDeviceThread extends Thread {
 			System.out.println("Received message: " + inMessage);
 			// Create new request and add to RequestHandler
 			//TODO: request type, parse message to check who sent the message
-			request = new Request(Request.LAPTOPDATA, inMessage, 1);
+			//TODO: instead of created new Requests here, make RequestHandler create new Requests
+			request = new Request(Request.NEWDEVICE, inMessage, 1);
 			request.addObserver(requestHandler);
 			request.notifyObservers(currentThread().getId());
 			

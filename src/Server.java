@@ -13,10 +13,18 @@ public class Server {
 	private static ArrayList<TCPDeviceThread> deviceConnections = new ArrayList<TCPDeviceThread>();
 	// Server request handler, observer checking for new requests
 	private static final RequestHandler requestHandler = new RequestHandler();
+	// Server device controller
+	private static final DeviceController deviceController = new DeviceController();
+	// Server Database controller
+	private static final DBController dbController = new DBController();
 	
+	/*
+	 * Creates a server, initializes and starts controllers
+	 */
 	public Server() {
 		try {
 			serverSock = new ServerSocket(10000);
+			requestHandler.addDeviceController(deviceController);
 			new Thread(requestHandler).start();
 		}
 		catch(IOException e) {
@@ -34,6 +42,8 @@ public class Server {
 		
 		while(true) {
 			try {
+				System.out.println("Connected clients: " + deviceConnections.size());
+				System.out.println("List: " + deviceConnections.toString());
 				System.out.println("\nwaiting for connection");
 				// Listen for a connection to server
 				deviceSock = serverSock.accept();

@@ -30,13 +30,17 @@ namespace WindowsServiceTracker
             {
                 _hookID = SetHook(_proc);
                 UnhookWindowsHookEx(_hookID);
+                while (true)
+                {
+                    Thread.Sleep(1000);
+                }
             }
             catch (ThreadAbortException)
             {
             }
         }
 
-        private void Start()
+        public void Start()
         {
             if (loggingThread == null)
             {
@@ -45,7 +49,7 @@ namespace WindowsServiceTracker
             }
         }
 
-        private void Stop()
+        public void Stop()
         {
             if (loggingThread != null || !loggingThread.IsAlive)
             {

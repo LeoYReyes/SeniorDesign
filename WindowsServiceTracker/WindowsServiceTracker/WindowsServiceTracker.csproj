@@ -55,6 +55,9 @@
     <Compile Include="ProjectInstaller.Designer.cs">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestProcess.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tracker.cs">
       <SubType>Component</SubType>
     </Compile>

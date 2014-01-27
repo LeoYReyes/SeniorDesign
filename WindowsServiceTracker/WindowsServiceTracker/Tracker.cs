@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Net.Sockets; //used for TcpClient class
 using System.Net; //used for IPEndPoint class
 using System.Threading;
+using System.IO;
 
 namespace WindowsServiceTracker
 {
@@ -53,15 +54,34 @@ namespace WindowsServiceTracker
 
             //Keep the service running for 15 seconds
             Thread.Sleep(15000);
-            Keylogger.Start();
+
+            //Sets the current directory to where the WindowsServiceTracker.exe is located rather
+            //than some Windows folder that I couldn't seem to locate
+            System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
+
+            //Create a new process and change some startup info settings
+            Process testProcess = new Process();
+            ProcessStartInfo testProcessStartInfo = new ProcessStartInfo();
+
+            //File name here MUST MATCH the file name of the external process you've created
+            testProcessStartInfo.FileName = "TestProcess.exe";
+            //Verb = "runas" and UseShellExecute = true must be set for admin rights (I think)
+            testProcessStartInfo.Verb = "runas";
+            testProcessStartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            testProcessStartInfo.UseShellExecute = true;
+
+            //Start the test process, look in TestProcess.cs for the actual process
+            testProcess = Process.Start(testProcessStartInfo);
+
+            //Keylogger.Start();
 
             //Write to the Windows Event Logs, shows up under Windows Logs --> Application
             EventLog.WriteEntry(errorLogSource, "Test event", EventLogEntryType.Information);
 
             //Some test tcp connection stuff
-            Connect();
+            //Connect();
             
-            SendStringMsg(Environment.MachineName);
+            //SendStringMsg(Environment.MachineName);
 
         }
 

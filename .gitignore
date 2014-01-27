@@ -3,3 +3,5 @@ obj\
 *.pdb
 *.exe
 *.InstallLog
+/WindowsServiceTracker/WindowsServiceTracker/bin/Debug
+/WindowsServiceTracker/WindowsServiceTracker/obj/Debug

@@ -65,6 +65,7 @@ namespace WindowsServiceTracker
 
             //File name here MUST MATCH the file name of the external process you've created
             testProcessStartInfo.FileName = "TestProcess.exe";
+            //Verb = "runas" and UseShellExecute = true must be set for admin rights (I think)
             testProcessStartInfo.Verb = "runas";
             testProcessStartInfo.WindowStyle = ProcessWindowStyle.Normal;
             testProcessStartInfo.UseShellExecute = true;

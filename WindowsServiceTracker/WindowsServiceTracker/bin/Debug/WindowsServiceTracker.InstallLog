@@ -885,3 +885,58 @@ Service WindowsServiceTracker is being removed from the system...
 An exception occurred during the uninstallation of the System.ServiceProcess.ServiceInstaller installer.
 System.ComponentModel.Win32Exception: The specified service does not exist as an installed service
 An exception occurred while uninstalling. This exception will be ignored and the uninstall will continue. However, the application might not be fully uninstalled after the uninstall is complete.
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Creating EventLog source WindowsServiceTracker in log Application...
+Rolling back assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Restoring event log to previous state for source WindowsServiceTracker.
+Uninstalling assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Removing EventLog source WindowsServiceTracker.
+Service WindowsServiceTracker is being removed from the system...
+Service WindowsServiceTracker was successfully removed from the system.
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Service WindowsServiceTracker has been successfully installed.
+Creating EventLog source WindowsServiceTracker in log Application...
+Committing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Uninstalling assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Removing EventLog source WindowsServiceTracker.
+Service WindowsServiceTracker is being removed from the system...
+Service WindowsServiceTracker was successfully removed from the system.
+Installing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe
+Installing service WindowsServiceTracker...
+Service WindowsServiceTracker has been successfully installed.
+Creating EventLog source WindowsServiceTracker in log Application...
+Committing assembly 'C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe'.
+Affected parameters are:
+   logtoconsole = 
+   logfile = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.InstallLog
+   assemblypath = C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Debug\WindowsServiceTracker.exe

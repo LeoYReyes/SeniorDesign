@@ -36,11 +36,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Keylogger.cs" />
+    <Compile Include="SystemTrayKeylogger.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="TestProcess.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

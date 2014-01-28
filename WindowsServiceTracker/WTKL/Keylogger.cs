@@ -30,6 +30,7 @@ namespace WindowsServiceTracker
             {
                 _hookID = SetHook(_proc);
                 logging = true;
+                Application.Run();
             }
         }
 

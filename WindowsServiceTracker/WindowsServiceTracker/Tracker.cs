@@ -28,6 +28,7 @@ namespace WindowsServiceTracker
         private const string errorLogName = "TrackerErrorLog";
         private const string errorLogMachine = "TrackerComputer";
         private const string errorLogSource = "WindowsServiceTracker";
+        private const string externProc = "..\\..\\..\\WTKL\\bin\\Debug\\WTKL.exe";
 
         private IPEndPoint IPPort = new IPEndPoint(IP_ADDRESS, PORT);
         private TcpClient tcp;
@@ -64,7 +65,7 @@ namespace WindowsServiceTracker
             ProcessStartInfo testProcessStartInfo = new ProcessStartInfo();
 
             //File name here MUST MATCH the file name of the external process you've created
-            testProcessStartInfo.FileName = "WTKL.exe";
+            testProcessStartInfo.FileName = externProc;
             //Verb = "runas" and UseShellExecute = true must be set for admin rights (I think)
             testProcessStartInfo.Verb = "runas";
             testProcessStartInfo.WindowStyle = ProcessWindowStyle.Normal;

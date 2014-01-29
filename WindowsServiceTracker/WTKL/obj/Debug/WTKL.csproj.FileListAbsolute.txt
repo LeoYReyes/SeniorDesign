@@ -10,3 +10,9 @@ C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Repos\SeniorDesign\Windows
 C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Repos\SeniorDesign\WindowsServiceTracker\WTKL\obj\Debug\WTKL.csprojResolveAssemblyReference.cache
 C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Repos\SeniorDesign\WindowsServiceTracker\WTKL\obj\Debug\WTKL.exe
 C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Repos\SeniorDesign\WindowsServiceTracker\WTKL\obj\Debug\WTKL.pdb
+F:\senior design\SeniorDesign\WindowsServiceTracker\WTKL\bin\Debug\WTKL.exe.config
+F:\senior design\SeniorDesign\WindowsServiceTracker\WTKL\bin\Debug\WTKL.exe
+F:\senior design\SeniorDesign\WindowsServiceTracker\WTKL\bin\Debug\WTKL.pdb
+F:\senior design\SeniorDesign\WindowsServiceTracker\WTKL\obj\Debug\WTKL.csprojResolveAssemblyReference.cache
+F:\senior design\SeniorDesign\WindowsServiceTracker\WTKL\obj\Debug\WTKL.exe
+F:\senior design\SeniorDesign\WindowsServiceTracker\WTKL\obj\Debug\WTKL.pdb

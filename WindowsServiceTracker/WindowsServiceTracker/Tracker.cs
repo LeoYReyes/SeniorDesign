@@ -124,15 +124,17 @@ namespace WindowsServiceTracker
         {
             string mac = String.Empty;
 
+            bool keepUnlessEthernet = false;
             foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
             {
                 if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
                 {
                     return nic.GetPhysicalAddress().ToString();
                 }
-                else if (mac == String.Empty && nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+                else if (!keepUnlessEthernet && nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
                 {
                     mac = nic.GetPhysicalAddress().ToString();
+                    keepUnlessEthernet = true;
                 }
                 else if (mac == String.Empty && nic.OperationalStatus == OperationalStatus.Up)
                 {

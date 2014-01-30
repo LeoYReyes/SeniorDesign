@@ -1,5 +1,4 @@
 C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Repos\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\bin\Debug\KeyloggerCommunications.dll
 C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Repos\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\bin\Debug\KeyloggerCommunications.pdb
-C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Repos\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\obj\Debug\KeyloggerCommunications.csprojResolveAssemblyReference.cache
 C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Repos\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\obj\Debug\KeyloggerCommunications.dll
 C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Repos\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\obj\Debug\KeyloggerCommunications.pdb

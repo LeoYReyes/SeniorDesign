@@ -2,6 +2,10 @@
 *.exe
 *.InstallLog
 *.suo
-/WindowsServiceTracker/WindowsServiceTracker/bin/Debug
-/WindowsServiceTracker/WindowsServiceTracker/obj/Debug
+/WindowsServiceTracker/WindowsServiceTracker/bin
+/WindowsServiceTracker/WindowsServiceTracker/obj
+/WindowsServiceTracker/WTKL/bin
+/WindowsServiceTracker/WTKL/obj
+/WindowsServiceTracker/KeyloggerCommunications/bin
+/WindowsServiceTracker/KeyloggerCommunications/obj
 keylogTEST.txt

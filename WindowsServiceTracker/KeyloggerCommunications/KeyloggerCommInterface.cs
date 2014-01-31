@@ -15,5 +15,7 @@ namespace KeyloggerCommunications
 
         [OperationContract]
         bool StopKeylogger();
+
+        //todo add TestConnect method
     }
 }

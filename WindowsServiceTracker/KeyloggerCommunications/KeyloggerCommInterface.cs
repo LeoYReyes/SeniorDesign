@@ -16,6 +16,7 @@ namespace KeyloggerCommunications
         [OperationContract]
         bool StopKeylogger();
 
-        //todo add TestConnect method
+        [OperationContract]
+        bool CheckIfRunning();
     }
 }

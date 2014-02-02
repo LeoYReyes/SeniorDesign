@@ -1,20 +1,30 @@
 
 /*
- * 
+ * 	Steven Whaley - February 1
  */
-public class Device {
-	//TODO: make class abstract and create child classes for different device types
+public abstract class Device 
+{
 	private int id;
+	private String name;
 	
-	public Device(int id) {
+	public Device(int id, String name) 
+	{
 		this.id = id;
+		this.name = name;
 	}
 	
-	public int getId() {
+	public int getId() 
+	{
 		return id;
 	}
 	
-	public String toString() {
-		return "Device" + id;
+	public String getName()
+	{
+		return name;
+	}
+	
+	public String toString() 
+	{
+		return "\nDevice ID: " + id + "\nDevice Name: " + name;
 	}
 }

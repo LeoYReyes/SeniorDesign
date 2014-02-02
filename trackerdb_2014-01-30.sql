@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.6.15)
 # Database: trackerdb
-# Generation Time: 2014-01-31 02:23:03 +0000
+# Generation Time: 2014-02-01 23:29:25 +0000
 # ************************************************************
 
 
@@ -26,23 +26,13 @@
 DROP TABLE IF EXISTS `account`;
 
 CREATE TABLE `account` (
-  `id` varchar(50) NOT NULL DEFAULT '',
-  `username` varchar(30) DEFAULT NULL,
-  `password` varchar(30) DEFAULT NULL,
+  `customerId` int(11) NOT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userName` varchar(30) DEFAULT NULL,
+  `password` char(40) DEFAULT NULL COMMENT 'TODO: change from char to binary to save space',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `account` WRITE;
-/*!40000 ALTER TABLE `account` DISABLE KEYS */;
-
-INSERT INTO `account` (`id`, `username`, `password`)
-VALUES
-	('111111111111','catlvr666','cats'),
-	('222222222222','pro_hacker','7331'),
-	('333333333333','swagking420','weed');
-
-/*!40000 ALTER TABLE `account` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table customer
@@ -51,34 +41,23 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `customer`;
 
 CREATE TABLE `customer` (
-  `id` varchar(50) NOT NULL DEFAULT '',
-  `phone_number` varchar(20) DEFAULT NULL,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `phoneNumber` varchar(20) DEFAULT NULL,
   `address` varchar(30) DEFAULT NULL,
   `email` varchar(30) DEFAULT NULL,
-  `first_name` varchar(11) DEFAULT NULL,
-  `last_name` varchar(11) DEFAULT NULL,
+  `firstName` varchar(20) DEFAULT NULL,
+  `lastName` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `customer` WRITE;
-/*!40000 ALTER TABLE `customer` DISABLE KEYS */;
-
-INSERT INTO `customer` (`id`, `phone_number`, `address`, `email`, `first_name`, `last_name`)
-VALUES
-	('111111111111','3346661337','123 Fake St','steven@mensa.org','steven','whaley'),
-	('222222222222',NULL,NULL,'jo@google.com',NULL,NULL),
-	('333333333333',NULL,NULL,'al@microsoft.com',NULL,NULL);
-
-/*!40000 ALTER TABLE `customer` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
-# Dump of table gps_device
+# Dump of table gpsDevice
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `gps_device`;
+DROP TABLE IF EXISTS `gpsDevice`;
 
-CREATE TABLE `gps_device` (
+CREATE TABLE `gpsDevice` (
   `id` varchar(50) NOT NULL DEFAULT '',
   `name` varchar(50) DEFAULT NULL,
   `customer_id` varchar(50) DEFAULT NULL,
@@ -87,41 +66,77 @@ CREATE TABLE `gps_device` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `gps_device` WRITE;
-/*!40000 ALTER TABLE `gps_device` DISABLE KEYS */;
+LOCK TABLES `gpsDevice` WRITE;
+/*!40000 ALTER TABLE `gpsDevice` DISABLE KEYS */;
 
-INSERT INTO `gps_device` (`id`, `name`, `customer_id`, `latitude`, `longitude`)
+INSERT INTO `gpsDevice` (`id`, `name`, `customer_id`, `latitude`, `longitude`)
 VALUES
-	('111111111111','device1','12','33.5522','14.2233'),
-	('222222222222','device2','13','66.1111','18.1111'),
-	('333333333333','device3','14','88.1111','19.3333');
+  ('111111111111','device1','12','33.5522','14.2233'),
+  ('222222222222','device2','13','66.1111','18.1111'),
+  ('333333333333','device3','14','88.1111','19.3333');
 
-/*!40000 ALTER TABLE `gps_device` ENABLE KEYS */;
+/*!40000 ALTER TABLE `gpsDevice` ENABLE KEYS */;
 UNLOCK TABLES;
 
 
-# Dump of table laptop_device
+# Dump of table ipAddress
 # ------------------------------------------------------------
 
-DROP TABLE IF EXISTS `laptop_device`;
+DROP TABLE IF EXISTS `ipAddress`;
 
-CREATE TABLE `laptop_device` (
-  `id` varchar(100) DEFAULT '',
-  `name` varchar(30) DEFAULT NULL,
-  `customer_id` varchar(30) DEFAULT NULL
+CREATE TABLE `ipAddress` (
+  `listId` int(11) NOT NULL,
+  `ipAddress` varchar(15) DEFAULT NULL,
+  PRIMARY KEY (`listId`),
+  CONSTRAINT `ipAddressToList` FOREIGN KEY (`listId`) REFERENCES `ipList` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `laptop_device` WRITE;
-/*!40000 ALTER TABLE `laptop_device` DISABLE KEYS */;
 
-INSERT INTO `laptop_device` (`id`, `name`, `customer_id`)
-VALUES
-	('111111111111','laptop','steven'),
-	('222222222222','phone','leo'),
-	('333333333333','tablet','nathan');
 
-/*!40000 ALTER TABLE `laptop_device` ENABLE KEYS */;
-UNLOCK TABLES;
+# Dump of table ipList
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `ipList`;
+
+CREATE TABLE `ipList` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `deviceId` int(11) DEFAULT NULL,
+  `timestamp` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ipListToDevice` (`deviceId`),
+  CONSTRAINT `ipListToDevice` FOREIGN KEY (`deviceId`) REFERENCES `laptopDevice` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+# Dump of table keyLogs
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `keyLogs`;
+
+CREATE TABLE `keyLogs` (
+  `deviceId` int(11) NOT NULL,
+  `timestamp` timestamp NULL DEFAULT NULL,
+  `data` text,
+  KEY `keyLogToDevice` (`deviceId`),
+  CONSTRAINT `keyLogToDevice` FOREIGN KEY (`deviceId`) REFERENCES `laptopDevice` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+# Dump of table laptopDevice
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `laptopDevice`;
+
+CREATE TABLE `laptopDevice` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `deviceName` varchar(30) DEFAULT NULL,
+  `customerId` int(11) DEFAULT NULL,
+  `macAddress` varchar(12) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 
 

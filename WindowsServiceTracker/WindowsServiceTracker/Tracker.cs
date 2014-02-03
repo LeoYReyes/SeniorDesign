@@ -195,7 +195,7 @@ namespace WindowsServiceTracker
             byte[] buffer = new byte[bufferSize];
             while (tcpKeepAlive)
             {
-                if (tcp == null)
+                if (tcp == null || !tcp.Connected)
                 {
                     try 
                     {
@@ -267,27 +267,6 @@ namespace WindowsServiceTracker
             catch (Exception)
             {
                 throw new Exception("Error connecting");
-            }
-        }
-
-        /* Checks to see if there is an open TCP connection and attempts to write to it.
-         */
-        private bool CheckTCPConnected() // todo fix this
-        {
-            if (tcp == null || tcpStream == null)
-            {
-                return false;
-            }
-
-            try
-            {
-                byte[] tmp = new byte[1];
-                tcpStream.Write(tmp, 0, 0);
-                return true;
-            }
-            catch (SocketException e)
-            {
-                return false;
             }
         }
 

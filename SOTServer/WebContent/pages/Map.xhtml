@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:m="http://code.google.com/p/gmaps4jsf/">
+<head>
+	<!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>-->
+	<link type="text/css" rel="stylesheet" href="css/default.css"/>
+	
+</head>
+	<body>
+		<ui:composition template="../templates/layout.xhtml">
+        	<ui:define name="content">
+	            <h1>Simple Map with a marker and an InfoWindow</h1>
+	            <h:form id="map">
+		            <m:map width="500px" height="500px">
+		       			<m:marker>
+		            		<m:htmlInformationWindow htmlText="Hello" />
+		            	</m:marker>
+		       		</m:map>
+	       		</h:form>
+	       	</ui:define>
+	     </ui:composition>
+	</body>
+</html>

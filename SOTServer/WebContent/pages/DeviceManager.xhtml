@@ -1,0 +1,35 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+      
+<head>
+
+</head>
+<body>
+	<ui:composition template="../templates/layout.xhtml">
+	<ui:define name="content">
+		<h1>Register Device</h1>
+		<form method="POST" action="../php/RegisterNewDevice.php">
+			<input type="text" name="deviceId" placeholder="Device ID"></input>
+			<input type="text" name="deviceType" placeholder="Device Type"></input>
+			<input type="text" name="firstName" placeholder="First Name"></input>
+			<input type="text" name="lastName" placeholder="Last Name"></input>
+			<input type="text" name="deviceName" placeholder="Device Name"></input>
+			<input type="submit" value="Register"></input>
+		</form>
+		<h1>Search Device</h1>
+		<form method="POST" action="../php/SearchDevice.php">
+			<input type="text" name="deviceId" placeholder="Device ID"></input>
+			or
+			<input type="text" name="deviceName" placeholder="Device Name"></input>
+			<input type="submit" value="Search"></input>
+		</form>
+		<h1>Edit Device</h1>
+	</ui:define>
+	</ui:composition>
+</body>
+
+</html>

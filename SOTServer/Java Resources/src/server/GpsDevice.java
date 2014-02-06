@@ -1,6 +1,6 @@
 package server;
 /*
- * 
+ * @author Rizwan Pirani
  * 		Steven Whaley - Feb 1
  */
 public class GpsDevice extends Device

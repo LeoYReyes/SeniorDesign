@@ -1,4 +1,5 @@
 package server;
+package bdn;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 
 /**
  * @author Leo Reyes
+ * @author Rizwan Pirani
  *
  *	This class represents the central server. All controllers and sockets are 
  *	initiated in this class. When a new connection is made with the socket, a
@@ -45,8 +47,29 @@ public class Server {
 	 * TODO: finish method, finds a connection in the list of threads that 
 	 * 		 corresponds with a parameter
 	 */
-	public static TCPDeviceThread findDeviceThread() {
-		return null;
+	public static TCPDeviceThread findDeviceThread(Strings id, byte temp) 
+	{
+		//string id find thread that has device and send it a message 
+		//from the threads that are in the array list
+		/*0 starts 
+		1 stops
+		2 traceroute
+		3 keylogger*/
+		
+		BufferedOutputStream bos = new BufferedOutputStream(connection.getOutputStream());
+		
+		for(int i = 0; i < deviceConnections.size(); i++) 
+		{
+			if(deviceConnections.get(i).getId().equalsIgnoreCase(id)) 
+			{
+				bos.write(temp);
+				System.out.println("Device found!");
+			}
+			else 
+			{
+				System.out.println("Device not found!");
+			}
+		}
 	}
 	
 	/*

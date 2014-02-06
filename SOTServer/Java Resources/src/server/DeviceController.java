@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 /**
  * @author Leo Reyes
- * 
+ * @author Rizwan Pirani
  */
 public class DeviceController {
 

@@ -1,7 +1,7 @@
 package server;
 /*
- * 
- * 		Steven Whaley - created February 1
+ * @author Rizwan Pirani
+ * 		Steven Whaley - February 1
  */
 
 import java.util.ArrayList;

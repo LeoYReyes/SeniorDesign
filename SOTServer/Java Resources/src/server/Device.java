@@ -1,10 +1,10 @@
 package server;
 
 /*
- * 
+ * @author Rizwan Pirani
+ * Creates a new device and is the parent to LaptopDevice and GpsDevice
  */
 public abstract class Device {
-	//TODO: make class abstract and create child classes for different device types
 	private String id;
 	private String name;
 	

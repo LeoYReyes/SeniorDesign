@@ -63,7 +63,7 @@ namespace WTKL
             CreateOpenPipe();
 
             //For debugging only
-            StartKeylogger();
+            //StartKeylogger();
         }
 
         /* This is the method that is called just before the application stops running,

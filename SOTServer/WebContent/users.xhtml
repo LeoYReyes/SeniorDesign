@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8"></meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
+
+    <title>Senior Design</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet"></link>
+    <link href="font-awesome/css/font-awesome.css" rel="stylesheet"></link>
+    <link href="css/plugins/dataTables/dataTables.bootstrap.css" rel="stylesheet"></link>
+    <link href="css/sb-admin.css" rel="stylesheet"></link>
+    <script src="js/jquery-1.10.2.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <script src="js/plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="js/plugins/dataTables/dataTables.bootstrap.js"></script>
+    <script src="js/sb-admin.js"></script>
+    <script>
+    	$(document).ready(function() {
+        	$('#dataTables-example').dataTable();
+    	});
+    </script>
+
+</head>
+
+<body>
+
+    <div id="wrapper">
+
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html">Senior Design Admin</a>
+            </div>
+            <!-- /.navbar-header -->
+            <ul class="nav navbar-top-links navbar-right">
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="login.xhtml"><i class="fa fa-sign-out fa-fw"></i> Logout</a></li>
+                    </ul> <!-- /.dropdown-user -->
+                </li> <!-- /.dropdown -->
+            </ul> <!-- /.navbar-top-links -->
+        </nav> <!-- /.navbar-static-top -->
+        <nav class="navbar-default navbar-static-side" role="navigation">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="side-menu">
+                    <li><a href="homeAdmin.xhtml"><i class="fa fa-dashboard fa-fw"></i> Statistics</a></li>
+                    <li><a href="mapAdmin.xhtml"><i class="fa fa-dashboard fa-fw"></i> Map of Devices</a></li>
+                    <li><a href="devices.xhtml"><i class="fa fa-table fa-fw"></i> Devices</a></li>
+                    <li><a href="users.xhtml"><i class="fa fa-edit fa-fw"></i> Users</a></li>
+                </ul> <!-- /side-menu -->
+            </div>
+        </nav><!-- /navbar-static-side -->
+
+        <div id="page-wrapper">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">Users Information</h1>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            List of all Registered Users
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                    <thead>
+                                        <tr>
+                                        	<th>Last Name</th>
+                                            <th>First Name</th>
+                                            <th>Email</th>
+                                            <th>Password</th>
+                                            <th>Date Registered</th>
+                                            <th>Date Last Login</th>
+                                            <th>Device IDs</th>
+                                        </tr>
+                                    </thead>
+                                  
+                                  <!-- DATA BASE INFORMATION will recursively GOES HERE -->  
+                                    <tbody>
+                                        <tr class="odd gradeX">
+                                            <td>Burkholder</td>
+                                            <td>Denney</td>
+                                            <td>dab1109@aol.com</td>
+                                            <td>password</td>
+                                            <td>02/05/2014</td>
+                                            <td>01/05/2014</td>
+                                            <td>1234567890</td>
+                                        </tr>
+                                        <tr class="odd gradeX">
+                                            <td>Brook</td>
+                                            <td>Burkholder</td>
+                                            <td>dab0018@auburn.edu</td>
+                                            <td>wordpass</td>
+                                            <td>02/05/2013</td>
+                                            <td>01/05/2013</td>
+                                            <td>0987654321</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> <!-- /"table-responsiveness" -->
+						</div> <!-- /"panel body" -->
+           			</div>  <!-- /"panel panel-default" -->
+           		</div>	<!-- /"col-lg-12" -->
+			</div> <!-- /row -->
+ 		 </div> <!-- /page-wrapper -->
+    </div>  <!-- /#wrapper -->
+
+</body>
+
+</html>

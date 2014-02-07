@@ -444,8 +444,8 @@ namespace WindowsServiceTracker
                     {
                         int offset = 0;
                         byte[] combinedMsg;
-                        bytesRead = log.Read(buffer, 0, bufferSize);
-                        msg = Encoding.UTF8.GetBytes(buffer, 0, bytesRead);
+                        string logRead = log.ReadToEnd();
+                        msg = Encoding.UTF8.GetBytes(logRead);
                         byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
 
                         combinedMsg = new byte[1 + msg.Length + newLine.Length];
@@ -454,7 +454,7 @@ namespace WindowsServiceTracker
                         offset += 1;
 
                         msg.CopyTo(combinedMsg, offset);
-                        offset += combinedMsg.Length;
+                        offset += msg.Length;
 
                         newLine.CopyTo(combinedMsg, offset);
                         offset += newLine.Length;

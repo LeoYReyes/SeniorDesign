@@ -15,10 +15,10 @@ public class LaptopDevice extends Device
 		super(id, name);
 	}
 	
-	public void addIPList(String ips, String time) {
+	public void addIPList(String ips) {
 		System.out.println("IPs: " + ips);
-		System.out.println("Timestamp: " + time);
-		list.add(new IPList(ips, time));
+		//System.out.println("Timestamp: " + time);
+		list.add(new IPList(ips));
 		System.out.println(list.get(0).toString());
 	}
 	

@@ -12,6 +12,7 @@ import java.net.SocketException;
 public class TCPDeviceThread extends Thread {
 	// Number of messages exchanged over the connection
 	private int messageCount;
+	String deviceId = null;
 	// Client socket
 	private Socket deviceSock = null;
 	// Representation of the device connected to this thread
@@ -44,10 +45,9 @@ public class TCPDeviceThread extends Thread {
 		try {
 			// incoming message buffer
 			BufferedInputStream in = new BufferedInputStream(deviceSock.getInputStream());
-			byte[] inMessage = new byte[500];
+			byte[] inMessage = new byte[1024];
 			// Number of bytes read
 			int bytesRead = 0;
-			String deviceId = null;
 			while((bytesRead = in.read(inMessage)) > 0) {
 				// Check to see if first message, if true setup device for connection
 				if(messageCount < 1) {
@@ -75,6 +75,9 @@ public class TCPDeviceThread extends Thread {
 					request.notifyObservers(currentThread().getId());
 					messageCount++;
 				}
+				for(int i = 0; i< inMessage.length; i++) {
+					inMessage[i] = 0x00;
+				}
 			}// end of while((bytesRead = in.read(inMessage)) > 0)
 			
 		} // end of try
@@ -83,6 +86,12 @@ public class TCPDeviceThread extends Thread {
 		}
 	}
 	
+	public Socket getSock() {
+		return deviceSock;
+	}
+	public String getDeviceId() {
+		return deviceId;
+	}
 	public Device getDevice() {
 		return device;
 	}

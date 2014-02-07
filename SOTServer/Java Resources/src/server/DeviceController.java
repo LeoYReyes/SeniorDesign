@@ -28,7 +28,7 @@ public class DeviceController {
 	
 	public void updateIp(String deviceId, String msg) {
 		System.out.println("Updating IP: " + msg);
-		((LaptopDevice)getDevice(deviceId)).addIPList(msg.substring(0, msg.indexOf('&')), msg.substring(msg.indexOf('&') + 1, msg.length()));
+		((LaptopDevice)getDevice(deviceId)).addIPList(msg);
 	}
 	
 	public void updateKeyLog(String deviceId, String msg) {

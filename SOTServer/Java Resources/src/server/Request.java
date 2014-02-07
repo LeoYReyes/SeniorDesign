@@ -16,9 +16,9 @@ public class Request extends Observable implements Comparable<Request> {
 	public static int requestId = 0;
 	
 	// Request Types
-	public static final int UPDATE_DEVICE_IP = 1;
-	public static final int UPDATE_DEVICE_KEYLOG = 2;
-	public static final int UPDATE_DEVICE_GPS = 3;
+	public static final int UPDATE_DEVICE_IP = 2;
+	public static final int UPDATE_DEVICE_KEYLOG = 3;
+	public static final int UPDATE_DEVICE_GPS = 5;
 	public static final int LOAD_DEVICE = 4;
 	
 	private int requestType;		// Type of request

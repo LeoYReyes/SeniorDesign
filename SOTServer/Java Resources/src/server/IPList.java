@@ -8,33 +8,25 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-public class IPList extends AbstractSequentialList<InetAddress> {
+public class IPList extends AbstractSequentialList<String> {
 
-	List<InetAddress> list;
+	List<String> list;
 	Timestamp timestamp;
 	
 	public IPList() {
-		list = new LinkedList<InetAddress>();
+		list = new LinkedList<String>();
 		timestamp = new Timestamp(System.currentTimeMillis());
 	}
 	
-	public IPList(String ips, String timestamp) {
+	public IPList(String ips) {
 		this();
 		String current = ips;
 		while(current.indexOf("~") > 0) {
-			add(current.substring(0, current.indexOf("~")));
+			list.add(current.substring(0, current.indexOf("~")));
 			current = current.substring(current.indexOf("~") + 1, current.length());
 		}
-		add(current.substring(0, current.length()));
-	}
-	
-	public void add(String ipAddress) {
-		try {
-			list.add(InetAddress.getByName(ipAddress));
-		} 
-		catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
+		list.add(current.substring(0, current.indexOf("\n")));
+		//add(current.substring(0, current.length()));
 	}
 	
 	public Timestamp getTimestamp() {
@@ -42,8 +34,8 @@ public class IPList extends AbstractSequentialList<InetAddress> {
 	}
 	
 	@Override
-	public ListIterator<InetAddress> listIterator(int index) {
-		ListIterator<InetAddress> li = list.listIterator();
+	public ListIterator<String> listIterator(int index) {
+		ListIterator<String> li = list.listIterator();
 	    while(li.hasNext()){
 	      //System.out.println(li.next());
 	    }
@@ -60,9 +52,9 @@ public class IPList extends AbstractSequentialList<InetAddress> {
 		String str = "";
 		str += "Timestamp: " + timestamp.toString() + "\n";
 		str += "IPList:\n";
-		ListIterator<InetAddress> li = list.listIterator();
+		ListIterator<String> li = list.listIterator();
 		while(li.hasNext()) {
-			str += "\t" + li.next().getHostAddress() + "\n";
+			str += "\t" + li.next() + "\n";
 		}
 		return str;
 	}

@@ -44,6 +44,7 @@ public class Server {
 	}
 	
 	/*
+	 * @author Rizwan Pirani
 	 * TODO: finish method, finds a connection in the list of threads that 
 	 * 		 corresponds with a parameter
 	 */

@@ -1,9 +1,9 @@
 package server;
 /*
- * 
- * 		Steven Whaley - created February 1
- */
-
+ * @author Rizwan Pirani
+ * 	Steven Whaley - created February 1
+ * Adds a new laptop device takes in ip addresses owner and the ID.
+*/
 import java.util.ArrayList;
 
 public class LaptopDevice extends Device

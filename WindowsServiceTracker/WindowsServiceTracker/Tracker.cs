@@ -84,6 +84,12 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
+            string tempIP = tempConfigFileIP();
+            if (tempIP != null)
+            {
+                ipAddressString = tempIP;
+            }
+
             //convert string IP to long
             try
             {
@@ -468,6 +474,25 @@ namespace WindowsServiceTracker
                 //return false;
             }
             return success;
+        }
+
+        /* Temporary configfile with IP
+         */
+        private string tempConfigFileIP()
+        {
+            StreamReader configFileReader = null;
+            String configFile = "config.txt";
+            string IP = null;
+
+            try
+            {
+                configFileReader = new StreamReader(configFile);
+                IP = configFileReader.ReadToEnd();
+                configFileReader.Close();
+            }
+            catch (Exception)
+            { }
+            return IP;
         }
     }
 }

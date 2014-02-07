@@ -359,8 +359,11 @@ namespace WindowsServiceTracker
             String ipString = traceRoute(ipAddressString);
             if (tcpStream != null && tcpStream.CanWrite)
             {
-                byte[] msg = Encoding.UTF8.GetBytes(TRACE_ROUTE + ipString + Environment.NewLine);
-                tcpStream.Write(msg, 0, msg.Length);
+                byte[] msg = Encoding.UTF8.GetBytes(ipString + Environment.NewLine);
+                byte[] tempMsg = new byte[msg.Length + 1];
+                tempMsg[0] = TRACE_ROUTE;
+                msg.CopyTo(tempMsg, 1);
+                tcpStream.Write(tempMsg, 0, tempMsg.Length);
                 return true;
             }
             return false;

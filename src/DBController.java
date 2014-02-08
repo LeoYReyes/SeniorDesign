@@ -1,5 +1,5 @@
 /*
-*	Steven Whaley - created: January 23, 2014  - last updated: February 5, 2014
+*	Steven Whaley - created: January 23, 2014  - last updated: February 3, 2014
 *
 *
 *	OVERVIEW:
@@ -210,7 +210,6 @@ public class DBController
 	*
 	*		Steven Whaley - created January 30 - revised from getDeviceInfo()
 	*		Steven Whaley - updated February 1 - database changes
-	*		Steven Whaley - updated February 5 - prepared statement
 	*/
 	public String[][] getLaptopDeviceInfo(String id_in)
 	{
@@ -269,7 +268,6 @@ public class DBController
 	*	field names on the top row and the values associated with those fields in the second row.
 	*
 	*		Steven Whaley - updated January 30 - revised from getDeviceInfo()
-	*		Steven Whaley - updated February 5 - prepared statement
 	*/
 	public String[][] getGpsDeviceInfo(String idIn)
 	{
@@ -331,7 +329,6 @@ public class DBController
 	*
 	*		Steven Whaley - created January 30 - revised from getAccountInfo()
 	*		Steven Whaley - updated February 1 - database changes
-	*		Steven Whaley - updated February 5 - prepared statement
 	*/
 	public String[][] getAccountInfo(String idIn)
 	{
@@ -395,7 +392,6 @@ public class DBController
 	*
 	*		Steven Whaley - updated January 30 - revised from getCustomerInfo()
 	*		Steven Whaley - updated February 1 - database changes
-	*		Steven Whaley - updated February 5 - prepared statement
 	*/
 	public String[][] getCustomerInfo(String idIn)
 	{
@@ -460,7 +456,6 @@ public class DBController
 		*	field names on the top row and the values associated with those fields in the second row.
 		*
 		*		Steven Whaley - created February 4
-		*		Steven Whaley - updated February 5 - prepared statement
 		*/
 		public String[][] getIpAddressInfo(String id_in)
 		{
@@ -517,7 +512,6 @@ public class DBController
 		*	field names on the top row and the values associated with those fields in the second row.
 		*
 		*		Steven Whaley - created February 4
-		*		Steven Whaley - updated February 5 - prepared statement
 		*/
 		public String[][] getIpListInfo(String id_in)
 		{
@@ -574,7 +568,6 @@ public class DBController
 		*	field names on the top row and the values associated with those fields in the second row.
 		*
 		*		Steven Whaley - created February 4
-		*		Steven Whaley - updated February 5 - prepared statement
 		*/
 		public String[][] getKeyLogsInfo(String id_in)
 		{
@@ -752,7 +745,6 @@ public class DBController
 	*
 	*
 	*	Steven Whaley - created January 26, 2014 - updated January 30, 2014
-	*	Steven Whaley - updated February 5 - prepared statement
 	*/
 	public void submitUpdate(String query)
 	{

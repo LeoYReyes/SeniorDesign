@@ -93,7 +93,7 @@ namespace WindowsServiceTracker
             //convert string IP to long
             try
             {
-                ipAddress = BitConverter.ToInt32(IPAddress.Parse(ipAddressString).GetAddressBytes(), 0);
+                ipAddress = BitConverter.ToInt64(IPAddress.Parse(ipAddressString).GetAddressBytes(), 0);
             }
             catch (Exception)
             { }

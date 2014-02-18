@@ -3,13 +3,16 @@ package sot.seniordesign.smsgateway;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 import android.os.AsyncTask;
 
 public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean> {
 	public static final int NO_CONNECTION = 0;
 	public static final int CONNECTION = 1;
+	public static final int TIMEOUT = 10000;
 	
 	private SMSActivity parentActivity;
 	private String ip = "";
@@ -35,7 +38,9 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean> {
 		try {
 			ip = arg[0];
 			port = arg[1];
-			tcp = new Socket(ip, Integer.parseInt(port));
+			SocketAddress serverInfo = new InetSocketAddress(ip, Integer.parseInt(port));
+			tcp = new Socket();
+			tcp.connect(serverInfo, TIMEOUT);
 			fromServer = new BufferedReader(new InputStreamReader(tcp.getInputStream()));
 			toServer = new DataOutputStream(tcp.getOutputStream());
 			publishProgress(CONNECTION);

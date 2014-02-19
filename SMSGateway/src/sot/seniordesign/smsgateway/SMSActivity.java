@@ -9,20 +9,23 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class SMSActivity extends Activity {
+public class SMSActivity extends Activity 
+{
 	
 	// true when the application is connecting or connected to a server
 	private boolean connection = false;
 	private TCPAsyncTask tcp;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_sms);
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.sm, menu);
 		return true;

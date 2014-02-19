@@ -7,9 +7,13 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.telephony.SmsManager;
 
-public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean> {
+public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean> 
+{
 	public static final int NO_CONNECTION = 0;
 	public static final int CONNECTION = 1;
 	public static final int TIMEOUT = 10000;
@@ -29,13 +33,15 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean> {
 		keepAlive = false;
 	}
 
-	protected Boolean doInBackground(String... arg) {
+	protected Boolean doInBackground(String... arg) 
+	{
 		Socket tcp = null;
 		BufferedReader fromServer = null;
 		DataOutputStream toServer = null;
 		
 		keepAlive = true;
-		try {
+		try 
+		{
 			ip = arg[0];
 			port = arg[1];
 			SocketAddress serverInfo = new InetSocketAddress(ip, Integer.parseInt(port));
@@ -45,7 +51,8 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean> {
 			toServer = new DataOutputStream(tcp.getOutputStream());
 			publishProgress(CONNECTION);
 		}
-		catch (Exception e) {
+		catch (Exception e) 
+		{
 			keepAlive = false;
 		}
 		
@@ -59,15 +66,24 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean> {
 			}
 		}
 		
-		try {
+		try 
+		{
 			fromServer.close();
 			toServer.close();
 			tcp.close();
 		}
-		catch (Exception e) {
+		catch (Exception e) 
+		{
 		}
 		
 		return Boolean.TRUE;
+	}
+	
+	private void sendSMS(String phoneNum, String msg)
+	{
+		PendingIntent pend = PendingIntent.getActivity(parentActivity, 0, new Intent(parentActivity, SMSActivity.class), 0);
+		SmsManager sms = SmsManager.getDefault();
+		sms.sendTextMessage(phoneNum, null, msg, pend, null);
 	}
 	
 	@Override

@@ -3,6 +3,7 @@ package webserver
 import (
 	"fmt"
 	"net/http"
+	"session"
 	"time"
 	"websocket"
 )
@@ -21,6 +22,12 @@ const (
 	maxMessageSize = 512
 )
 
+type userSession struct {
+	userId      string
+	inSession   bool
+	currentPage string
+}
+
 // connection is an middleman between the websocket connection and the hub
 type connection struct {
 	// The websocket connection
@@ -29,6 +36,8 @@ type connection struct {
 	// Buffered channel of outbound messages
 	send chan []byte
 }
+
+var store = sessions.NewCookieStore([]byte("its-the-most-wonderful-time"))
 
 // readPump pumps messages from the websocket connection to the hub
 func (c *connection) readPump() {
@@ -101,4 +110,15 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	h.register <- c
 	go c.writePump()
 	c.readPump()
+}
+
+func serveSession(w http.ResponseWriter, r *http.Request) {
+	// Get a session. We're ignoring the error resulted from decoding an
+	// existing session: Get() always returns a session, even if empty.
+	session, _ := store.Get(r, "session-name")
+	// Set some session values.
+	session.Values["userId"] = "bar"
+	session.Values[42] = 43
+	// Save it.
+	session.Save(r, w)
 }

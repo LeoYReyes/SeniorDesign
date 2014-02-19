@@ -3,7 +3,9 @@ package webserver
 import (
 	"fmt"
 	"html/template"
+	"mux"
 	"net/http"
+	"schema"
 )
 
 // for use with templates
@@ -26,8 +28,23 @@ func handle(t string) (string, http.HandlerFunc) {
 	}
 }
 
-func Test() {
-	fmt.Println("test")
+func formHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		// Handle error
+		fmt.Println("ParseForm error: ", err)
+	}
+	//workorder := new(WorkOrder)
+	// r.PostForm is a map of our POST form values
+	//err = decoder.Decode(workorder, r.PostForm)
+	fmt.Println(r.PostForm)
+	//workorder.contactInfo.firstName = r.PostForm.Get("contactInfo.firstName")
+	if err != nil {
+		// Handle error
+		fmt.Println("decoder error: ", err)
+	}
+	fmt.Println(workorder)
+	// Do something workorder
 }
 
 func StartWebServer() {
@@ -36,10 +53,14 @@ func StartWebServer() {
 
 	go h.run()
 
-	http.HandleFunc(handle("mapUser"))
-	http.HandleFunc(handle("webSocketTest"))
-	http.HandleFunc(handle("messager"))
-	http.HandleFunc("/ws", serveWs)
+	r := mux.NewRouter()
+
+	r.HandleFunc(handle("mapUser"))
+	r.HandleFunc(handle("webSocketTest"))
+	r.HandleFunc(handle("messager"))
+	r.HandleFunc("/ws", serveWs)
+
+	r.Handle("/", r)
 
 	// our server is one line!
 	http.ListenAndServe(":8080", nil)

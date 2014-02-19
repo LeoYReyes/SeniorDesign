@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	webserver.StartWebServer()
+	go webserver.StartWebServer()
 }

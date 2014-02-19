@@ -24,8 +24,9 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f080003;
+        public static final int action_settings=0x7f080004;
         public static final int connectionButton=0x7f080002;
+        public static final int connectionStatus=0x7f080003;
         public static final int hostIPText=0x7f080000;
         public static final int hostPortText=0x7f080001;
     }
@@ -40,6 +41,10 @@ public final class R {
         public static final int app_name=0x7f050000;
         public static final int button_connect=0x7f050003;
         public static final int button_disconnect=0x7f050004;
+        public static final int connection_connected=0x7f050008;
+        public static final int connection_connecting=0x7f050007;
+        public static final int connection_disconnecting=0x7f050009;
+        public static final int connection_hide=0x7f050006;
         public static final int edit_message_ip=0x7f050002;
         public static final int edit_message_port=0x7f050005;
     }

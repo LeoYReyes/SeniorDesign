@@ -7,5 +7,9 @@
     <string name="button_connect">Connect</string>
     <string name="button_disconnect">Disconnect</string>
     <string name="edit_message_port">Host port</string>
+    <string name="connection_hide"/>
+    <string name="connection_connecting">Connecting...</string>
+    <string name="connection_connected">Connected</string>
+    <string name="connection_disconnecting">Disconnecting...</string>
 
 </resources>

@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 /**
  * 
@@ -78,12 +79,14 @@ public class SMSActivity extends Activity
 		EditText ipText = (EditText) findViewById(R.id.hostIPText);
 		EditText portText = (EditText) findViewById(R.id.hostPortText);
 		Button button = (Button) findViewById(R.id.connectionButton);
+		TextView connectionText = (TextView) findViewById(R.id.connectionStatus);
 		
 		connection = true;
 		ipText.setEnabled(false);
 		portText.setEnabled(false);
 		button.setEnabled(true);
 		button.setText(getResources().getString(R.string.button_disconnect));
+		connectionText.setText(getResources().getString(R.string.connection_connecting));
 		
 		tcp = new TCPAsyncTask(this);
 		tcp.execute(ipText.getText().toString(), portText.getText().toString());
@@ -99,8 +102,10 @@ public class SMSActivity extends Activity
 		EditText ipText = (EditText) findViewById(R.id.hostIPText);
 		EditText portText = (EditText) findViewById(R.id.hostPortText);
 		Button button = (Button) findViewById(R.id.connectionButton);
+		TextView connectionText = (TextView) findViewById(R.id.connectionStatus);
 		
 		connection = false;
+		connectionText.setText(getResources().getString(R.string.connection_disconnecting));
 		button.setText(getResources().getString(R.string.button_disconnect));
 		ipText.setEnabled(false);
 		portText.setEnabled(false);
@@ -116,8 +121,10 @@ public class SMSActivity extends Activity
 		EditText ipText = (EditText) findViewById(R.id.hostIPText);
 		EditText portText = (EditText) findViewById(R.id.hostPortText);
 		Button button = (Button) findViewById(R.id.connectionButton);
+		TextView connectionText = (TextView) findViewById(R.id.connectionStatus);
 		
 		connection = false;
+		connectionText.setText(getResources().getString(R.string.connection_hide));
 		button.setText(getResources().getString(R.string.button_connect));
 		ipText.setEnabled(true);
 		portText.setEnabled(true);
@@ -129,7 +136,8 @@ public class SMSActivity extends Activity
 	 */
 	public void notConnected()
 	{
-		
+		TextView connectionText = (TextView) findViewById(R.id.connectionStatus);
+		connectionText.setText(getResources().getString(R.string.connection_connecting));
 	}
 	
 	/**
@@ -137,7 +145,8 @@ public class SMSActivity extends Activity
 	 */
 	public void connected()
 	{
-		
+		TextView connectionText = (TextView) findViewById(R.id.connectionStatus);
+		connectionText.setText(getResources().getString(R.string.connection_connected));
 	}
 
 }

@@ -8,7 +8,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".SMSActivity" >
+    tools:context=".SMSActivity"
+    android:keepScreenOn="true" >
 
        <EditText
            android:id="@+id/hostIPText"
@@ -31,13 +32,29 @@
            android:ems="10"
            android:hint="@string/edit_message_port" />
 
-       <Button
-           android:id="@+id/connectionButton"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_marginBottom="10dp"
-           android:layout_marginTop="10dp"
-           android:onClick="connectFunction"
-           android:text="@string/button_connect" />
+       <RelativeLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content" >
+
+           <Button
+               android:id="@+id/connectionButton"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_alignParentLeft="true"
+               android:layout_below="@+id/connectionButton"
+               android:onClick="connectFunction"
+               android:text="@string/button_connect" />
+
+           <TextView
+               android:id="@+id/connectionStatus"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:layout_alignBaseline="@+id/connectionButton"
+               android:layout_alignBottom="@+id/connectionButton"
+               android:layout_alignParentRight="true"
+               android:text="@string/connection_hide"
+               android:textAppearance="?android:attr/textAppearanceMedium" />
+
+       </RelativeLayout>
 
 </LinearLayout>

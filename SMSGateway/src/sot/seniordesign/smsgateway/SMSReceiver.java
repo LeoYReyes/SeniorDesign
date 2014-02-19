@@ -15,21 +15,29 @@ import android.telephony.SmsMessage;
  */
 public class SMSReceiver extends BroadcastReceiver {
 	
-	private LinkedList<SmsMessage> msgList = new LinkedList<SmsMessage>();
+	private static volatile LinkedList<SmsMessage> msgList = null;
+	private static final String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
 
 	/**
 	 * Receives SMS and places them in a linked list
 	 */
 	@Override
 	public void onReceive(Context arg0, Intent arg1) {
-		Bundle bundle = arg1.getExtras();
-		
-		if (bundle != null)
+		if (arg1.getAction().equals(SMS_RECEIVED))
 		{
-			Object[] pdus = (Object[]) bundle.get("pdus");
-			for (int i = 0; i < pdus.length; i++)
+			if (msgList == null)
 			{
-				msgList.addLast(SmsMessage.createFromPdu((byte[])pdus[i]));
+				msgList = new LinkedList<SmsMessage>();
+			}
+			Bundle bundle = arg1.getExtras();
+			
+			if (bundle != null)
+			{
+				Object[] pdus = (Object[]) bundle.get("pdus");
+				for (int i = 0; i < pdus.length; i++)
+				{
+					msgList.addLast(SmsMessage.createFromPdu((byte[])pdus[i]));
+				}
 			}
 		}
 	}
@@ -38,8 +46,12 @@ public class SMSReceiver extends BroadcastReceiver {
 	 * 
 	 * @return True if there are any SmsMessage available
 	 */
-	public boolean hasMsg()
+	public static boolean hasMsg()
 	{
+		if (msgList == null)
+		{
+			return false;
+		}
 		return (msgList.size() > 0);
 	}
 	
@@ -47,7 +59,7 @@ public class SMSReceiver extends BroadcastReceiver {
 	 * 
 	 * @return Oldest SmsMessage available or null if there are none
 	 */
-	public SmsMessage getNextMsg()
+	public static SmsMessage getNextMsg()
 	{
 		if (hasMsg())
 		{

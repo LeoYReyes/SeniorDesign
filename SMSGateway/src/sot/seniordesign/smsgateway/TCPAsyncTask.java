@@ -96,10 +96,11 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 				try 
 				{
 					//send received SMSs to server
-					while (smsRcv.hasMsg())
+					while (SMSReceiver.hasMsg())
 					{
-						SmsMessage msg = smsRcv.getNextMsg();
-						toServer.writeChars("[" + msg.getOriginatingAddress() + "]" + msg.getMessageBody().toString() + "|");
+						SmsMessage msg = SMSReceiver.getNextMsg();
+						String output = "[" + msg.getOriginatingAddress() + "]" + msg.getMessageBody().toString() + "|";
+						toServer.write(output.getBytes("UTF-8"));
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

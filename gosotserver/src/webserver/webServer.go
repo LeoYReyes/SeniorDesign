@@ -1,11 +1,12 @@
 package webserver
 
 import (
+	"crypto/sha1"
 	"fmt"
 	"html/template"
 	"mux"
 	"net/http"
-	"schema"
+	//"schema"
 )
 
 // for use with templates
@@ -43,8 +44,23 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		// Handle error
 		fmt.Println("decoder error: ", err)
 	}
-	fmt.Println(workorder)
+	//fmt.Println(workorder)
 	// Do something workorder
+}
+
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		// Handle error
+		fmt.Println("ParseForm error: ", err)
+	}
+	h := sha1.New()
+	h.Write(r.PostForm.Get("loginPassword"))
+	fmt.Println(r.PostForm.Get("loginName"))
+	fmt.Println(r.PostForm.Get("loginPassword").([]byte))
+	fmt.Println("% x", h.Sum(nil))
+
+	http.Redirect(w, r, "/mapUser", 301)
 }
 
 func StartWebServer() {
@@ -55,16 +71,18 @@ func StartWebServer() {
 
 	r := mux.NewRouter()
 
+	r.HandleFunc(handle("home"))
 	r.HandleFunc(handle("mapUser"))
 	r.HandleFunc(handle("webSocketTest"))
 	r.HandleFunc(handle("messager"))
+	r.HandleFunc(handle("devices"))
+	r.HandleFunc(handle("users"))
+	r.HandleFunc("/login", loginHandler)
 	r.HandleFunc("/ws", serveWs)
 
-	r.Handle("/", r)
+	http.Handle("/", r)
 
 	// our server is one line!
 	http.ListenAndServe(":8080", nil)
-	if err := http.ListenAndServe(":1234", nil); err != nil {
-		fmt.Println("ListenAndServer: ", err)
-	}
+
 }

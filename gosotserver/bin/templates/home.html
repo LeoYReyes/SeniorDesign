@@ -12,7 +12,7 @@
 <script src="js/jquery-2.1.0.min.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/signup.js"></script>
-<script src="js/login.js"></script>
+<!--<script src="js/login.js"></script>-->
 </head>
 
 
@@ -51,15 +51,17 @@
   <div class="col-md-1"></div>
   
   <div class="col-md-4">
+		<form id="login-form" action="/login" method="POST">
   		<h1> Login </h1>
   		<br></br>
-        	<input id="loginName" type="email" class="form-control" placeholder="Email address" required= "autofocus"></input>
+        	<input id="loginName" name="loginName" type="email" class="form-control" placeholder="Email address" required= "autofocus"></input>
         	<br></br>
-        	<input id="loginPassword" type="password" class="form-control" placeholder="Password" required= "autofocus"></input>
+        	<input id="loginPassword" name="loginPassword" type="password" class="form-control" placeholder="Password" required= "autofocus"></input>
         	<br></br>
         	<input type="checkbox" value="remember-me"> Remember me</input>
         	<br></br>
-        	<button class="btn btn-lg btn-success btn-block" onclick="login()" type="submit">Login</button>
+        	<button class="btn btn-lg btn-success btn-block" type="submit">Login</button>
+		</form>
 	</div> 
 	
 	<div class="col-md-1"></div>

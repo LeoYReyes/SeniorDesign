@@ -5,6 +5,6 @@ import (
 )
 
 func main() {
-	comChannel := make(chan string)
-	go webserver.StartWebServer()
+	//comChannel := make(chan string)
+	webserver.StartWebServer()
 }

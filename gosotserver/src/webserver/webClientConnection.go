@@ -3,7 +3,7 @@ package webserver
 import (
 	"fmt"
 	"net/http"
-	"session"
+	"sessions"
 	"time"
 	"websocket"
 )
@@ -119,6 +119,11 @@ func serveSession(w http.ResponseWriter, r *http.Request) {
 	// Set some session values.
 	session.Values["userId"] = "bar"
 	session.Values[42] = 43
+	session.Options = &sessions.Options{
+		Path:     "/",
+		MaxAge:   86400 * 7,
+		HttpOnly: true,
+	}
 	// Save it.
 	session.Save(r, w)
 }

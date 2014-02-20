@@ -1,4 +1,4 @@
-func // testproj project testproj.go
+// testproj project testproj.go
 // personal note: export GOPATH=/Users/stevenwhaley/go/
 
 package main
@@ -482,9 +482,9 @@ func disconnect() {
 
 func main() {
 
-    //fmt.Println(GetAccountInfo("leo@auburn.edu", "369d841cdf0dd150a680931769e868d9e487452f"))
+    //fmt.Println(VerifyAccountInfo("leo@auburn.edu", "369d841cdf0dd150a680931769e868d9e487452f"))
 
-    //fmt.Println(GetAccountInfo("wrongusernameexample", "369d841cdf0dd150a680931769e868d9e487452f"))
+    //fmt.Println(VerifyAccountInfo("wrongusernameexample", "369d841cdf0dd150a680931769e868d9e487452f"))
     
-    //fmt.Println(GetAccountInfo("leo@auburn.edu", "wrongpasswordexample"))   
+    //fmt.Println(VerifyAccountInfo("leo@auburn.edu", "wrongpasswordexample"))   
 }

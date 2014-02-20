@@ -1,4 +1,5 @@
-// testproj project testproj.go
+func // testproj project testproj.go
+// personal note: export GOPATH=/Users/stevenwhaley/go/
 
 package main
 
@@ -6,7 +7,7 @@ import (
         "fmt"
         "os"
         //"bytes"
-        "encoding/json"
+      //  "encoding/json"
         "github.com/ziutek/mymysql/mysql"
         //_ "github.com/ziutek/mymysql/native" // Native engine
          _ "github.com/ziutek/mymysql/thrsafe" // Thread safe engine
@@ -21,8 +22,8 @@ type Account struct {
 
 type Coordinates struct {
     field1 int64
-    field2 float
-    field3 float
+    field2 float64
+    field3 float64
     field4 string
     field5 int64   
 }
@@ -77,9 +78,11 @@ func checkedResult(rows []mysql.Row, res mysql.Result, err error) ([]mysql.Row, 
     return rows, res
 }
 
-func GetAccountInfo() (string)  {
+func VerifyAccountInfo(username string, password string) (bool, bool)  {
 
-    out := ""
+    bool1 := false
+    bool2 := false
+    
     user := "root"
     pass := ""
     dbname := "trackerdb"
@@ -125,7 +128,7 @@ func GetAccountInfo() (string)  {
         accountInfo.Password = string(val5[:])
       //  fmt.Println(accountInfo.Password)
 
-        jsonx, _ := json.Marshal(accountInfo)
+        //jsonx, _ := json.Marshal(accountInfo)
       //  fmt.Println(string(jsonx))
        
        
@@ -138,14 +141,24 @@ func GetAccountInfo() (string)  {
         //acc1, _ := json.Marshal(x)
         //fmt.Println(string(acc1))
 
+        
+
+        if accountInfo.UserName == username{
+            bool1 = true
+        }
+        if accountInfo.Password == password{
+            bool2 = true
+        }
+
             fmt.Print("Close connection... ")
             checkError(db.Close())
             printOK()
 
-        out = string(jsonx)
+      //  out = string(jsonx)
 
     }
-     return out
+
+    return bool1, bool2
 }
 
 func GetCoordinatesInfo() {
@@ -469,6 +482,9 @@ func disconnect() {
 
 func main() {
 
-    //fmt.Println(GetAccountInfo())
-   
+    //fmt.Println(GetAccountInfo("leo@auburn.edu", "369d841cdf0dd150a680931769e868d9e487452f"))
+
+    //fmt.Println(GetAccountInfo("wrongusernameexample", "369d841cdf0dd150a680931769e868d9e487452f"))
+    
+    //fmt.Println(GetAccountInfo("leo@auburn.edu", "wrongpasswordexample"))   
 }

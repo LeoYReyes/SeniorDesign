@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"mux"
 	"net/http"
+	"strings"
 	//"schema"
 )
 
@@ -55,10 +56,11 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("ParseForm error: ", err)
 	}
 	h := sha1.New()
-	h.Write(r.PostForm.Get("loginPassword"))
+	h.Write([]byte(strings.Join([]string{r.PostForm.Get("loginName"), r.PostForm.Get("loginPassword")}, "")))
+
 	fmt.Println(r.PostForm.Get("loginName"))
-	fmt.Println(r.PostForm.Get("loginPassword").([]byte))
-	fmt.Println("% x", h.Sum(nil))
+	fmt.Println(r.PostForm.Get("loginPassword"))
+	fmt.Printf("% x", h.Sum(nil))
 
 	http.Redirect(w, r, "/mapUser", 301)
 }

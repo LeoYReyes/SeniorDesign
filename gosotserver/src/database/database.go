@@ -3,21 +3,22 @@
 package main
 
 import (
-		"fmt"
-		"os"
+        "fmt"
+        "os"
+        //"bytes"
         "encoding/json"
-		"github.com/ziutek/mymysql/mysql"
-		//_ "github.com/ziutek/mymysql/native" // Native engine
-		 _ "github.com/ziutek/mymysql/thrsafe" // Thread safe engine
-	)
+        "github.com/ziutek/mymysql/mysql"
+        //_ "github.com/ziutek/mymysql/native" // Native engine
+         _ "github.com/ziutek/mymysql/thrsafe" // Thread safe engine
+    ) 
+
 
 type Account struct {
-    field1 int64
-    field2 int64
-    field3 string
-    field4 string
-    field5 int64
+    UserName string
+    Password string
+
 }
+
 type Coordinates struct {
     field1 int64
     field2 float
@@ -61,23 +62,24 @@ type LaptopDevice struct {
 }
 
 func printOK() {
-	fmt.Println("OK")
+    fmt.Println("OK")
 }
 
 func checkError(err error) {
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
+    if err != nil {
+        fmt.Println(err)
+        os.Exit(1)
+    }
 }
 
 func checkedResult(rows []mysql.Row, res mysql.Result, err error) ([]mysql.Row, mysql.Result) {
-	checkError(err)
-	return rows, res
+    checkError(err)
+    return rows, res
 }
 
-func getAccountInfo() {
+func GetAccountInfo() (string)  {
 
+    out := ""
     user := "root"
     pass := ""
     dbname := "trackerdb"
@@ -109,25 +111,44 @@ func getAccountInfo() {
             }
         }
 
-        val1 := row[0].([]byte)
-        val2 := row[1].([]byte)
-        val3 := row[2].([]byte)
-        val4 := row[3].([]byte)
-        //val5 := row[4].([]byte)
 
-        os.Stdout.Write(val1)
-        os.Stdout.Write(val2)
-        os.Stdout.Write(val3)
-        os.Stdout.Write(val4)
-       // os.Stdout.Write(val5)
+        accountInfo := new (Account)
+        
+        //val2 := row[0].([]byte)
+        //val3 := row[1].([]byte)
+        val4 := row[2].([]byte)
+        val5 := row[3].([]byte)
+        
+        accountInfo.UserName = string(val4[:])
+      //  fmt.Println(accountInfo.UserName)
+        
+        accountInfo.Password = string(val5[:])
+      //  fmt.Println(accountInfo.Password)
+
+        jsonx, _ := json.Marshal(accountInfo)
+      //  fmt.Println(string(jsonx))
+       
+       
+      //  m := &Account{UserName: "leo", Password: "pass"}
+        //json1, _ := json.Marshal(m)
+        //fmt.Println(string(json1))
 
 
-        a := Account{val1, val2, 1294706395881547000}
-        b, err := json.Marshal(m)
+        //x := &Account{UserName: "test", Password: "pass"}
+        //acc1, _ := json.Marshal(x)
+        //fmt.Println(string(acc1))
+
+            fmt.Print("Close connection... ")
+            checkError(db.Close())
+            printOK()
+
+        out = string(jsonx)
+
     }
+     return out
 }
 
-func getCoordinatesInfo() {
+func GetCoordinatesInfo() {
 
     user := "root"
     pass := ""
@@ -174,7 +195,7 @@ func getCoordinatesInfo() {
     }
 }
 
-func getCustomerInfo() {
+func GetCustomerInfo() {
 
     user := "root"
     pass := ""
@@ -224,7 +245,7 @@ func getCustomerInfo() {
     }
 }
 
-func getGpsDeviceInfo() {
+func GetGpsDeviceInfo() {
 
     user := "root"
     pass := ""
@@ -268,7 +289,7 @@ func getGpsDeviceInfo() {
     }
 }
 
-func getIpAddressInfo() {
+func GetIpAddressInfo() {
 
     user := "root"
     pass := ""
@@ -311,7 +332,7 @@ func getIpAddressInfo() {
     }
 }
 
-func getIpListInfo() {
+func GetIpListInfo() {
 
     user := "root"
     pass := ""
@@ -397,7 +418,7 @@ func getKeyLogsInfo() {
     }
 }
 
-func getLaptopDeviceInfo() {
+func GetLaptopDeviceInfo() {
 
     user := "root"
     pass := ""
@@ -448,12 +469,6 @@ func disconnect() {
 
 func main() {
 
-   // getAccountInfo()
-    //getCoordinatesInfo()
-    getCustomerInfo()
-    //getGpsDeviceInfo()
-    //getIpAddressInfo()
-    //getIpListInfo()
-    //getKeyLogsInfo()
-    //getLaptopDeviceInfo()
+    //fmt.Println(GetAccountInfo())
+   
 }

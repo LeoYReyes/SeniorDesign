@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -30,8 +32,10 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 	private String ip = "";
 	private String port = "";
 	private volatile boolean keepAlive;
-	private SMSReceiver smsRcv;
 	private String msgFromServer;
+	private long timeout = 30000;
+	private long pingFreq = 9000;
+	private String pingMsg = "|";
 
 	/**
 	 * @param parentAct Reference to activity that called it
@@ -56,15 +60,17 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 	 */
 	protected Boolean doInBackground(String... arg) 
 	{
-		smsRcv = new SMSReceiver();
 		Socket tcp = null;
 		BufferedReader fromServer = null;
-		DataOutputStream toServer = null;
+		OutputStream toServer = null;
+		long lastRecvMsg = 0;
+		long lastPing = 0;
+		boolean receivedPing = true;
 		
 		keepAlive = true;
 		while (keepAlive)
 		{
-			if (tcp == null || !tcp.isConnected())
+			if (!receivedPing || tcp == null || !tcp.isConnected())
 			{
 				publishProgress(NO_CONNECTION);
 				try 
@@ -76,8 +82,10 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 					tcp = new Socket();
 					tcp.connect(serverInfo, TIMEOUT);
 					fromServer = new BufferedReader(new InputStreamReader(tcp.getInputStream()));
-					toServer = new DataOutputStream(tcp.getOutputStream());
+					toServer = tcp.getOutputStream();
 					publishProgress(CONNECTION);
+					receivedPing = true;
+					lastRecvMsg = System.currentTimeMillis();
 				}
 				catch (Exception e) 
 				{
@@ -90,7 +98,7 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 				}
 			}
 			
-			while (keepAlive && tcp != null && tcp.isConnected())
+			while (receivedPing && keepAlive && tcp != null)
 			{
 				// read SMS message and forward to server
 				try 
@@ -110,17 +118,29 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 				// Read TCP messages and forward via SMS
 				try
 				{
-					char next;
+					boolean msgRecv = false;
+					char[] next = new char[1];
+					
+					if (fromServer.ready()){
+						msgRecv = true;
+					}
+					
 					while (fromServer.ready())
 					{
-						next = (char) fromServer.read();
-						msgFromServer += next;
-						if (next == '|')
+						fromServer.read(next, 0, 1);
+						msgFromServer += next[0];
+						if (next[0] == '|')
 						{
 							sendSMS(msgFromServer);
 							msgFromServer = "";
 						}
 					}
+					
+					if (msgRecv)
+					{
+						lastRecvMsg = System.currentTimeMillis();
+					}
+					
 				} catch (Exception e)
 				{
 				}
@@ -128,8 +148,25 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 				
 				try 
 				{
+					long time = System.currentTimeMillis();
+					if (time - lastRecvMsg > timeout)
+					{
+						receivedPing = false;
+					}
+					
+					if (time - lastPing > pingFreq)
+					{
+						lastPing = time;
+						toServer.write(pingMsg.getBytes("UTF-8"));
+					}
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
@@ -156,9 +193,9 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 	 */
 	private void sendSMS(String phoneNum, String msg)
 	{
-		PendingIntent pend = PendingIntent.getActivity(parentActivity, 0, new Intent(parentActivity, SMSActivity.class), 0);
+		//PendingIntent pend = PendingIntent.getActivity(parentActivity, 0, new Intent(parentActivity, SMSActivity.class), 0);
 		SmsManager sms = SmsManager.getDefault();
-		sms.sendTextMessage(phoneNum, null, msg, pend, null);
+		sms.sendTextMessage(phoneNum, null, msg, null/*pend*/, null);
 	}
 	
 	/**
@@ -200,7 +237,7 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 	}
 	
 	/**
-	 * Called automatically whenn the thread ends
+	 * Called automatically when the thread ends
 	 */
 	@Override
 	protected void onPostExecute(Boolean bool)

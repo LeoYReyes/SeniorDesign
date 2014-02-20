@@ -5,10 +5,60 @@ package main
 import (
 		"fmt"
 		"os"
+        "encoding/json"
 		"github.com/ziutek/mymysql/mysql"
 		//_ "github.com/ziutek/mymysql/native" // Native engine
 		 _ "github.com/ziutek/mymysql/thrsafe" // Thread safe engine
 	)
+
+type Account struct {
+    field1 int64
+    field2 int64
+    field3 string
+    field4 string
+    field5 int64
+}
+type Coordinates struct {
+    field1 int64
+    field2 float
+    field3 float
+    field4 string
+    field5 int64   
+}
+type Customer struct {
+    field1 int64
+    field2 string
+    field3 string
+    field4 string
+    field5 string
+    field6 string
+}
+type GpsDevice struct {
+    field1 int64
+    field2 string
+    field3 int64
+}
+type IpAddress struct {
+    field1 int64
+    field2 string
+    field3 int64
+}
+type IpList struct {
+    field1 int64
+    field2 int64
+    field3 string
+}
+type KeyLogs struct {
+    field1 int64
+    field2 string
+    field3 string
+}
+type LaptopDevice struct {
+    field1 int64
+    field2 string
+    field3 int64
+    field4 string
+}
 
 func printOK() {
 	fmt.Println("OK")
@@ -70,6 +120,10 @@ func getAccountInfo() {
         os.Stdout.Write(val3)
         os.Stdout.Write(val4)
        // os.Stdout.Write(val5)
+
+
+        a := Account{val1, val2, 1294706395881547000}
+        b, err := json.Marshal(m)
     }
 }
 

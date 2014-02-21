@@ -61,7 +61,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.PostForm.Get("loginName"))
 	fmt.Println(r.PostForm.Get("loginPassword"))
 	fmt.Printf("% x", h.Sum(nil))
-
+	//TODO: validate login and start session
+	serveSession(w, r)
 	http.Redirect(w, r, "/mapUser", 301)
 }
 
@@ -75,6 +76,8 @@ func StartWebServer() {
 
 	r.HandleFunc(handle("home"))
 	r.HandleFunc(handle("mapUser"))
+	r.HandleFunc(handle("homeAdmin"))
+	r.HandleFunc(handle("mapAdmin"))
 	r.HandleFunc(handle("webSocketTest"))
 	r.HandleFunc(handle("messager"))
 	r.HandleFunc(handle("devices"))

@@ -25,6 +25,7 @@ const (
 type userSession struct {
 	userId      string
 	inSession   bool
+	isAdmin     bool
 	currentPage string
 }
 
@@ -36,8 +37,6 @@ type connection struct {
 	// Buffered channel of outbound messages
 	send chan []byte
 }
-
-var store = sessions.NewCookieStore([]byte("its-the-most-wonderful-time"))
 
 // readPump pumps messages from the websocket connection to the hub
 func (c *connection) readPump() {
@@ -112,13 +111,15 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	c.readPump()
 }
 
+var store = sessions.NewCookieStore([]byte("its-the-most-wonderful-time"))
+
 func serveSession(w http.ResponseWriter, r *http.Request) {
 	// Get a session. We're ignoring the error resulted from decoding an
 	// existing session: Get() always returns a session, even if empty.
-	session, _ := store.Get(r, "session-name")
+	session, _ := store.Get(r, r.PostForm.Get("loginName"))
 	// Set some session values.
-	session.Values["userId"] = "bar"
-	session.Values[42] = 43
+	session.Values["userId"] = r.PostForm.Get("loginName")
+	//session.Values[42] = 43
 	session.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   86400 * 7,

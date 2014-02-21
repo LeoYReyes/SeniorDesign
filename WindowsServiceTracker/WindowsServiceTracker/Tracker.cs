@@ -31,11 +31,14 @@ namespace WindowsServiceTracker
         public const byte KEYLOG_OFF = 1;
         public const byte TRACE_ROUTE = 2;
         public const byte KEYLOG = 3;
+        public const byte NOT_STOLEN = 4;
+        public const byte STOLEN = 5;
         public const byte NO_OP = 255;
         private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
+        public const int checkInWaitTime = 60000;
 
         //Variables
         private volatile String ipAddressString = "172.17.57.149";
@@ -45,6 +48,7 @@ namespace WindowsServiceTracker
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
         private KeyloggerCommInterface pipeProxy;
         private Thread tcpThread;
+        private volatile bool connectionKeepAlive = true;
         private volatile bool tcpKeepAlive = true;
         private volatile string macAddress = null;
         private volatile String keyLogFilePath;
@@ -54,6 +58,8 @@ namespace WindowsServiceTracker
         // not be used by other threads without making them volatile.
         private NetworkStream tcpStream;
         private TcpClient tcp;
+        private UdpClient udp;
+        private bool reportedStolen = false;
 
         /* Constructor for the service. Currently only creates an event log source
          * that is used to output errors with in the windows event logs.
@@ -110,6 +116,7 @@ namespace WindowsServiceTracker
             StopKeylogger();
             Disconnect();
             tcpKeepAlive = false;
+            connectionKeepAlive = false;
             if (tcpThread != null && tcpThread.IsAlive)
             {
                 tcpThread.Join();
@@ -210,13 +217,61 @@ namespace WindowsServiceTracker
             return mac;
         }
 
+        private void IpConnectionThread() //todo Make thread start this instead of maintain connection
+        {
+            macAddress = getMacAddress();
+            while (connectionKeepAlive)
+            {
+                UdpCheckin();
+
+                while (reportedStolen)
+                {
+                    MaintainServerConnection(); //todo change reportStolen
+                }
+            }
+        }
+
+        private void UdpCheckin()
+        {
+            while (!connectUdp())
+            {
+                Thread.Sleep(5000);
+            }
+
+            while (connectionKeepAlive)
+            {
+                //todo finish
+                // set reportedstolen based on server response
+            }
+
+            try
+            {
+                udp.Close();
+            } catch (Exception)
+            {
+
+            }
+        }
+
+        private bool connectUdp()
+        {
+            try
+            {
+                udp = new UdpClient(ipPort);
+                return true;
+            } catch (Exception)
+            {
+                return false;
+            }
+        }
+
         /* This method is used to create a thread that will constantly try to connect
          * to the server while it is active. When a connection is established, the
          * MAC address is immidiately sent to the server and it waits for commands.
          */
         private void MaintainServerConnection()
         {
-            macAddress = getMacAddress();
+            tcpKeepAlive = true;
             int maxwaitBetweenConnects = 60;
             int waitToConnect = 0;
             int bufferSize = 1;
@@ -276,6 +331,12 @@ namespace WindowsServiceTracker
                                     case KEYLOG:
                                         sendKeylog();
                                         break;
+                                    case NOT_STOLEN:
+                                        tcpKeepAlive = false;
+                                        reportedStolen = false;
+                                        break;
+                                    case STOLEN:
+                                        break;
                                     default:
                                         break;
                                 }
@@ -286,6 +347,7 @@ namespace WindowsServiceTracker
                     }
                 }
             }
+            tcp.Close(); //new
         }
 
         /* Creates a new connection with the server.

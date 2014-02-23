@@ -224,100 +224,12 @@ namespace WindowsServiceTracker
             macAddress = getMacAddress();
             while (connectionKeepAlive)
             {
-                UdpCheckin();
-
-                while (reportedStolen && connectionKeepAlive)
+                MaintainServerConnection();
+                if (!reportedStolen)
                 {
-                    MaintainServerConnection(); //todo change reportStolen
+                    Thread.Sleep(checkInWaitTime);
                 }
             }
-        }
-
-        private void UdpCheckin() //checkInWaitTime
-        {
-            int time = 0;
-            int delay = 5000;
-
-            while (connectionKeepAlive && !connectUdp())
-            {
-                Thread.Sleep(delay);
-            }
-
-            while (connectionKeepAlive)
-            {
-                if (time > checkInWaitTime)
-                {
-                    try
-                    {
-                        time = 0;
-                        byte[] mac = Encoding.UTF8.GetBytes(macAddress);
-                        udp.Send(mac, mac.Length);
-                    } catch (Exception)
-                    {
-
-                    }
-                }
-
-                Thread.Sleep(delay);
-                time += delay;
-            }
-
-            try
-            {
-                udp.Close();
-            } catch (Exception)
-            {
-
-            }
-        }
-
-        private bool connectUdp()
-        {
-            try
-            {
-                udp = new UdpClient(tcpIpPort);
-                UdpState state = new UdpState();
-                state.endpoint = tcpIpPort;
-                state.client = udp;
-                udp.BeginReceive(ReceiveCallback, state);
-                return true;
-            } catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        /* Callback function to that will be called when a UDP datagram arrives.
-         * Sets the object as stolen or not stolen based on the opcode received.
-         */
-        public static void ReceiveCallback(IAsyncResult ar)
-        {
-            UdpClient u = (UdpClient)((UdpState)(ar.AsyncState)).client;
-            IPEndPoint e = (IPEndPoint)((UdpState)(ar.AsyncState)).endpoint;
-
-            Byte[] receiveBytes = u.EndReceive(ar, ref e);
-
-            if (receiveBytes.Length > 0 && receiveBytes[0] == STOLEN)
-            {
-                reportedStolen = true;
-            }
-            else if (receiveBytes.Length > 0 && receiveBytes[0] == NOT_STOLEN)
-            {
-                reportedStolen = false;
-                u.BeginReceive(ReceiveCallback, ar);
-            }
-            else
-            {
-                u.BeginReceive(ReceiveCallback, ar);
-            }
-        }
-
-        /* used to pass info into the udp receive callback function
-         */
-        private class UdpState
-        {
-            public UdpClient client;
-            public IPEndPoint endpoint;
         }
 
         /* This method is used to create a thread that will constantly try to connect
@@ -331,7 +243,7 @@ namespace WindowsServiceTracker
             int waitToConnect = 0;
             int bufferSize = 1;
             byte[] buffer = new byte[bufferSize];
-            while (tcpKeepAlive)
+            while (tcpKeepAlive && connectionKeepAlive)
             {
                 if (tcp == null || !tcp.Connected)
                 {
@@ -391,6 +303,7 @@ namespace WindowsServiceTracker
                                         reportedStolen = false;
                                         break;
                                     case STOLEN:
+                                        reportedStolen = true;
                                         break;
                                     default:
                                         break;
@@ -402,7 +315,7 @@ namespace WindowsServiceTracker
                     }
                 }
             }
-            tcp.Close(); //new
+            tcp.Close();
         }
 
         /* Creates a new connection with the server.

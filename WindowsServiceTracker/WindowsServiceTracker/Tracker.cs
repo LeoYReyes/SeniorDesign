@@ -59,7 +59,7 @@ namespace WindowsServiceTracker
         private NetworkStream tcpStream;
         private TcpClient tcp;
         private UdpClient udp;
-        private bool reportedStolen = false;
+        private static bool reportedStolen = false;
 
         /* Constructor for the service. Currently only creates an event log source
          * that is used to output errors with in the windows event logs.
@@ -104,7 +104,7 @@ namespace WindowsServiceTracker
             keyLogFilePath = GetKeylogFilePath();
             StartKeylogger(); //todo remove after debugging
 
-            tcpThread = new Thread(this.MaintainServerConnection);
+            tcpThread = new Thread(this.IpConnectionThread);
             tcpThread.Start();
         }
 
@@ -114,7 +114,7 @@ namespace WindowsServiceTracker
         protected override void OnStop()
         {
             StopKeylogger();
-            Disconnect();
+            tcpDisconnect();
             tcpKeepAlive = false;
             connectionKeepAlive = false;
             if (tcpThread != null && tcpThread.IsAlive)
@@ -224,24 +224,40 @@ namespace WindowsServiceTracker
             {
                 UdpCheckin();
 
-                while (reportedStolen)
+                while (reportedStolen && connectionKeepAlive)
                 {
                     MaintainServerConnection(); //todo change reportStolen
                 }
             }
         }
 
-        private void UdpCheckin()
+        private void UdpCheckin() //checkInWaitTime
         {
+            int time = 0;
+            int delay = 5000;
+
             while (!connectUdp())
             {
-                Thread.Sleep(5000);
+                Thread.Sleep(delay);
             }
 
             while (connectionKeepAlive)
             {
-                //todo finish
-                // set reportedstolen based on server response
+                if (time > checkInWaitTime)
+                {
+                    try
+                    {
+                        time = 0;
+                        byte[] mac = Encoding.UTF8.GetBytes(macAddress);
+                        udp.Send(mac, mac.Length);
+                    } catch (Exception)
+                    {
+
+                    }
+                }
+
+                Thread.Sleep(delay);
+                time += delay;
             }
 
             try
@@ -258,11 +274,48 @@ namespace WindowsServiceTracker
             try
             {
                 udp = new UdpClient(ipPort);
+                UdpState state = new UdpState();
+                state.endpoint = ipPort;
+                state.client = udp;
+                udp.BeginReceive(ReceiveCallback, state);
                 return true;
             } catch (Exception)
             {
                 return false;
             }
+        }
+
+        /* Callback function to that will be called when a UDP datagram arrives.
+         * Sets the object as stolen or not stolen based on the opcode received.
+         */
+        public static void ReceiveCallback(IAsyncResult ar)
+        {
+            UdpClient u = (UdpClient)((UdpState)(ar.AsyncState)).client;
+            IPEndPoint e = (IPEndPoint)((UdpState)(ar.AsyncState)).endpoint;
+
+            Byte[] receiveBytes = u.EndReceive(ar, ref e);
+
+            if (receiveBytes.Length > 0 && receiveBytes[0] == STOLEN)
+            {
+                reportedStolen = true;
+            }
+            else if (receiveBytes.Length > 0 && receiveBytes[0] == NOT_STOLEN)
+            {
+                reportedStolen = false;
+                u.BeginReceive(ReceiveCallback, ar);
+            }
+            else
+            {
+                u.BeginReceive(ReceiveCallback, ar);
+            }
+        }
+
+        /* used to pass info into the udp receive callback function
+         */
+        private class UdpState
+        {
+            public UdpClient client;
+            public IPEndPoint endpoint;
         }
 
         /* This method is used to create a thread that will constantly try to connect
@@ -282,7 +335,7 @@ namespace WindowsServiceTracker
                 {
                     try 
                     {
-                        Connect();
+                        tcpConnect();
                         waitToConnect = 0;
                         getTcpStream();
                         SendStdMsg(NO_OP, macAddress, true);
@@ -352,7 +405,7 @@ namespace WindowsServiceTracker
 
         /* Creates a new connection with the server.
          */
-        private bool Connect()
+        private bool tcpConnect()
         {
             try
             {
@@ -368,7 +421,7 @@ namespace WindowsServiceTracker
 
         /* Closes the TCP connection with the server
          */
-        private bool Disconnect()
+        private bool tcpDisconnect()
         {
             try
             {

@@ -38,7 +38,7 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
-        public const int checkInWaitTime = 60000;
+        public const int checkInWaitTime = 20000;
 
         //Variables
         private volatile String ipAddressString = "127.0.0.1";
@@ -355,6 +355,7 @@ namespace WindowsServiceTracker
             try
             {
                 tcpStream = tcp.GetStream();
+                tcpStream.ReadTimeout = 5000;
             }
             catch (InvalidOperationException)
             {

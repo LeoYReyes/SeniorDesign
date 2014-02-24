@@ -1,6 +1,7 @@
 package device
 
 import (
+	"CustomRequest"
 	"fmt"
 	"net"
 )
@@ -26,6 +27,8 @@ var dh = deviceHub{
 	connections:    make(map[string]net.Conn),
 }
 
+var toServer chan *CustomRequest.Request
+var fromServer chan *CustomRequest.Request
 var deviceConn = new(mapDeviceQueueStruct)
 
 // Open a TCP socket to listen on
@@ -66,6 +69,11 @@ func Listen(listener net.Listener) {
 	}
 }
 
+func GetMessage(conn net.Conn) {
+	//buffer := make([]byte, 1024)
+	//bytesRead, err := conn.Read(buffer)
+}
+
 // Get ID from device
 func GetDeviceID(conn net.Conn) { //(string, error) {
 	buffer := make([]byte, 1024)
@@ -78,26 +86,24 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	deviceConn.ld.ID = string(buffer[0:bytesRead])
 	deviceConn.conn = conn
 	dh.mapDeviceQueue <- deviceConn
+	go GetMessage(conn)
 }
 
 // Hash the device to the connection
 func MapDeviceID() {
-	fmt.Println("Before for loop")
 	for {
-		fmt.Println("Begin for loop")
 		dc := <-dh.mapDeviceQueue
-		fmt.Println("Before hashing")
 		dh.connections[dc.ld.ID] = dc.conn
-		fmt.Println("After hashing")
 		fmt.Println(dc.ld.ID)
 	}
 }
 
-// Read from open connections
-func Read(conn net.Conn) bool {
-	buffer := make([]byte, 1024)
-	conn.Read(buffer)
-	return false
+func StartDeviceServer(fromServerIn chan *CustomRequest.Request, toServerIn chan *CustomRequest.Request) {
+	toServer = toServerIn
+	fromServer = fromServerIn
+	go MapDeviceID()
+	listener := Connect()
+	Listen(listener)
 }
 
 // Test code for server.go

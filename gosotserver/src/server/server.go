@@ -2,6 +2,7 @@ package main
 
 import (
 	"CustomRequest"
+	"device"
 	"fmt"
 	"webserver"
 )
@@ -17,5 +18,6 @@ func main() {
 	// channel can take optional capacity param to make it asynchronous
 	//comChannel := make(chan string)
 	go webserver.StartWebServer(fromWebCh, toWebCh)
+	go device.StartDeviceServer(fromDeviceCh, toDeviceCh)
 	fmt.Println(<-fromWebCh)
 }

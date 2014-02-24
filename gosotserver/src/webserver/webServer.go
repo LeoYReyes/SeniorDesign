@@ -2,6 +2,7 @@ package webserver
 
 import (
 	"crypto/sha1"
+	"databaseSOT"
 	"fmt"
 	"html/template"
 	"mux"
@@ -22,10 +23,18 @@ const viewsPath = "/"
 
 func handle(t string) (string, http.HandlerFunc) {
 	return viewsPath + t, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(t)
+		fmt.Println(r)
 		p := &Page{Name: "Leo Reyes", Title: t}
-		err := templates.ExecuteTemplate(w, t+".html", p)
-		if err != nil {
-			http.NotFound(w, r)
+		if t == "home" {
+			err := templates.ExecuteTemplate(w, t+".html", p)
+			if err != nil {
+				http.NotFound(w, r)
+			}
+		} else {
+			if r.Header.Get("Origin") != "http://"+r.Host {
+				http.Error(w, "Not logged in", 8008)
+			}
 		}
 	}
 }
@@ -60,10 +69,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(r.PostForm.Get("loginName"))
 	fmt.Println(r.PostForm.Get("loginPassword"))
-	fmt.Printf("% x", h.Sum(nil))
-	//TODO: validate login and start session
-	serveSession(w, r)
-	http.Redirect(w, r, "/mapUser", 301)
+	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
+	accountValid, passwordValid := databaseSOT.VerifyAccountInfo(r.PostForm.Get("loginName"), hashedPass)
+	if accountValid && passwordValid {
+		serveSession(w, r)
+		http.Redirect(w, r, "/home/"+r.PostForm.Get("loginName")+"/mapUser", 301)
+	} else {
+		http.Error(w, "Invalid Login", 80085)
+		return
+	}
 }
 
 func StartWebServer() {
@@ -73,6 +87,11 @@ func StartWebServer() {
 	go h.run()
 
 	r := mux.NewRouter()
+	//vars := mux.Vars(request)
+	//userId := vars["userid"]
+	//s := r.PathPrefix("/home/{userid}").Subrouter()
+	//s.HandleFunc(handle("/")).Name("userId")
+	//url, err := s.Get("userId").URL("userid")
 
 	r.HandleFunc(handle("home"))
 	r.HandleFunc(handle("mapUser"))

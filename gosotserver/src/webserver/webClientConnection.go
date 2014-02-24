@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"device"
 	"fmt"
 	"net/http"
 	"sessions"
@@ -34,8 +35,16 @@ type connection struct {
 	// The websocket connection
 	ws *websocket.Conn
 
+	// Devices associated with connection
+	deviceList []device.Device
+
 	// Buffered channel of outbound messages
 	send chan []byte
+}
+
+type Message struct {
+	conn    *connection
+	message []byte
 }
 
 // readPump pumps messages from the websocket connection to the hub
@@ -52,7 +61,7 @@ func (c *connection) readPump() {
 		if err != nil {
 			break
 		}
-		h.broadcast <- message
+		//h.inMessage <- Message{c, message}
 	}
 }
 
@@ -105,6 +114,8 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
+	//TODO: see user info from r (*http.Request) and map the connection to user
+	//		or find all devices associated with the user
 	c := &connection{send: make(chan []byte, 256), ws: ws}
 	h.register <- c
 	go c.writePump()

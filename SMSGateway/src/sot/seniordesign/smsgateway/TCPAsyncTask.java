@@ -156,8 +156,14 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 					
 					if (time - lastPing > pingFreq)
 					{
-						lastPing = time;
-						toServer.write(pingMsg.getBytes("UTF-8"));
+						try
+						{
+							lastPing = time;
+							toServer.write(pingMsg.getBytes("UTF-8"));
+						} catch (NullPointerException e)
+						{
+							
+						}
 					}
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {

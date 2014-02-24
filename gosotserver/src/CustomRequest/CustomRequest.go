@@ -3,7 +3,7 @@ package CustomRequest
 type opCode byte
 
 const (
-	checkIn
+	checkIn = iota
 
 	// Web opcodes
 	updateWebMap
@@ -38,10 +38,10 @@ const (
 	Web			== 2
 	Device		== 3
 */
-type CustomRequest struct {
-	id          int
-	destination int
-	source      int
-	opCode      byte
-	payload     string
+type Request struct {
+	Id          int
+	Destination int
+	Source      int
+	OpCode      byte
+	Payload     string
 }

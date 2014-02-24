@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"CustomRequest"
 	"crypto/sha1"
 	"databaseSOT"
 	"fmt"
@@ -80,12 +81,16 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func StartWebServer() {
+func StartWebServer(toServer chan *CustomRequest.Request, fromServer chan *CustomRequest.Request) {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
 
-	go h.run()
+	toServer = toServer
+	fromServer = fromServer
 
+	go h.run()
+	req := CustomRequest.Request{1, 1, 1, 1, "test"}
+	toServer <- &req
 	r := mux.NewRouter()
 	//vars := mux.Vars(request)
 	//userId := vars["userid"]

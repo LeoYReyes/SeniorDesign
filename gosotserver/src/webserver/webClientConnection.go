@@ -1,7 +1,7 @@
 package webserver
 
 import (
-	"device"
+	//"CustomRequest"
 	"fmt"
 	"net/http"
 	"sessions"
@@ -36,7 +36,7 @@ type connection struct {
 	ws *websocket.Conn
 
 	// Devices associated with connection
-	deviceList []device.Device
+	//deviceList []device.Device
 
 	// Buffered channel of outbound messages
 	send chan []byte
@@ -61,6 +61,7 @@ func (c *connection) readPump() {
 		if err != nil {
 			break
 		}
+		fmt.Println(message)
 		//h.inMessage <- Message{c, message}
 	}
 }
@@ -116,6 +117,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	}
 	//TODO: see user info from r (*http.Request) and map the connection to user
 	//		or find all devices associated with the user
+	//req := CustomRequest.CustomRequest{}
 	c := &connection{send: make(chan []byte, 256), ws: ws}
 	h.register <- c
 	go c.writePump()
@@ -131,6 +133,7 @@ func serveSession(w http.ResponseWriter, r *http.Request) {
 	// Set some session values.
 	session.Values["userId"] = r.PostForm.Get("loginName")
 	//session.Values[42] = 43
+	//TODO: Request database for device IDs associated with account
 	session.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   86400 * 7,

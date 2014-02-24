@@ -11,7 +11,7 @@ type hub struct {
 	inMessage chan Message
 
 	// Out going message to connections
-	outMessage chan []Message
+	outMessage chan Message
 
 	// Register requests from the connections
 	register chan *connection
@@ -40,7 +40,7 @@ func (h *hub) run() {
 		case c := <-h.unregister:
 			delete(h.connections, c)
 			close(c.send)
-		case m := <-h.outMessage:
+			/*case m := <-h.outMessage:
 			for c := range h.connections {
 				select {
 				case c.send <- m:
@@ -48,7 +48,7 @@ func (h *hub) run() {
 					close(c.send)
 					delete(h.connections, c)
 				}
-			}
+			}*/
 		}
 	}
 }

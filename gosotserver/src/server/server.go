@@ -4,6 +4,7 @@ import (
 	"CustomRequest"
 	"device"
 	"fmt"
+	//"time"
 	"webserver"
 )
 
@@ -20,4 +21,7 @@ func main() {
 	go webserver.StartWebServer(fromWebCh, toWebCh)
 	go device.StartDeviceServer(fromDeviceCh, toDeviceCh)
 	fmt.Println(<-fromWebCh)
+	for {
+
+	}
 }

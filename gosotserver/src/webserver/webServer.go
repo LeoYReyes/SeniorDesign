@@ -81,15 +81,23 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func StartWebServer(toServer chan *CustomRequest.Request, fromServer chan *CustomRequest.Request) {
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println(r)
+}
+
+// Declaration of global variable
+var toServer chan *CustomRequest.Request
+var fromServer chan *CustomRequest.Request
+
+func StartWebServer(toServerIn chan *CustomRequest.Request, fromServerIn chan *CustomRequest.Request) {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
 
-	toServer = toServer
-	fromServer = fromServer
+	toServer = toServerIn
+	fromServer = fromServerIn
 
 	go h.run()
-	req := CustomRequest.Request{1, 1, 1, 1, "test"}
+	req := CustomRequest.Request{1, 1, 1, CustomRequest.GetDeviceList, "test"}
 	toServer <- &req
 	r := mux.NewRouter()
 	//vars := mux.Vars(request)
@@ -99,13 +107,17 @@ func StartWebServer(toServer chan *CustomRequest.Request, fromServer chan *Custo
 	//url, err := s.Get("userId").URL("userid")
 
 	r.HandleFunc(handle("home"))
-	r.HandleFunc(handle("mapUser"))
+	/*r.HandleFunc(handle("mapUser"))
 	r.HandleFunc(handle("homeAdmin"))
 	r.HandleFunc(handle("mapAdmin"))
 	r.HandleFunc(handle("webSocketTest"))
 	r.HandleFunc(handle("messager"))
 	r.HandleFunc(handle("devices"))
-	r.HandleFunc(handle("users"))
+	r.HandleFunc(handle("users"))*/
+	r.HandleFunc("/home/{userid}/mapUser", testHandler)
+	/*r.HandleFunc(handle("/home/{userid}/webSocketTest"))
+	r.HandleFunc(handle("/home/{userid}/messager"))
+	r.HandleFunc(handle("/home/{userid}/devices"))*/
 	r.HandleFunc("/login", loginHandler)
 	r.HandleFunc("/ws", serveWs)
 

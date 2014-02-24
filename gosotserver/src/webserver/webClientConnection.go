@@ -1,7 +1,7 @@
 package webserver
 
 import (
-	//"CustomRequest"
+	"CustomRequest"
 	"fmt"
 	"net/http"
 	"sessions"
@@ -115,8 +115,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-	//TODO: see user info from r (*http.Request) and map the connection to user
-	//		or find all devices associated with the user
+	//TODO: see user info from r (*http.Request) get deviceID list from session
 	//req := CustomRequest.CustomRequest{}
 	c := &connection{send: make(chan []byte, 256), ws: ws}
 	h.register <- c
@@ -134,6 +133,9 @@ func serveSession(w http.ResponseWriter, r *http.Request) {
 	session.Values["userId"] = r.PostForm.Get("loginName")
 	//session.Values[42] = 43
 	//TODO: Request database for device IDs associated with account
+	//		create a Request to be sent to database
+	req := CustomRequest.Request{0, 1, 2, CustomRequest.GetDeviceList, "test"}
+	toServer <- &req
 	session.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   86400 * 7,

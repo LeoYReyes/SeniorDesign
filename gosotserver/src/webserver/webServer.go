@@ -27,16 +27,16 @@ func handle(t string) (string, http.HandlerFunc) {
 		fmt.Println(t)
 		fmt.Println(r)
 		p := &Page{Name: "Leo Reyes", Title: t}
-		if t == "home" {
-			err := templates.ExecuteTemplate(w, t+".html", p)
-			if err != nil {
-				http.NotFound(w, r)
-			}
-		} else {
-			if r.Header.Get("Origin") != "http://"+r.Host {
-				http.Error(w, "Not logged in", 8008)
-			}
+		//if t == "home" {
+		err := templates.ExecuteTemplate(w, t+".html", p)
+		if err != nil {
+			http.NotFound(w, r)
 		}
+		//} else {
+		if r.Header.Get("Origin") != "http://"+r.Host {
+			http.Error(w, "Not logged in", 8008)
+		}
+		//}
 	}
 }
 
@@ -81,15 +81,24 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func StartWebServer(toServer chan *CustomRequest.Request, fromServer chan *CustomRequest.Request) {
+func testHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("mapUser executed")
+	handle("mapUser")
+}
+
+// Declaration of global variable
+var toServer chan *CustomRequest.Request
+var fromServer chan *CustomRequest.Request
+
+func StartWebServer(toServerIn chan *CustomRequest.Request, fromServerIn chan *CustomRequest.Request) {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
 
-	toServer = toServer
-	fromServer = fromServer
+	toServer = toServerIn
+	fromServer = fromServerIn
 
 	go h.run()
-	req := CustomRequest.Request{1, 1, 1, 1, "test"}
+	req := CustomRequest.Request{1, 1, 1, CustomRequest.GetDeviceList, "test"}
 	toServer <- &req
 	r := mux.NewRouter()
 	//vars := mux.Vars(request)
@@ -97,7 +106,6 @@ func StartWebServer(toServer chan *CustomRequest.Request, fromServer chan *Custo
 	//s := r.PathPrefix("/home/{userid}").Subrouter()
 	//s.HandleFunc(handle("/")).Name("userId")
 	//url, err := s.Get("userId").URL("userid")
-
 	r.HandleFunc(handle("home"))
 	r.HandleFunc(handle("mapUser"))
 	r.HandleFunc(handle("homeAdmin"))
@@ -110,7 +118,6 @@ func StartWebServer(toServer chan *CustomRequest.Request, fromServer chan *Custo
 	r.HandleFunc("/ws", serveWs)
 
 	http.Handle("/", r)
-
 	// our server is one line!
 	http.ListenAndServe(":8080", nil)
 

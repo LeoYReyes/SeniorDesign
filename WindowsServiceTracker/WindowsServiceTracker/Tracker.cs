@@ -231,13 +231,16 @@ namespace WindowsServiceTracker
             return mac;
         }
 
-        private void IpConnectionThread() //todo Make thread start this instead of maintain connection
+        /* Tries to connect to the server and sleeps for a given amount of time
+         * if the server reports it is not stolen.
+         */
+        private void IpConnectionThread()
         {
             macAddress = getMacAddress();
             while (connectionKeepAlive)
             {
                 MaintainServerConnection();
-                if (!reportedStolen)
+                if (!reportedStolen && connectionKeepAlive) //todo don't sleep for so long so service stops in a timely manner
                 {
                     Thread.Sleep(checkInWaitTime);
                 }

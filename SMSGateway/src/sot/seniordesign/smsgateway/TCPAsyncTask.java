@@ -70,6 +70,7 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 		keepAlive = true;
 		while (keepAlive)
 		{
+			// if not connected try to get a tcp connection
 			if (!receivedPing || tcp == null || !tcp.isConnected())
 			{
 				publishProgress(NO_CONNECTION);
@@ -98,6 +99,7 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 				}
 			}
 			
+			//while connected
 			while (receivedPing && keepAlive && tcp != null)
 			{
 				// read SMS message and forward to server

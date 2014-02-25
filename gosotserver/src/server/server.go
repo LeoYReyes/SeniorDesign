@@ -4,7 +4,7 @@ import (
 	"CustomRequest"
 	"device"
 	"fmt"
-	//"time"
+	"time"
 	"webserver"
 )
 
@@ -21,7 +21,6 @@ func main() {
 	go webserver.StartWebServer(fromWebCh, toWebCh)
 	go device.StartDeviceServer(fromDeviceCh, toDeviceCh)
 	fmt.Println(<-fromWebCh)
-	for {
-
-	}
+	time.Sleep(3000000 * time.Millisecond)
+	//TODO: figure out a way to leave it running with for loop
 }

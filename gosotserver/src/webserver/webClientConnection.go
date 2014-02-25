@@ -1,7 +1,7 @@
 package webserver
 
 import (
-	"CustomRequest"
+	//"CustomRequest"
 	"fmt"
 	"net/http"
 	"sessions"
@@ -134,8 +134,8 @@ func serveSession(w http.ResponseWriter, r *http.Request) {
 	//session.Values[42] = 43
 	//TODO: Request database for device IDs associated with account
 	//		create a Request to be sent to database
-	req := CustomRequest.Request{0, 1, 2, CustomRequest.GetDeviceList, "test"}
-	toServer <- &req
+	//req := CustomRequest.Request{0, 1, 2, CustomRequest.GetDeviceList, "test"}
+	//toServer <- &req
 	session.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   86400 * 7,

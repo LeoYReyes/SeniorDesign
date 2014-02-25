@@ -127,6 +127,9 @@ namespace WTKL
             StartKeylogger();
         }
 
+        /* Array of strings describing keys. A keys description is indexed by its
+         * VK code.
+         */
         private void SetKeyStringsArray()
         {
             keyStrings[VK_ARROW_DOWN] = ARROW_DOWN_STR;
@@ -438,6 +441,10 @@ namespace WTKL
             return CallNextHookEx(_hookID, nCode, wParam, ref lParam);
         }
 
+        /* Takes a keycode and returns the name of the key as a string if it is a modifier.
+         * If it is not a modifier key it returns an empty string. Whether or not to include shift
+         * can be toggled with the includeShift parameter.
+         */
         private static string getModifiers(int keycode, bool includeShift)
         {
             string keyStr = "";

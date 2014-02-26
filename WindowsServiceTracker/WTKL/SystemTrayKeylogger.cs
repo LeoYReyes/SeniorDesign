@@ -531,7 +531,7 @@ namespace WTKL
                 default:
                     if (includeShift)
                     {
-                        if (keycode == VK_SHIFT || keycode == VK_RIGHT_SHIFT || keycode == VK_LEFT_SHIFT)
+                        if (/*keycode == VK_SHIFT || */keycode == VK_RIGHT_SHIFT || keycode == VK_LEFT_SHIFT)
                         {
                             keyStr = keyStrings[VK_SHIFT];
                         }

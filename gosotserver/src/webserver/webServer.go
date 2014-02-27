@@ -117,7 +117,7 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
 	fmt.Println(hashedPass)
 	databaseSOT.SignUp(r.PostForm.Get("firstName"), r.PostForm.Get("lastName"),
-		r.PostForm.Get("email"), r.PostForm.Get("phoneNumber"), r.PostForm.Get("password"))
+		r.PostForm.Get("email"), r.PostForm.Get("phoneNumber"), hashedPass)
 	serveSession(w, r)
 	//http.Redirect(w, r, "/home", http.StatusFound)
 }

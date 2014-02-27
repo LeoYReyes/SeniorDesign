@@ -63,6 +63,7 @@ func (c *connection) readPump() {
 			break
 		}
 		fmt.Println(message)
+		h.broadcast <- message
 		//h.inMessage <- Message{c, message}
 	}
 }

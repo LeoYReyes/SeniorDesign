@@ -115,7 +115,7 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 	accountInfo := new(Account)
 
 	user := "root"
-	pass := ""
+	pass := "toor"
 	dbname := "trackerdb"
 	//proto := "unix"
 	//addr := "/var/run/mysqld/mysqld.sock"

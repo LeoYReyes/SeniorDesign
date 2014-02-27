@@ -1,5 +1,5 @@
 var map;
-var socket = new WebSocket("ws://localhost:8080/ws")
+var socket = new WebSocket("ws://" + window.location.href.substring(window.location.protocol.length, window.location.href.lastIndexOf('/')) + "/ws");
 
 var mapOptions = {
     zoom: 8,

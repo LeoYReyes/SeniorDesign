@@ -6,10 +6,10 @@ const (
 	CheckIn = iota
 
 	// Web opcodes
-	UpdateWebMap
+	UpdateWebMap // 1
 
 	// Geogram opcodes
-	ActivateGPS
+	ActivateGPS // 2
 
 	// Laptop opcodes
 	DeviceStolen
@@ -28,6 +28,9 @@ const (
 	GetDevice
 	SetDevice
 	GetDeviceList
+
+	// No OpCode
+	noOp
 )
 
 /*
@@ -39,9 +42,14 @@ const (
 	Device		== 3
 */
 type Request struct {
+	// Unique id
 	Id          int
 	Destination int
 	Source      int
 	OpCode      byte
 	Payload     string
+}
+
+func (req *Request) isThisForMe(int i) bool {
+
 }

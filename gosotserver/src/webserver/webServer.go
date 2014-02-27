@@ -24,8 +24,16 @@ const viewsPath = "/"
 
 func handle(t string) (string, http.HandlerFunc) {
 	return viewsPath + t, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(t)
-		fmt.Println(r)
+		fmt.Println("url: ", t)
+		//fmt.Println(r)
+		// check for session. If no session is active, redirect to home page
+		cookie, cookieErr := r.Cookie("userSession")
+		if cookieErr != nil {
+			fmt.Println("Cookie Error: ", cookieErr)
+		} else {
+			fmt.Println("Cookie: ", cookie)
+		}
+		//session, _ := store.Get(r, r.PostForm.Get("loginName"))
 		p := &Page{Name: "Leo Reyes", Title: t}
 		//if t == "home" {
 		err := templates.ExecuteTemplate(w, t+".html", p)
@@ -55,8 +63,7 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		// Handle error
 		fmt.Println("decoder error: ", err)
 	}
-	//fmt.Println(workorder)
-	// Do something workorder
+
 }
 
 func loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +81,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	accountValid, passwordValid := databaseSOT.VerifyAccountInfo(r.PostForm.Get("loginName"), hashedPass)
 	if accountValid && passwordValid {
 		serveSession(w, r)
-		http.Redirect(w, r, "/home/"+r.PostForm.Get("loginName")+"/mapUser", 301)
+		//http.Redirect(w, r, "/mapUser", 301)
 	} else {
 		http.Error(w, "Invalid Login", 80085)
 		return

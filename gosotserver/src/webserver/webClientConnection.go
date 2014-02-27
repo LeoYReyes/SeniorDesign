@@ -2,6 +2,7 @@ package webserver
 
 import (
 	//"CustomRequest"
+	//"encoding/gob"
 	"fmt"
 	"net/http"
 	"sessions"
@@ -128,19 +129,33 @@ var store = sessions.NewCookieStore([]byte("its-the-most-wonderful-time"))
 func serveSession(w http.ResponseWriter, r *http.Request) {
 	// Get a session. We're ignoring the error resulted from decoding an
 	// existing session: Get() always returns a session, even if empty.
-	session, _ := store.Get(r, r.PostForm.Get("loginName"))
+	session, _ := store.Get(r, "userSession")
+	if session.IsNew {
+		fmt.Println("New session created")
+		session.Values["userId"] = r.PostForm.Get("loginName")
+		// Check to see if user is an admin
+		//session.Values["isAdmin"] = true
+	} else {
+		fmt.Println("Existing session loaded")
+	}
 	// Set some session values.
-	session.Values["userId"] = r.PostForm.Get("loginName")
 	//session.Values[42] = 43
 	//TODO: Request database for device IDs associated with account
 	//		create a Request to be sent to database
 	//req := CustomRequest.Request{0, 1, 2, CustomRequest.GetDeviceList, "test"}
 	//toServer <- &req
 	session.Options = &sessions.Options{
+		// MaxAge=0 means no 'Max-Age' attribute specified.
+		// MaxAge<0 means delete cookie now, equivalently 'Max-Age: 0'.
+		// MaxAge>0 means Max-Age attribute present and given in seconds.
 		Path:     "/",
-		MaxAge:   86400 * 7,
+		MaxAge:   86400,
 		HttpOnly: true,
 	}
+	fmt.Println("Session store: ", store.Codecs)
 	// Save it.
-	session.Save(r, w)
+	err := session.Save(r, w)
+	if err != nil {
+		fmt.Println("Session save error")
+	}
 }

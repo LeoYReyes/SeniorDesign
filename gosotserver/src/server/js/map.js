@@ -33,8 +33,8 @@ socket.onopen = function() {
 
 socket.onmessage = function(msg){
     alert(msg.data); //Awesome!
-	var lat = parseFloat(msg.data.substring(0,6));
-	var longitude = parseFloat(msg.data.substring(7,14));
+	var lat = parseFloat(msg.data.substring(0,7));
+	var longitude = parseFloat(msg.data.substring(8,16));
 	var markerPos = new google.maps.LatLng(lat, longitude);
 	new google.maps.Marker({
             position: markerPos,

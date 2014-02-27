@@ -24,6 +24,7 @@ const (
 	maxMessageSize = 512
 )
 
+// Not being used right now, might not need at all
 type userSession struct {
 	userId      string
 	inSession   bool

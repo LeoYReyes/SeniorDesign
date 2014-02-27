@@ -1,3 +1,9 @@
+/*
+ * @author Nathan Plotts (nwp0002@auburn.edu)
+ * This file is where the "start" function is for both the LaptopHub and
+ * the GPSHub connection handling.
+ */
+
 package device
 
 import (
@@ -9,6 +15,9 @@ import (
 	//"strings"
 )
 
+/* Constants for connections and OP codes are stored here, accessible by
+ * all in the device package.
+ */
 const (
 	CONN_TYPE     = "tcp"
 	CONN_PORT     = ":10015"
@@ -21,9 +30,15 @@ const (
 	STOLEN        = 5
 )
 
+// Global channel variables for sending and receiving request to/from the server
 var toServer chan *CustomRequest.Request
 var fromServer chan *CustomRequest.Request
 
+/*
+ * This method is the function that you call to start both the laptop and GPS connection
+ * handling. Once connection handling has started then connections will be continually
+ * accepted and requests will continually be handled.
+ */
 func StartDeviceServer(toServerIn chan []byte) {
 	toServerT = toServerIn
 	go MapDeviceID()

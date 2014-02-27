@@ -50,6 +50,6 @@ type Request struct {
 	Payload     string
 }
 
-func (req *Request) isThisForMe(int i) bool {
-
+func (req *Request) isThisForMe(i int) bool {
+	return true
 }

@@ -124,6 +124,7 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	c.readPump()
 }
 
+//TODO: add key rotation
 var store = sessions.NewCookieStore([]byte("its-the-most-wonderful-time"))
 
 func serveSession(w http.ResponseWriter, r *http.Request) {
@@ -138,8 +139,7 @@ func serveSession(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Println("Existing session loaded")
 	}
-	// Set some session values.
-	//session.Values[42] = 43
+	session.Values["isLoggedIn"] = "true"
 	//TODO: Request database for device IDs associated with account
 	//		create a Request to be sent to database
 	//req := CustomRequest.Request{0, 1, 2, CustomRequest.GetDeviceList, "test"}
@@ -157,5 +157,7 @@ func serveSession(w http.ResponseWriter, r *http.Request) {
 	err := session.Save(r, w)
 	if err != nil {
 		fmt.Println("Session save error")
+	} else {
+		http.Redirect(w, r, "/mapUser", http.StatusFound)
 	}
 }

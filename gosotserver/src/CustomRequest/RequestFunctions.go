@@ -1,6 +1,6 @@
-package GoServer
+package CustomRequest
 
-import (
+/*import (
 	"strings"
 	"fmt"
 )
@@ -30,7 +30,7 @@ func (req *Request) checkValidity() bool{
 //Parses Payload and returns all string variables
 //If wants it to not be a string can change the type- str2byteExample: []byte("string")
 func (req *Request) parsePayload()  {
-	return strings.Split(req.Payload, "/")	
+	return strings.Split(req.Payload, "/")
 }
 
 
@@ -51,7 +51,7 @@ func (req *Request) opCodeExists() {
 		case #, #, #, #, : isFunctionInDestination(2) //Web Destination.
 		case #, #, #, #, : isFunctionInDestination(3) //Device Destination.
 	}
-} 
+}
 
 
 //Test OpCode Value against Destination Function Values.
@@ -67,13 +67,13 @@ func (req *Request) isFunctionInDestination(int i) bool {
 	} else if i = req.Destination  {
 		return
 	//Destination and OpCode Mismatch
-	} else { 	
+	} else {
 		Destination := string(req.Destination)
 		OpCode := string(req.OpCode)
 		fmt.Printf("%q\n\t", "OpCode function called doesn't belong to that Destination.")
 		fmt.Printf("%q\n\t", "Destination: ", Destination)
 		fmt.Printf("%q\n", "OpCode: ", OpCode)
-		return false	
+		return false
 	}
 }
 
@@ -82,4 +82,4 @@ func (req *Request) ErrorOpCodeDNE() bool{
 	OpCode := string(req.OpCode)
 	fmt.Printf("%q\n", "OpCode '", OpCode, "' does not exist.")
 	return false
-}
+}*/

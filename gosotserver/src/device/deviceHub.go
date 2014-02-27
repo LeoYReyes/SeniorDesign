@@ -2,7 +2,7 @@ package device
 
 import (
 	"CustomRequest"
-	//"container/list"
+	"container/list"
 	"fmt"
 	"net"
 	"strconv"
@@ -84,7 +84,7 @@ func GetMessage(deviceConn *deviceConnection) {
 		fmt.Println("Error reading", err)
 	}
 	msg := string(buffer[0:bytesRead])
-	opCode, err := strconv.Atoi(msg[0:0])
+	opCode, err := strconv.Atoi(msg[0:1])
 	if err != nil {
 		fmt.Println("Invalid OP code", err)
 	} else {
@@ -92,26 +92,31 @@ func GetMessage(deviceConn *deviceConnection) {
 		case TRACE_ROUTE:
 			UpdateTraceroute(deviceConn, msg)
 		case KEYLOG_GET:
-			UpdateKeylog()
+			UpdateKeylog(deviceConn, msg)
 		}
 	}
 }
 
 func UpdateTraceroute(deviceConn *deviceConnection, msg string) {
-	/*deviceConn.ld.TraceRouteList.PushBack(new(list.List))
+	newList := new(list.List)
 	start := 1
-	for i := 1; msg[i:i] != "\n"; i++ {
-		if msg[i:i] == "~" {
-			deviceConn.ld.TraceRouteList.Back().Value.PushFront(msg[start:i])
-			ip = nil
-		} else {
-			//ip = ip + msg[i:i]
+	//ip := new(string)
+	for i := 1; i < len(msg)-1; i++ {
+		if msg[i:i+1] == "~" {
+			newList.PushBack(msg[start:i])
+			start = i + 1
 		}
-	}*/
+	}
+	newList.PushBack(msg[start : len(msg)-1]) //to get the final IP address
+	deviceConn.ld.TraceRouteList.PushBack(newList)
+	for e := newList.Front(); e != nil; e = e.Next() {
+		fmt.Println(e.Value)
+	}
 }
 
-func UpdateKeylog() {
-
+func UpdateKeylog(deviceConn *deviceConnection, msg string) {
+	deviceConn.ld.KeylogData.PushBack(msg[1 : len(msg)-1])
+	fmt.Println(deviceConn.ld.KeylogData.Back().Value)
 }
 
 // Get ID from device

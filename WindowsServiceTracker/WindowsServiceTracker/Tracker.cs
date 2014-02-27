@@ -62,6 +62,8 @@ namespace WindowsServiceTracker
         private TcpClient tcp;
         private UdpClient udp;
         private static bool reportedStolen = false;
+        private int pingFrequency = 30000;
+        private Stopwatch pingStopwatch = new Stopwatch();
 
         /* Constructor for the service. Currently only creates an event log source
          * that is used to output errors with in the windows event logs.
@@ -249,11 +251,12 @@ namespace WindowsServiceTracker
 
         /* This method is used to create a thread that will constantly try to connect
          * to the server while it is active. When a connection is established, the
-         * MAC address is immidiately sent to the server and it waits for commands.
+         * MAC address is immediately sent to the server and it waits for commands.
          */
         private void MaintainServerConnection()
         {
             tcpKeepAlive = true;
+            pingStopwatch.Restart();
             int maxwaitBetweenConnects = 60;
             int waitToConnect = 0;
             int bufferSize = 1;
@@ -267,7 +270,7 @@ namespace WindowsServiceTracker
                         tcpConnect();
                         waitToConnect = 0;
                         getTcpStream();
-                        SendStdMsg(NO_OP, macAddress, true);
+                        SendStdMsg(macAddress, true);
                     }
                     catch (Exception)
                     {
@@ -327,6 +330,13 @@ namespace WindowsServiceTracker
                         }
                         catch (Exception)
                         {}
+
+                        //ping server
+                        if (pingStopwatch.ElapsedMilliseconds > pingFrequency)
+                        {
+                            SendStdMsg(NO_OP, "", true);
+                            pingStopwatch.Restart();
+                        }
                     }
                 }
             }
@@ -381,10 +391,10 @@ namespace WindowsServiceTracker
 
         /* Writes a message to the tcp connection. The format is
          * <opcode><message><newline>
-         * A NO_OP opcode (255 or 0xFF) or msg that is null or empty will leave it out.
+         * A msg that is null or empty will leave it out.
          * If newLine is false, the newline will not be included at the end of the msg.
          */
-        private bool SendStdMsg(byte opcode, byte[] msg, bool newLine) // todo first message to fail isn't detected, maybe send empty message first?
+        private bool SendStdMsg(bool includeOpcode, byte opcode, byte[] msg, bool newLine)
         {
             int msgSize = 0;
             int offset = 0;
@@ -392,7 +402,8 @@ namespace WindowsServiceTracker
             byte[] combinedMsg;
             try
             {
-                if (opcode != NO_OP)
+                //opcode
+                if (includeOpcode)
                 {
                     msgSize += 1;
                 }
@@ -416,7 +427,7 @@ namespace WindowsServiceTracker
                 combinedMsg = new byte[msgSize];
 
                 // assemble message into single array to be sent as a single unit
-                if (opcode != NO_OP)
+                if (includeOpcode)
                 {
                     combinedMsg[offset] = opcode;
                     offset += 1;
@@ -441,6 +452,33 @@ namespace WindowsServiceTracker
                 return false;
             }
             return true;
+        }
+
+        /* Writes a message to the tcp connection. The format is
+         * <opcode><message><newline>
+         * A msg that is null or empty will leave it out.
+         * If newLine is false, the newline will not be included at the end of the msg.
+         */
+        private bool SendStdMsg(byte opcode, byte[] msg, bool newLine) // todo first message to fail isn't detected, maybe send empty message first?
+        {
+            return SendStdMsg(true, opcode, msg, newLine);
+        }
+
+        /* Convenience method to send a string message with optional newline
+         * on the end. No opcode is included at the beginning of the message.
+         */
+        private bool SendStdMsg(String msg, bool newLine)
+        {
+            byte[] byteMsg = null;
+            if (msg == null || msg.Length == 0)
+            {
+                return SendStdMsg(false, NO_OP, byteMsg, newLine);
+            }
+            else
+            {
+                byteMsg = Encoding.UTF8.GetBytes(msg + Environment.NewLine);
+                return SendStdMsg(false, NO_OP, byteMsg, newLine);
+            }
         }
 
         /* Convenience method that converts a string message to a byte[] array

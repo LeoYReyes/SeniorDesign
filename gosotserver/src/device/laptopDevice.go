@@ -4,6 +4,7 @@ import "container/list"
 
 type LaptopDevice struct {
 	TraceRouteList list.List
+	KeylogData     list.List
 	Device
 }
 

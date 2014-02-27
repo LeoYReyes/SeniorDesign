@@ -25,26 +25,31 @@ const viewsPath = "/"
 func handle(t string) (string, http.HandlerFunc) {
 	return viewsPath + t, func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("url: ", t)
-		//fmt.Println(r)
 		// check for session. If no session is active, redirect to home page
-		cookie, cookieErr := r.Cookie("userSession")
+		_, cookieErr := r.Cookie("userSession")
+		sesh, _ := store.Get(r, "userSession")
 		if cookieErr != nil {
 			fmt.Println("Cookie Error: ", cookieErr)
 		} else {
-			fmt.Println("Cookie: ", cookie)
+			fmt.Println("Cookie userid: ", sesh.Values["userId"])
+			fmt.Println("Cookie isLoggedIn: ", sesh.Values["isLoggedIn"])
 		}
-		//session, _ := store.Get(r, r.PostForm.Get("loginName"))
 		p := &Page{Name: "Leo Reyes", Title: t}
-		//if t == "home" {
-		err := templates.ExecuteTemplate(w, t+".html", p)
-		if err != nil {
-			http.NotFound(w, r)
+		if t != "home" {
+			if sesh.Values["isLoggedIn"] == "true" {
+				err := templates.ExecuteTemplate(w, t+".html", p)
+				if err != nil {
+					http.NotFound(w, r)
+				}
+			} else {
+				http.Error(w, "Not Logged In", 000)
+			}
+		} else {
+			err := templates.ExecuteTemplate(w, "home.html", p)
+			if err != nil {
+				http.NotFound(w, r)
+			}
 		}
-		//} else {
-		if r.Header.Get("Origin") != "http://"+r.Host {
-			http.Error(w, "Not logged in", 8008)
-		}
-		//}
 	}
 }
 
@@ -88,9 +93,33 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func testHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("mapUser executed")
-	handle("mapUser")
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	session, _ := store.Get(r, "userSession")
+	session.Values["isLoggedIn"] = "false"
+	session.Save(r, w)
+	http.Redirect(w, r, "/home", http.StatusFound)
+}
+
+func signUpHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		// Handle error
+		fmt.Println("ParseForm error: ", err)
+	}
+	h := sha1.New()
+	h.Write([]byte(strings.Join([]string{r.PostForm.Get("email"), r.PostForm.Get("password")}, "")))
+
+	fmt.Println(r.PostForm.Get("firstName"))
+	fmt.Println(r.PostForm.Get("lastName"))
+	fmt.Println(r.PostForm.Get("email"))
+	fmt.Println(r.PostForm.Get("phoneNumber"))
+	fmt.Println(r.PostForm.Get("password"))
+	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
+	fmt.Println(hashedPass)
+	databaseSOT.SignUp(r.PostForm.Get("firstName"), r.PostForm.Get("lastName"),
+		r.PostForm.Get("email"), r.PostForm.Get("phoneNumber"), hashedPass)
+	serveSession(w, r)
+	//http.Redirect(w, r, "/home", http.StatusFound)
 }
 
 // Declaration of global variable
@@ -108,11 +137,7 @@ func StartWebServer(toServerIn chan *CustomRequest.Request, fromServerIn chan *C
 	req := CustomRequest.Request{1, 1, 1, CustomRequest.GetDeviceList, "test"}
 	toServer <- &req
 	r := mux.NewRouter()
-	//vars := mux.Vars(request)
-	//userId := vars["userid"]
-	//s := r.PathPrefix("/home/{userid}").Subrouter()
-	//s.HandleFunc(handle("/")).Name("userId")
-	//url, err := s.Get("userId").URL("userid")
+
 	r.HandleFunc(handle("home"))
 	r.HandleFunc(handle("mapUser"))
 	r.HandleFunc(handle("homeAdmin"))
@@ -121,7 +146,9 @@ func StartWebServer(toServerIn chan *CustomRequest.Request, fromServerIn chan *C
 	r.HandleFunc(handle("messager"))
 	r.HandleFunc(handle("devices"))
 	r.HandleFunc(handle("users"))
+	r.HandleFunc("/signup", signUpHandler)
 	r.HandleFunc("/login", loginHandler)
+	r.HandleFunc("/logout", logoutHandler)
 	r.HandleFunc("/ws", serveWs)
 
 	http.Handle("/", r)

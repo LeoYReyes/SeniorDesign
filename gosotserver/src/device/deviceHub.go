@@ -9,14 +9,15 @@ import (
 )
 
 const (
-	CONN_TYPE   = "tcp"
-	CONN_PORT   = ":10015"
-	KEYLOG_ON   = 0
-	KEYLOG_OFF  = 1
-	TRACE_ROUTE = 2
-	KEYLOG_GET  = 3
-	NOT_STOLEN  = 4
-	STOLEN      = 5
+	CONN_TYPE     = "tcp"
+	CONN_PORT     = ":10015"
+	CONN_PORT_SMS = ":10016"
+	KEYLOG_ON     = 0
+	KEYLOG_OFF    = 1
+	TRACE_ROUTE   = 2
+	KEYLOG_GET    = 3
+	NOT_STOLEN    = 4
+	STOLEN        = 5
 )
 
 type deviceHub struct {
@@ -139,10 +140,43 @@ func MapDeviceID() {
 	}
 }
 
+func SmsConnection() {
+	//connect
+	listener, err := net.Listen(CONN_TYPE, CONN_PORT_SMS)
+	if err != nil {
+		fmt.Println("Error listening:", err.Error())
+	} else {
+
+	}
+
+	fmt.Println("Connection created on " + CONN_TYPE + " " + CONN_PORT_SMS)
+
+	//send & receive
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			fmt.Println("Error connecting", err)
+		}
+		buffer := make([]byte, 512)
+		fmt.Println("Connection established with SMS client")
+
+		msg := ""
+		for {
+			bytesRead, _ := conn.Read(buffer)
+			if bytesRead > 0 {
+				received := string(buffer[0:bytesRead])
+				msg = msg + received
+			}
+		}
+	}
+
+}
+
 func StartDeviceServer(fromServerIn chan *CustomRequest.Request, toServerIn chan *CustomRequest.Request) {
 	toServer = toServerIn
 	fromServer = fromServerIn
 	go MapDeviceID()
+	go SmsConnection()
 	listener := Connect()
 	Listen(listener)
 }

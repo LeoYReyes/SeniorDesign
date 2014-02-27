@@ -38,7 +38,7 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
-        public const int checkInWaitTime = 20000;
+        public const int checkInWaitTime = 20000; //todo increase to ~5min after debugging
 
         //Variables
         private volatile String ipAddressString = "127.0.0.1";
@@ -60,7 +60,6 @@ namespace WindowsServiceTracker
         // not be used by other threads without making them volatile.
         private NetworkStream tcpStream;
         private TcpClient tcp;
-        private UdpClient udp;
         private static bool reportedStolen = false;
         private int pingFrequency = 30000;
         private Stopwatch pingStopwatch = new Stopwatch();
@@ -242,9 +241,14 @@ namespace WindowsServiceTracker
             while (connectionKeepAlive)
             {
                 MaintainServerConnection();
-                if (!reportedStolen && connectionKeepAlive) //todo don't sleep for so long so service stops in a timely manner
+                if (!reportedStolen && connectionKeepAlive)
                 {
-                    Thread.Sleep(checkInWaitTime);
+                    long timeWaited = 0;
+                    while (connectionKeepAlive && timeWaited < checkInWaitTime)
+                    {
+                        Thread.Sleep(5000);
+                        timeWaited += 5000;
+                    }
                 }
             }
         }
@@ -283,8 +287,6 @@ namespace WindowsServiceTracker
                 }
                 else
                 {
-                    // todo make sure thCanRead is false in the case that a previous connection was lost, 
-                    // and new one created, but the stream was not changed from the old connection
                     if (tcpStream == null || !tcpStream.CanRead)
                     {
                         getTcpStream();

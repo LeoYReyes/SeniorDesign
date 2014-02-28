@@ -8,12 +8,12 @@ import (
 	"webserver"
 )
 
-var toWebCh = make(chan *CustomProtocol.Request)
-var fromWebCh = make(chan *CustomProtocol.Request)
-var toDatabaseCh = make(chan *CustomProtocol.Request)
-var fromDatabaseCh = make(chan *CustomProtocol.Request)
-var toDeviceCh = make(chan *CustomProtocol.Request)
-var fromDeviceCh = make(chan *CustomProtocol.Request)
+var toWebCh = make(chan *CustomProtocol.CustomProtocol)
+var fromWebCh = make(chan *CustomProtocol.CustomProtocol)
+var toDatabaseCh = make(chan *CustomProtocol.CustomProtocol)
+var fromDatabaseCh = make(chan *CustomProtocol.CustomProtocol)
+var toDeviceCh = make(chan *CustomProtocol.CustomProtocol)
+var fromDeviceCh = make(chan *CustomProtocol.CustomProtocol)
 
 var testDeviceCh = make(chan []byte)
 var testWebCh = make(chan []byte)
@@ -46,7 +46,7 @@ func main() {
 	//TODO: figure out a way to leave it running with for loop
 }
 
-func reRoute(req *CustomProtocol.Request) {
+func reRoute(req *CustomProtocol.CustomProtocol) {
 	switch req.Destination {
 	case CustomProtocol.Database:
 		toDatabaseCh <- req

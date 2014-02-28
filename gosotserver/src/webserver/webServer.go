@@ -88,8 +88,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	buf = strconv.AppendQuoteToASCII(buf, r.PostForm.Get("loginName"))
 	buf = append(buf, 0x1B)
 	buf = strconv.AppendQuoteToASCII(buf, hashedPass)
-	req := CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: 1, Source: 2, OpCode: CustomProtocol.VerifyLoginCredentials,
-		Payload: buf}
+	req := CustomProtocol.Request{CustomProtocol.CustomProtocol{Id: CustomProtocol.AssignRequestId(), Destination: 1, Source: 2,
+		Payload: buf}, CustomProtocol.VerifyLoginCredentials}
 	toServer <- &req
 	accountValid, passwordValid := databaseSOT.VerifyAccountInfo(r.PostForm.Get("loginName"), hashedPass)
 	if accountValid && passwordValid {

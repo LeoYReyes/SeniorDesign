@@ -129,7 +129,6 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	databaseSOT.SignUp(r.PostForm.Get("firstName"), r.PostForm.Get("lastName"),
 		r.PostForm.Get("email"), r.PostForm.Get("phoneNumber"), hashedPass)
 	serveSession(w, r)
-	//http.Redirect(w, r, "/home", http.StatusFound)
 }
 
 // Declaration of global variable
@@ -178,37 +177,3 @@ func chanHandler() {
 		}
 	}*/
 }
-
-/*var fromServerT chan []byte
-
-func StartWebServer(fromServerIn chan []byte) {
-	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
-	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
-	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("images/"))))
-
-	fromServerT = fromServerIn
-
-	go h.run()
-	go chanHandler()
-	//req := CustomRequest.Request{1, 1, 1, CustomRequest.GetDeviceList, "test"}
-	//toServer <- &req
-	r := mux.NewRouter()
-
-	r.HandleFunc(handle("home"))
-	r.HandleFunc(handle("mapUser"))
-	r.HandleFunc(handle("homeAdmin"))
-	r.HandleFunc(handle("mapAdmin"))
-	r.HandleFunc(handle("webSocketTest"))
-	r.HandleFunc(handle("messager"))
-	r.HandleFunc(handle("devices"))
-	r.HandleFunc(handle("users"))
-	r.HandleFunc("/signup", signUpHandler)
-	r.HandleFunc("/login", loginHandler)
-	r.HandleFunc("/logout", logoutHandler)
-	r.HandleFunc("/ws", serveWs)
-
-	http.Handle("/", r)
-	// our server is one line!
-	http.ListenAndServe(":8080", nil)
-
-}*/

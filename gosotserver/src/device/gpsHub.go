@@ -1,7 +1,7 @@
 package device
 
 import (
-	//"CustomRequest"
+	"CustomProtocol"
 	//"container/list"
 	"fmt"
 	"net"
@@ -40,8 +40,9 @@ func SmsConnection() {
 					received := string(buffer[0:bytesRead])
 					msg = googleMapLinkParser(received)
 					fmt.Println("Received msg: ", msg)
-					toServerT <- []byte(msg)
-					//msg = msg + received
+					req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Web, Source: CustomProtocol.DeviceGPS,
+						OpCode: CustomProtocol.UpdateWebMap, Payload: []byte(msg)}
+					toServer <- req
 				} else {
 					conn.Write([]byte("|"))
 				}

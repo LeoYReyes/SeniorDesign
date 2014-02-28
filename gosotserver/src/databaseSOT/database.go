@@ -43,9 +43,10 @@
 *        -also what other functionality is needed?
  */
 
-package main
+package databaseSOT
 
 import (
+	"CustomProtocol"
 	"fmt"
 	"github.com/ziutek/mymysql/mysql"
 	"os"

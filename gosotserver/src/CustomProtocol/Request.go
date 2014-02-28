@@ -35,7 +35,7 @@ const (
 	UpdateUserIPTraceData = 131
 
 	// No OpCode 255
-	noOp = 255
+	NoOp = 255
 )
 
 // Destination constants

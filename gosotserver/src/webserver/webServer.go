@@ -89,9 +89,9 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	buf = append(buf, 0x1B)
 
 	resCh := make(chan []byte)
-	req := CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: 1, Source: 2,
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: 1, Source: 2,
 		OpCode: CustomProtocol.VerifyLoginCredentials, Payload: buf, Response: resCh}
-	toServer <- &req
+	toServer <- req
 	res := <-resCh
 	//accountValid, passwordValid := databaseSOT.VerifyAccountInfo(r.PostForm.Get("loginName"), hashedPass)
 	fmt.Println("Response: ", res[0], res[1])

@@ -1,13 +1,14 @@
 package webserver
 
 import (
-	"CustomRequest"
+	"CustomProtocol"
 	"crypto/sha1"
 	"databaseSOT"
 	"fmt"
 	"html/template"
 	"mux"
 	"net/http"
+	"strconv"
 	"strings"
 	//"schema"
 )
@@ -83,6 +84,14 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.PostForm.Get("loginName"))
 	fmt.Println(r.PostForm.Get("loginPassword"))
 	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
+	buf := []byte{}
+	buf = strconv.AppendQuoteToASCII(buf, r.PostForm.Get("loginName"))
+	buf = append(buf, 0x1B)
+	buf = strconv.AppendQuoteToASCII(buf, hashedPass)
+	buf = append(buf, 0x1B)
+	req := CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: 1, Source: 2,
+		OpCode: CustomProtocol.VerifyLoginCredentials, Payload: buf}
+	toServer <- &req
 	accountValid, passwordValid := databaseSOT.VerifyAccountInfo(r.PostForm.Get("loginName"), hashedPass)
 	if accountValid && passwordValid {
 		serveSession(w, r)
@@ -123,19 +132,20 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // Declaration of global variable
-var toServer chan *CustomRequest.Request
-var fromServer chan *CustomRequest.Request
+var toServer chan *CustomProtocol.Request
+var fromServer chan *CustomProtocol.Request
 
-/*func StartWebServer(toServerIn chan *CustomRequest.Request, fromServerIn chan *CustomRequest.Request) {
+func StartWebServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *CustomProtocol.Request) {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
+	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("images/"))))
 
 	toServer = toServerIn
 	fromServer = fromServerIn
 
 	go h.run()
-	req := CustomRequest.Request{1, 1, 1, CustomRequest.GetDeviceList, "test"}
-	toServer <- &req
+	go chanHandler()
+
 	r := mux.NewRouter()
 
 	r.HandleFunc(handle("home"))
@@ -155,24 +165,25 @@ var fromServer chan *CustomRequest.Request
 	// our server is one line!
 	http.ListenAndServe(":8080", nil)
 
-}*/
+}
 
 //TODO: make chan handler in webClientHub
 func chanHandler() {
-	for {
+	/*for {
 		select {
 		case c := <-fromServerT:
 			fmt.Println("web server received: ", string(c))
 			h.broadcast <- c
 		}
-	}
+	}*/
 }
 
-var fromServerT chan []byte
+/*var fromServerT chan []byte
 
 func StartWebServer(fromServerIn chan []byte) {
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("css/"))))
 	http.Handle("/js/", http.StripPrefix("/js/", http.FileServer(http.Dir("js/"))))
+	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("images/"))))
 
 	fromServerT = fromServerIn
 
@@ -199,4 +210,4 @@ func StartWebServer(fromServerIn chan []byte) {
 	// our server is one line!
 	http.ListenAndServe(":8080", nil)
 
-}
+}*/

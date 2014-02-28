@@ -1,19 +1,20 @@
 package main
 
 import (
-	"CustomRequest"
+	"CustomProtocol"
+	"databaseSOT"
 	"device"
 	//"fmt"
 	//"time"
 	"webserver"
 )
 
-var toWebCh = make(chan *CustomRequest.Request)
-var fromWebCh = make(chan *CustomRequest.Request)
-var toDatabaseCh = make(chan *CustomRequest.Request)
-var fromDatabaseCh = make(chan *CustomRequest.Request)
-var toDeviceCh = make(chan *CustomRequest.Request)
-var fromDeviceCh = make(chan *CustomRequest.Request)
+var toWebCh = make(chan *CustomProtocol.Request)
+var fromWebCh = make(chan *CustomProtocol.Request)
+var toDatabaseCh = make(chan *CustomProtocol.Request)
+var fromDatabaseCh = make(chan *CustomProtocol.Request)
+var toDeviceCh = make(chan *CustomProtocol.Request)
+var fromDeviceCh = make(chan *CustomProtocol.Request)
 
 var testDeviceCh = make(chan []byte)
 var testWebCh = make(chan []byte)
@@ -22,19 +23,38 @@ func main() {
 	// channel can take optional capacity param to make it asynchronous
 	//comChannel := make(chan string)
 
-	//go webserver.StartWebServer(fromWebCh, toWebCh)
-	//go device.StartDeviceServer(fromDeviceCh, toDeviceCh)
+	go webserver.StartWebServer(fromWebCh, toWebCh)
+	go device.StartDeviceServer(fromDeviceCh, toDeviceCh)
+	go databaseSOT.StartDatabaseServer(fromDatabaseCh, toDatabaseCh)
 
 	// FOR TESTING
-	go webserver.StartWebServer(testWebCh)
-	go device.StartDeviceServer(testDeviceCh)
+	//go webserver.StartWebServer(testWebCh)
+	//go device.StartDeviceServer(testDeviceCh)
 	for {
 		select {
-		case c := <-testDeviceCh:
-			testWebCh <- c
+		case req := <-testDeviceCh:
+			testWebCh <- req
+		case req := <-fromWebCh:
+			reRoute(req)
+		case req := <-fromDeviceCh:
+			reRoute(req)
+		case req := <-fromDatabaseCh:
+			reRoute(req)
 		}
+
 	}
 	//fmt.Println(<-fromWebCh)
 	//time.Sleep(3000000 * time.Millisecond)
 	//TODO: figure out a way to leave it running with for loop
+}
+
+func reRoute(req *CustomProtocol.Request) {
+	switch req.Destination {
+	case CustomProtocol.Database:
+		toDatabaseCh <- req
+	case CustomProtocol.Web:
+		toWebCh <- req
+	case CustomProtocol.DeviceGPS, CustomProtocol.DeviceLaptop:
+		toDeviceCh <- req
+	}
 }

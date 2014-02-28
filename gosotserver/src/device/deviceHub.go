@@ -1,13 +1,7 @@
-/*
- * @author Nathan Plotts (nwp0002@auburn.edu)
- * This file is where the "start" function is for both the LaptopHub and
- * the GPSHub connection handling.
- */
-
 package device
 
 import (
-	"CustomRequest"
+	"CustomProtocol"
 	//"container/list"
 	//"fmt"
 	//"net"
@@ -15,9 +9,6 @@ import (
 	//"strings"
 )
 
-/* Constants for connections and OP codes are stored here, accessible by
- * all in the device package.
- */
 const (
 	CONN_TYPE     = "tcp"
 	CONN_PORT     = ":10015"
@@ -30,31 +21,25 @@ const (
 	STOLEN        = 5
 )
 
-// Global channel variables for sending and receiving request to/from the server
-var toServer chan *CustomRequest.Request
-var fromServer chan *CustomRequest.Request
+var toServer chan *CustomProtocol.Request
+var fromServer chan *CustomProtocol.Request
 
-/*
- * This method is the function that you call to start both the laptop and GPS connection
- * handling. Once connection handling has started then connections will be continually
- * accepted and requests will continually be handled.
- */
-func StartDeviceServer(toServerIn chan []byte) {
+/*func StartDeviceServer(toServerIn chan []byte) {
 	toServerT = toServerIn
 	go MapDeviceID()
 	go SmsConnection()
 	listener := Connect()
 	Listen(listener)
-}
+}*/
 
-/*func StartDeviceServer(fromServerIn chan *CustomRequest.Request, toServerIn chan *CustomRequest.Request) {
+func StartDeviceServer(fromServerIn chan *CustomProtocol.Request, toServerIn chan *CustomProtocol.Request) {
 	toServer = toServerIn
 	fromServer = fromServerIn
 	go MapDeviceID()
 	go SmsConnection()
 	listener := Connect()
 	Listen(listener)
-}*/
+}
 
 // Test code for server.go
 //go device.MapDeviceID()

@@ -28,10 +28,10 @@ const (
 	ActivateGPS = 96
 
 	// Laptop opcodes 128 - 159
-	DeviceStolen       = 128
-	DeviceNotStolen    = 129
-	ActivateKeylog     = 130
-	ActivateTraceRoute = 131
+	CheckDeviceStolen     = 128
+	GetUserData           = 129
+	UpdateUserKeylogData  = 130
+	UpdateUserIPTraceData = 131
 
 	// No OpCode 255
 	noOp = 255

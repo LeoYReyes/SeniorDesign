@@ -1,4 +1,47 @@
-// personal note: export GOPATH=/Users/stevenwhaley/go/
+/*
+* Steven Whaley - created: February 18, 2014  - last updated: February 27, 2014
+*
+* OVERVIEW:
+*     
+*     This is the database portion of the server. It provides functionality for interacting with the database. Actions
+*     such as user sign up and login must use functions provided in this file to update and query the database.
+*     See the comments for each method for details. 
+*
+*   useful links:
+*       mysql driver for google go: 
+*         https://github.com/ziutek/mymysql
+*     golang documentation:
+*         http://golang.org/doc/
+*   
+*   changes:
+*       Steven Whaley:
+*       February 18 - The server is now being implemented in Google Go instead of Java. Started researching mysql libraries
+*             in go, and wrote some database connection code. Experimented with some simple database connection code.
+*   
+*       Steven Whaley:    
+*       February 19 - Successfully connected to database, but code is all in main and isn't ready to
+*               interface with server code. Worked on getter functions, such as GetAccountInfo().
+*             Currently working on outputting in JSON format.
+*       
+*       Steven Whaley:      
+*       February 20 - VerifyAccountInfo() takes in strings for username and password and
+*             returns two booleans for whether they match the database values or not.
+*
+*     Steven Whaley:
+*     February 23 - Issue Parsing some mysql datatypes properly. Testing code using my main function.
+*   
+*     Steven Whaley:
+*     February 26 - SignUp() takes in user information entered on the sign up page, and creates account and customer entries
+*             in the database. 
+*
+*     Steven Whaley:
+*     February 27 - We have now tested using the website for sign up and login. It works, but we now need to properly
+*             implement a request system. I 
+*   
+*   TO DO: Interface with other server components using requests, continue testing existing functions.
+*  
+*        -also what other functionality is needed?
+*/
 
 package databaseSOT
 
@@ -11,14 +54,15 @@ import (
          _ "github.com/ziutek/mymysql/thrsafe" // Thread safe engine
     ) 
 
-
+/*
+* These structs represent tables in the database.
+*/
 type Account struct {
   CustomerId int64
   Id int64
     UserName string
     Password string
     Admin bool
-
 }
 type Coordinates struct {
     DeviceId int64
@@ -78,6 +122,13 @@ func checkedResult(rows []mysql.Row, res mysql.Result, err error) ([]mysql.Row, 
     return rows, res
 }
 
+/*
+* Used to form connection with the database.
+*
+*
+* Steven Whaley Feb, 27 - created
+*/
+
 func connect() (connection mysql.Conn){
     user := "root"
     pass := "toor"
@@ -95,11 +146,26 @@ func connect() (connection mysql.Conn){
     return db
 }
 
+/*
+* Used to close connection with the database.
+* 
+*
+* Steven Whaley Feb, 27 - created
+*/
+
 func disconnect(connection mysql.Conn) {
 
   checkError(connection.Close())
 
 }
+
+/*
+* Takes in user information entered on the sign up page, and creates account and customer entries
+* in the database.
+* 
+*
+* Steven Whaley Feb, 26 - created
+*/
 
 func SignUp(firstname string, lastname string, email string, phoneNumber string, password string){
 
@@ -113,6 +179,14 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
     
     return
 }
+
+/*
+* Takes in user information entered on the sign up page, and creates account and customer entries
+* in the database.
+* 
+*
+* Steven Whaley Feb, 26 - created
+*/
 
 func VerifyAccountInfo(username string, password string) (bool, bool)  {
 
@@ -160,7 +234,13 @@ func VerifyAccountInfo(username string, password string) (bool, bool)  {
 }
 
 
-
+/*
+* Takes in user email address, and returns a slice of strings containing the names
+* of all the devices owned by the user.
+* 
+*
+* Steven Whaley Feb, 26 - created
+*/
 func GetUserDevices(email string) ([]string)  {
 
     customerId := "initial"
@@ -242,6 +322,12 @@ func GetUserDevices(email string) ([]string)  {
     return list
 }
 
+/*
+* Returns all the fields for a row with the id passed to the function.
+* 
+*
+* Steven Whaley Feb, 22 - created
+*/
 func GetAccountInfo(id_in string) (string)  {
 
     out := "initial"
@@ -295,6 +381,12 @@ func GetAccountInfo(id_in string) (string)  {
     return out 
 }
 
+/*
+* Returns all the fields for a row with the id passed to the function.
+* 
+*
+* Steven Whaley Feb, 22 - created
+*/
 func GetCoordinatesInfo(id_in string) (string){
 
      out := "initial"
@@ -351,6 +443,12 @@ func GetCoordinatesInfo(id_in string) (string){
     return out 
 }
 
+/*
+* Returns all the fields for a row with the id passed to the function.
+* 
+*
+* Steven Whaley Feb, 22 - created
+*/
 func GetCustomerInfo(id_in string) (string){
 
      out := "initial"
@@ -413,6 +511,12 @@ func GetCustomerInfo(id_in string) (string){
     return out 
 }
 
+/*
+* Returns all the fields for a row with the id passed to the function.
+* 
+*
+* Steven Whaley Feb, 22 - created
+*/
 func GetGpsDeviceInfo(id_in string) (string){
 
      out := "initial"
@@ -467,6 +571,12 @@ func GetGpsDeviceInfo(id_in string) (string){
     return out 
 }
 
+/*
+* Returns all the fields for a row with the id passed to the function.
+* 
+*
+* Steven Whaley Feb, 22 - created
+*/
 func GetIpAddressInfo(id_in string) (string){
 
      out := "initial"
@@ -518,6 +628,12 @@ func GetIpAddressInfo(id_in string) (string){
     return out 
 }
 
+/*
+* Returns all the fields for a row with the id passed to the function.
+* 
+*
+* Steven Whaley Feb, 22 - created
+*/
 func GetIpListInfo(id_in string) (string){
 
      out := "initial"
@@ -569,6 +685,12 @@ func GetIpListInfo(id_in string) (string){
     return out 
 }
 
+/*
+* Returns all the fields for a row with the id passed to the function.
+* 
+*
+* Steven Whaley Feb, 22 - created
+*/
 func GetKeyLogsInfo(id_in string) (string){
 
      out := "initial"
@@ -621,6 +743,12 @@ func GetKeyLogsInfo(id_in string) (string){
     return out 
 }
 
+/*
+* Returns all the fields for a row with the id passed to the function.
+* 
+*
+* Steven Whaley Feb, 22 - created
+*/
 func GetLaptopDeviceInfo(id_in string) (string){
 
      out := "initial"
@@ -679,6 +807,12 @@ func GetLaptopDeviceInfo(id_in string) (string){
     return out 
 }
 
+/*
+* Main used for testing only.
+* 
+*
+* Steven Whaley Feb, 22 - created
+*/
 func main() {
 
   //fmt.Println(GetAccountInfo("12"))

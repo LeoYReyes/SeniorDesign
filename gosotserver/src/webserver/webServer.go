@@ -169,11 +169,12 @@ func StartWebServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *
 
 //TODO: make chan handler in webClientHub
 func chanHandler() {
-	/*for {
+	fmt.Println("web chan handler started")
+	for {
 		select {
-		case c := <-fromServerT:
-			fmt.Println("web server received: ", string(c))
-			h.broadcast <- c
+		case req := <-fromServer:
+			fmt.Println("web server received: ", string(req.Payload))
+			h.broadcast <- req.Payload
 		}
-	}*/
+	}
 }

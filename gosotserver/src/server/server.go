@@ -4,7 +4,7 @@ import (
 	"CustomProtocol"
 	"databaseSOT"
 	"device"
-	//"fmt"
+	"fmt"
 	//"time"
 	"webserver"
 )
@@ -43,8 +43,6 @@ func main() {
 		}
 
 	}
-	//fmt.Println(<-fromWebCh)
-	//time.Sleep(3000000 * time.Millisecond)
 	//TODO: figure out a way to leave it running with for loop
 }
 
@@ -52,9 +50,12 @@ func reRoute(req *CustomProtocol.Request) {
 	switch req.Destination {
 	case CustomProtocol.Database:
 		toDatabaseCh <- req
+		fmt.Println("Reroute to database")
 	case CustomProtocol.Web:
 		toWebCh <- req
+		fmt.Println("Reroute to web")
 	case CustomProtocol.DeviceGPS, CustomProtocol.DeviceLaptop:
 		toDeviceCh <- req
+		fmt.Println("Reroute to device")
 	}
 }

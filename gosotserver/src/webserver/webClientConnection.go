@@ -1,7 +1,7 @@
 package webserver
 
 import (
-	//"CustomRequest"
+	"CustomProtocol"
 	//"encoding/gob"
 	"fmt"
 	"net/http"
@@ -63,8 +63,15 @@ func (c *connection) readPump() {
 		if err != nil {
 			break
 		}
-		fmt.Println(message)
-		h.broadcast <- message
+		fmt.Println(string(message))
+		// Creates request from message and send off
+		// Currently only sending msg to GPS device
+		response := make(chan []byte)
+		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
+			Source: CustomProtocol.Web, OpCode: CustomProtocol.ActivateGPS, Payload: message, Response: response}
+		toServer <- req
+		fmt.Println("Response received: ", <-response)
+		//h.broadcast <- message
 		//h.inMessage <- Message{c, message}
 	}
 }

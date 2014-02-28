@@ -190,7 +190,7 @@ func checkedResult(rows []mysql.Row, res mysql.Result, err error) ([]mysql.Row, 
 
 func connect() (connection mysql.Conn) {
 	user := "root"
-	pass := ""
+	pass := "toor"
 	dbname := "trackerdb"
 	proto := "tcp"
 	addr := "127.0.0.1:3306"

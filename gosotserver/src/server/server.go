@@ -8,12 +8,12 @@ import (
 	"webserver"
 )
 
-var toWebCh = make(chan *CustomProtocol.CustomProtocol)
-var fromWebCh = make(chan *CustomProtocol.CustomProtocol)
-var toDatabaseCh = make(chan *CustomProtocol.CustomProtocol)
-var fromDatabaseCh = make(chan *CustomProtocol.CustomProtocol)
-var toDeviceCh = make(chan *CustomProtocol.CustomProtocol)
-var fromDeviceCh = make(chan *CustomProtocol.CustomProtocol)
+var toWebCh = make(chan *CustomProtocol.Request)
+var fromWebCh = make(chan *CustomProtocol.Request)
+var toDatabaseCh = make(chan *CustomProtocol.Request)
+var fromDatabaseCh = make(chan *CustomProtocol.Request)
+var toDeviceCh = make(chan *CustomProtocol.Request)
+var fromDeviceCh = make(chan *CustomProtocol.Request)
 
 var testDeviceCh = make(chan []byte)
 var testWebCh = make(chan []byte)
@@ -22,12 +22,12 @@ func main() {
 	// channel can take optional capacity param to make it asynchronous
 	//comChannel := make(chan string)
 
-	//go webserver.StartWebServer(fromWebCh, toWebCh)
-	//go device.StartDeviceServer(fromDeviceCh, toDeviceCh)
+	go webserver.StartWebServer(fromWebCh, toWebCh)
+	go device.StartDeviceServer(fromDeviceCh, toDeviceCh)
 
 	// FOR TESTING
-	go webserver.StartWebServer(testWebCh)
-	go device.StartDeviceServer(testDeviceCh)
+	//go webserver.StartWebServer(testWebCh)
+	//go device.StartDeviceServer(testDeviceCh)
 	for {
 		select {
 		case req := <-testDeviceCh:
@@ -46,7 +46,7 @@ func main() {
 	//TODO: figure out a way to leave it running with for loop
 }
 
-func reRoute(req *CustomProtocol.CustomProtocol) {
+func reRoute(req *CustomProtocol.Request) {
 	switch req.Destination {
 	case CustomProtocol.Database:
 		toDatabaseCh <- req

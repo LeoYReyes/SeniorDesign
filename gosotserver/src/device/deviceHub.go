@@ -24,22 +24,22 @@ const (
 var toServer chan *CustomProtocol.Request
 var fromServer chan *CustomProtocol.Request
 
-func StartDeviceServer(toServerIn chan []byte) {
+/*func StartDeviceServer(toServerIn chan []byte) {
 	toServerT = toServerIn
 	go MapDeviceID()
 	go SmsConnection()
 	listener := Connect()
 	Listen(listener)
-}
+}*/
 
-/*func StartDeviceServer(fromServerIn chan *CustomRequest.Request, toServerIn chan *CustomRequest.Request) {
+func StartDeviceServer(fromServerIn chan *CustomProtocol.Request, toServerIn chan *CustomProtocol.Request) {
 	toServer = toServerIn
 	fromServer = fromServerIn
 	go MapDeviceID()
 	go SmsConnection()
 	listener := Connect()
 	Listen(listener)
-}*/
+}
 
 // Test code for server.go
 //go device.MapDeviceID()

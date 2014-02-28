@@ -1,5 +1,5 @@
 var map;
-var socket = new WebSocket("ws://localhost:8080/ws")
+var socket = new WebSocket("ws://" + window.location.href.substring(window.location.protocol.length, window.location.href.lastIndexOf('/')) + "/ws");
 
 var mapOptions = {
     zoom: 8,
@@ -33,8 +33,8 @@ socket.onopen = function() {
 
 socket.onmessage = function(msg){
     alert(msg.data); //Awesome!
-	var lat = parseFloat(msg.data.substring(0,6));
-	var longitude = parseFloat(msg.data.substring(7,14));
+	var lat = parseFloat(msg.data.substring(0,7));
+	var longitude = parseFloat(msg.data.substring(8,16));
 	var markerPos = new google.maps.LatLng(lat, longitude);
 	new google.maps.Marker({
             position: markerPos,

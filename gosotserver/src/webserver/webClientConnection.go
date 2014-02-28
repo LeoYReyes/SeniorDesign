@@ -24,6 +24,7 @@ const (
 	maxMessageSize = 512
 )
 
+// Not being used right now, might not need at all
 type userSession struct {
 	userId      string
 	inSession   bool
@@ -63,6 +64,7 @@ func (c *connection) readPump() {
 			break
 		}
 		fmt.Println(message)
+		h.broadcast <- message
 		//h.inMessage <- Message{c, message}
 	}
 }

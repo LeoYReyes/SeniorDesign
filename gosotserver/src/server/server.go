@@ -2,6 +2,7 @@ package main
 
 import (
 	"CustomProtocol"
+	"databaseSOT"
 	"device"
 	//"fmt"
 	//"time"
@@ -24,6 +25,7 @@ func main() {
 
 	go webserver.StartWebServer(fromWebCh, toWebCh)
 	go device.StartDeviceServer(fromDeviceCh, toDeviceCh)
+	go databaseSOT.StartDatabaseServer(fromDatabaseCh, toDatabaseCh)
 
 	// FOR TESTING
 	//go webserver.StartWebServer(testWebCh)

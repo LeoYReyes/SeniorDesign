@@ -1,3 +1,4 @@
+//TODO: Refactor: processRequest that all components can share
 package CustomProtocol
 
 const (

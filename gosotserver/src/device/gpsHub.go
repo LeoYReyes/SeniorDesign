@@ -1,3 +1,12 @@
+/*
+ * @author Nathan Plotts (nwp0002@auburn.edu)
+ * @author Charlie Baker (cmb0049@auburn.edu)
+ * @author Leo Reyes (lyr0001@auburn.edu)
+ * This file is where the the gpsHub struct is defined and also
+ * where general Geogram connection handling functions will be
+ * stored.
+ */
+
 package device
 
 import (

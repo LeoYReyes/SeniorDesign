@@ -1,4 +1,3 @@
-// testproj project testproj.go
 // personal note: export GOPATH=/Users/stevenwhaley/go/
 
 package databaseSOT
@@ -7,9 +6,6 @@ import (
         "fmt"
         "os"
         "strconv"
-        //"bytes"
-        //"encoding/json"
-
         "github.com/ziutek/mymysql/mysql"
         //_ "github.com/ziutek/mymysql/native" // Native engine
          _ "github.com/ziutek/mymysql/thrsafe" // Thread safe engine
@@ -17,8 +13,8 @@ import (
 
 
 type Account struct {
-	CustomerId int64
-	Id int64
+  CustomerId int64
+  Id int64
     UserName string
     Password string
     Admin bool
@@ -33,7 +29,7 @@ type Coordinates struct {
 }
 type Customer struct {
     Id int64
-	PhoneNumber string
+  PhoneNumber string
     Address string
     Email string
     FirstName string
@@ -69,9 +65,6 @@ type LaptopDevice struct {
     IsStolen int64
 }
 
-func printOK() {
-    fmt.Println("OK")
-}
 
 func checkError(err error) {
     if err != nil {
@@ -85,8 +78,7 @@ func checkedResult(rows []mysql.Row, res mysql.Result, err error) ([]mysql.Row, 
     return rows, res
 }
 
-func SignUp(firstname string, lastname string, email string, phoneNumber string, username string, password string){
-
+func connect() (connection mysql.Conn){
     user := "root"
     pass := "toor"
     dbname := "trackerdb"
@@ -100,11 +92,24 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
         panic(err)
     }
 
+    return db
+}
+
+func disconnect(connection mysql.Conn) {
+
+  checkError(connection.Close())
+
+}
+
+func SignUp(firstname string, lastname string, email string, phoneNumber string, password string){
+
+    db := connect()
+
     db.Query("INSERT INTO customer (firstName, lastName, email, phoneNumber) VALUES ('" + firstname + "', '" + lastname+ "', '" + email + "', '" + phoneNumber + "')") 
     
     db.Query("INSERT INTO account (userName, password, customerId) SELECT '" + email + "', '" + password + "', id FROM customer WHERE email='" + email + "'")
   
-    checkError(db.Close())
+    disconnect(db)
     
     return
 }
@@ -114,22 +119,9 @@ func VerifyAccountInfo(username string, password string) (bool, bool)  {
     bool1 := false
     bool2 := false
     
-     accountInfo := new (Account)
+    accountInfo := new (Account)
 
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    //proto := "unix"
-    //addr := "/var/run/mysqld/mysqld.sock"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
-    
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    db := connect()
 
     rows, res, err := db.Query("select * from account")
     if err != nil {
@@ -147,32 +139,12 @@ func VerifyAccountInfo(username string, password string) (bool, bool)  {
             }
         }
 
-        
-        //val2 := row[0].([]byte)
-        //val3 := row[1].([]byte)
         val4 := row[2].([]byte)
         val5 := row[3].([]byte)
         
         accountInfo.UserName = string(val4[:])
         accountInfo.Password = string(val5[:])
       
-	  //  fmt.Println(accountInfo.UserName)
-      //  fmt.Println(accountInfo.Password)
-
-        //jsonx, _ := json.Marshal(accountInfo)
-      //  fmt.Println(string(jsonx))
-       
-       
-      //  m := &Account{UserName: "leo", Password: "pass"}
-        //json1, _ := json.Marshal(m)
-        //fmt.Println(string(json1))
-
-
-        //x := &Account{UserName: "test", Password: "pass"}
-        //acc1, _ := json.Marshal(x)
-        //fmt.Println(string(acc1))
-
-        
 
         if accountInfo.UserName == username{
             bool1 = true
@@ -180,42 +152,25 @@ func VerifyAccountInfo(username string, password string) (bool, bool)  {
         if accountInfo.Password == password{
             bool2 = true
         }
-
-            
-
-      //  out = string(jsonx)
-
     }
 
-    checkError(db.Close())
-    //fmt.Print("Connection Closed... ")
-    //printOK()
-
+    disconnect(db)
+    
     return bool1, bool2
 }
 
 
 
-/*func GetUserDevices(customerId string) (string)  {
+func GetUserDevices(email string) ([]string)  {
 
-    out := "initial"
-
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    //proto := "unix"
-    //addr := "/var/run/mysqld/mysqld.sock"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
+    customerId := "initial"
     
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    var list []string
+    
+    db := connect()
 
-    rows, res, err := db.Query("select name from gpsDevice, laptopDevice where customerId = 15")
+    //finding customerId to be used for selecting devices
+  rows, res, err := db.Query("select customerId from account where userName = '" + email + "'")
     if err != nil {
         panic(err)
     }
@@ -232,38 +187,68 @@ func VerifyAccountInfo(username string, password string) (bool, bool)  {
         }
 
         val1 := row[0].([]byte)
-        val2 := row[1].([]byte)
-        val3 := row[2].([]byte)
-        val4 := row[3].([]byte)
-        val5 := row[4].([]byte)
- 
-        out = string(val1[:])
+        customerId = string(val1[:])
+     
     }
 
-    checkError(db.Close())
- 
+    //adding laptopDevices to the the devices list
+    rows2, res2, err2 := db.Query("select deviceName from laptopDevice where customerId = '" + customerId + "'")
+    if err2 != nil {
+        panic(err2)
+    }
 
-    return out
-}*/
+    res2 = res2
+    
+
+    for _, row2 := range rows2 {
+        for _, col2 := range row2 {
+            if col2 == nil {
+                // col has NULL value
+            } else {
+                // Do something with text in col (type []byte)
+            }
+        }
+
+        val2 := row2[0].([]byte)
+
+        list = append(list, string(val2[:]))
+        
+    }
+
+    //adding gpsDevices to the devices list
+    rows3, res3, err3 := db.Query("select name from gpsDevice where customerId = '" + customerId + "'")
+    if err3 != nil {
+        panic(err3)
+    }
+
+    res3 = res3
+    
+    for _, row3 := range rows3 {
+        for _, col3 := range row3 {
+            if col3 == nil {
+                // col has NULL value
+            } else {
+                // Do something with text in col (type []byte)
+            }
+        }
+
+        val3 := row3[0].([]byte)
+
+        list = append(list, string(val3[:]))
+    }
+
+    disconnect(db)
+ 
+    return list
+}
 
 func GetAccountInfo(id_in string) (string)  {
 
     out := "initial"
     
-     accountInfo := new (Account)
+    accountInfo := new (Account)
 
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
-    
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    db := connect()
 
     rows, res, err := db.Query("select * from account where id = " + id_in)
     if err != nil {
@@ -298,14 +283,14 @@ func GetAccountInfo(id_in string) (string)  {
       accountInfo.Password = string(val4[:])
       //accountInfo.Admin = string(val5[:])
 
- 		err2 = err2
- 		err3 = err3
+    err2 = err2
+    err3 = err3
 
     }
 
-    	out = fmt.Sprint(accountInfo.CustomerId, accountInfo.Id, accountInfo.UserName, accountInfo.Password)
+      out = fmt.Sprint(accountInfo.CustomerId, accountInfo.Id, accountInfo.UserName, accountInfo.Password)
 
-    checkError(db.Close())
+    disconnect(db)
 
     return out 
 }
@@ -316,18 +301,7 @@ func GetCoordinatesInfo(id_in string) (string){
     
      coordinatesInfo := new (Coordinates)
 
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
-    
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    db := connect()
 
     rows, res, err := db.Query("select * from coordinates where id = " + id_in)
     if err != nil {
@@ -363,16 +337,16 @@ func GetCoordinatesInfo(id_in string) (string){
       coordinatesInfo.Timestamp = string(val4[:])
       coordinatesInfo.Id, err5 = strconv.ParseInt(string(val5[:]), 10, 64)
 
- 		err2 = err2
- 		err3 = err3
- 		err4 = err4
- 		err5 = err5
+    err2 = err2
+    err3 = err3
+    err4 = err4
+    err5 = err5
 
     }
 
     out = fmt.Sprint(coordinatesInfo.DeviceId, coordinatesInfo.Latitude, coordinatesInfo.Longitude, coordinatesInfo.Timestamp, coordinatesInfo.Id)
 
-    checkError(db.Close())
+    disconnect(db)
 
     return out 
 }
@@ -383,18 +357,7 @@ func GetCustomerInfo(id_in string) (string){
     
      customerInfo := new (Customer)
 
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
-    
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    db := connect()
 
     rows, res, err := db.Query("select * from customer where id = " + id_in)
     if err != nil {
@@ -432,20 +395,20 @@ func GetCustomerInfo(id_in string) (string){
       customerInfo.Address = string(val3[:])
       customerInfo.Email = string(val4[:])
       customerInfo.FirstName = string(val5[:])
-	  customerInfo.LastName = string(val6[:])
- 	
- 		err2 = err2
- 		err3 = err3
- 		err4 = err4
- 		err5 = err5
- 		err6 = err6
- 		err7 = err7
+    customerInfo.LastName = string(val6[:])
+  
+    err2 = err2
+    err3 = err3
+    err4 = err4
+    err5 = err5
+    err6 = err6
+    err7 = err7
 
     }
 
     out = fmt.Sprint(customerInfo.Id, customerInfo.PhoneNumber, customerInfo.Address, customerInfo.Email, customerInfo.FirstName, customerInfo.LastName)
 
-    checkError(db.Close())
+    disconnect(db)
 
     return out 
 }
@@ -456,18 +419,7 @@ func GetGpsDeviceInfo(id_in string) (string){
     
      gpsDeviceInfo := new (GpsDevice)
 
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
-    
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    db := connect()
 
     rows, res, err := db.Query("select * from gpsDevice where id = " + id_in)
     if err != nil {
@@ -501,16 +453,16 @@ func GetGpsDeviceInfo(id_in string) (string){
       gpsDeviceInfo.CustomerId, err3 = strconv.ParseInt(string(val3[:]), 10, 64)
       gpsDeviceInfo.IsStolen, err4 = strconv.ParseInt(string(val4[:]), 10, 64)
      
- 		err2 = err2
- 		err3 = err3
- 		err4 = err4
- 		err5 = err5
+    err2 = err2
+    err3 = err3
+    err4 = err4
+    err5 = err5
 
     }
 
     out = fmt.Sprint(gpsDeviceInfo.Id, gpsDeviceInfo.Name, gpsDeviceInfo.CustomerId, gpsDeviceInfo.IsStolen)
 
-    checkError(db.Close())
+    disconnect(db)
 
     return out 
 }
@@ -521,18 +473,7 @@ func GetIpAddressInfo(id_in string) (string){
     
      ipAddressInfo := new (IpAddress)
 
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
-    
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    db := connect()
 
     rows, res, err := db.Query("select * from ipAddress where id = " + id_in)
     if err != nil {
@@ -563,16 +504,16 @@ func GetIpAddressInfo(id_in string) (string){
       ipAddressInfo.ListId, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
       ipAddressInfo.IpAddress = string(val2[:])
       ipAddressInfo.Id, err3 = strconv.ParseInt(string(val3[:]), 10, 64)
- 	
- 		err2 = err2
- 		err3 = err3
- 		err4 = err4
- 		
+  
+    err2 = err2
+    err3 = err3
+    err4 = err4
+    
     }
 
     out = fmt.Sprint(ipAddressInfo.ListId, ipAddressInfo.IpAddress, ipAddressInfo.Id)
 
-    checkError(db.Close())
+    disconnect(db)
 
     return out 
 }
@@ -583,18 +524,7 @@ func GetIpListInfo(id_in string) (string){
     
      ipListInfo := new (IpList)
 
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
-    
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    db := connect()
 
     rows, res, err := db.Query("select * from ipList where id = " + id_in)
     if err != nil {
@@ -626,15 +556,15 @@ func GetIpListInfo(id_in string) (string){
       ipListInfo.Id, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
       ipListInfo.DeviceId, err3 = strconv.ParseInt(string(val2[:]), 10, 64)
       ipListInfo.Timestamp = string(val3[:])
-     	
- 		err2 = err2
- 		err3 = err3
- 		err4 = err4
+      
+    err2 = err2
+    err3 = err3
+    err4 = err4
     }
 
     out = fmt.Sprint(ipListInfo.Id, ipListInfo.DeviceId, ipListInfo.Timestamp)
 
-    checkError(db.Close())
+    disconnect(db)
 
     return out 
 }
@@ -645,18 +575,7 @@ func GetKeyLogsInfo(id_in string) (string){
     
      keyLogsInfo := new (KeyLogs)
 
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
-    
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    db := connect()
 
     rows, res, err := db.Query("select * from keyLogs where id = " + id_in)
     if err != nil {
@@ -688,16 +607,16 @@ func GetKeyLogsInfo(id_in string) (string){
       keyLogsInfo.Timestamp = string(val2[:])
       keyLogsInfo.Data = string(val3[:])
      
- 	
- 		err2 = err2
- 		err3 = err3
- 		err4 = err4
- 		
+  
+    err2 = err2
+    err3 = err3
+    err4 = err4
+    
     }
 
     out = fmt.Sprint(keyLogsInfo.DeviceId, keyLogsInfo.Timestamp, keyLogsInfo.Data)
 
-    checkError(db.Close())
+    disconnect(db)
 
     return out 
 }
@@ -708,18 +627,7 @@ func GetLaptopDeviceInfo(id_in string) (string){
     
      laptopDeviceInfo := new (LaptopDevice)
 
-    user := "root"
-    pass := ""
-    dbname := "trackerdb"
-    proto := "tcp"
-    addr := "127.0.0.1:3306"
-
-    db := mysql.New(proto, "", addr, user, pass, dbname)
-    
-    err := db.Connect()
-    if err != nil {
-        panic(err)
-    }
+    db := connect()
 
     rows, res, err := db.Query("select * from laptopDevice where id = " + id_in)
     if err != nil {
@@ -756,47 +664,44 @@ func GetLaptopDeviceInfo(id_in string) (string){
       laptopDeviceInfo.MacAddress = string(val4[:])
       laptopDeviceInfo.IsStolen, err4 = strconv.ParseInt(string(val5[:]), 10, 64)
      
- 		err2 = err2
- 		err3 = err3
- 		err4 = err4
- 		err5 = err5
- 		err6 = err6
- 		
+    err2 = err2
+    err3 = err3
+    err4 = err4
+    err5 = err5
+    err6 = err6
+    
     }
 
     out = fmt.Sprint(laptopDeviceInfo.Id, laptopDeviceInfo.DeviceName, laptopDeviceInfo.CustomerId, laptopDeviceInfo.MacAddress, laptopDeviceInfo.IsStolen)
 
-    checkError(db.Close())
+    disconnect(db)
 
     return out 
 }
 
-func disconnect() {
-
-}
-
 func main() {
 
-	//fmt.Println(GetAccountInfo("12"))
+  //fmt.Println(GetAccountInfo("12"))
 
-	//fmt.Println(GetCoordinatesInfo("1"))
+  //fmt.Println(GetCoordinatesInfo("1"))
 
-	//fmt.Println(GetCustomerInfo("15"))
+  //fmt.Println(GetCustomerInfo("15"))
 
-	//fmt.Println(GetGpsDeviceInfo("15"))
+  //fmt.Println(GetGpsDeviceInfo("15"))
 
-	//fmt.Println(GetIpAddressInfo("1"))
+  //fmt.Println(GetIpAddressInfo("1"))
 
-	//fmt.Println(GetIpListInfo("1"))
+  //fmt.Println(GetIpListInfo("1"))
 
-	//fmt.Println(GetKeyLogsInfo("1"))
+  //fmt.Println(GetKeyLogsInfo("1"))
 
-	//fmt.Println(GetLaptopDeviceInfo("1"))
+  //fmt.Println(GetLaptopDeviceInfo("1"))
 
-	//fmt.Println(GetUserDevices("15"))
+  //fmt.Println(GetUserDevices("15"))
 
+  //fmt.Println(GetUserDevices("sadfk"))
 
-	SignUp("steven", "whaley", "steven@facebook.gov", "911", "usersteve", "password1")
+  //SignUp("steven", "whaley", "steven@facebook.gov", "911", "password1")
 
 
     //fmt.Println(VerifyAccountInfo("sadfk", "eieiei"))

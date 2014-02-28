@@ -1,7 +1,7 @@
 package device
 
 import (
-	"CustomRequest"
+	"CustomProtocol"
 	//"container/list"
 	//"fmt"
 	//"net"
@@ -21,8 +21,8 @@ const (
 	STOLEN        = 5
 )
 
-var toServer chan *CustomRequest.Request
-var fromServer chan *CustomRequest.Request
+var toServer chan *CustomProtocol.Request
+var fromServer chan *CustomProtocol.Request
 
 func StartDeviceServer(toServerIn chan []byte) {
 	toServerT = toServerIn

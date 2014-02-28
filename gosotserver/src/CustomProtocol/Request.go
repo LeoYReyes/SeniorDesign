@@ -64,6 +64,7 @@ type Request struct {
 	Source      int
 	OpCode      byte
 	Payload     []byte
+	Response    chan []byte
 }
 
 func AssignRequestId() int {

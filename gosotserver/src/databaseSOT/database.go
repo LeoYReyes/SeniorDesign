@@ -99,8 +99,22 @@ func processRequest(req *CustomProtocol.Request) {
 			}
 		}
 		fmt.Println(str)
-		//accountValid, passwordValid := VerifyAccountInfo(str[0], str[1])
-		//res := CustomProtocol.Request{Id:}
+		accountValid, passwordValid := VerifyAccountInfo(str[0], str[1])
+		res := make([]byte, 2)
+		if accountValid {
+			res[0] = 1
+			if passwordValid {
+				res[1] = 1
+			} else {
+				res[0] = 0
+			}
+		} else {
+			res[0] = 0
+			res[1] = 0
+		}
+		//fmt.Println("Method Return: ", accountValid, passwordValid)
+		//fmt.Println("Byte form: ", res)
+		req.Response <- res
 	case CustomProtocol.SetAccount:
 	case CustomProtocol.GetDevice:
 	case CustomProtocol.SetDevice:

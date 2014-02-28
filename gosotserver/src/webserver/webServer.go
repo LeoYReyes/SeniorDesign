@@ -60,11 +60,8 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		// Handle error
 		fmt.Println("ParseForm error: ", err)
 	}
-	//workorder := new(WorkOrder)
-	// r.PostForm is a map of our POST form values
-	//err = decoder.Decode(workorder, r.PostForm)
+
 	fmt.Println(r.PostForm)
-	//workorder.contactInfo.firstName = r.PostForm.Get("contactInfo.firstName")
 	if err != nil {
 		// Handle error
 		fmt.Println("decoder error: ", err)
@@ -84,18 +81,22 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.PostForm.Get("loginName"))
 	fmt.Println(r.PostForm.Get("loginPassword"))
 	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
+
 	buf := []byte{}
 	buf = strconv.AppendQuoteToASCII(buf, r.PostForm.Get("loginName"))
 	buf = append(buf, 0x1B)
 	buf = strconv.AppendQuoteToASCII(buf, hashedPass)
 	buf = append(buf, 0x1B)
+
+	resCh := make(chan []byte)
 	req := CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: 1, Source: 2,
-		OpCode: CustomProtocol.VerifyLoginCredentials, Payload: buf}
+		OpCode: CustomProtocol.VerifyLoginCredentials, Payload: buf, Response: resCh}
 	toServer <- &req
-	accountValid, passwordValid := databaseSOT.VerifyAccountInfo(r.PostForm.Get("loginName"), hashedPass)
-	if accountValid && passwordValid {
+	res := <-resCh
+	//accountValid, passwordValid := databaseSOT.VerifyAccountInfo(r.PostForm.Get("loginName"), hashedPass)
+	fmt.Println("Response: ", res[0], res[1])
+	if (res[0] == 1) && (res[1] == 1) {
 		serveSession(w, r)
-		//http.Redirect(w, r, "/mapUser", 301)
 	} else {
 		http.Error(w, "Invalid Login", 80085)
 		return

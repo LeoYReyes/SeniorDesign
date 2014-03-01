@@ -24,12 +24,12 @@ function initialize() {
     mapOptions.center = point;
 
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
-	currentPosition = new google.maps.Marker({
+	/*currentPosition = new google.maps.Marker({
             position: point,
 			icon: markerImg,
             map: map,
             title: 'Default Location'
-        });
+        });*/
 	document.getElementById("togglePrevLoc").addEventListener('click', togglePreviousLocations, false);
 }
 
@@ -52,16 +52,24 @@ socket.onmessage = function(msg){
 	var lat = parseFloat(msg.data.substring(0, msg.data.lastIndexOf(",")));
 	var longitude = parseFloat(msg.data.substring(msg.data.lastIndexOf(",") + 1,msg.data.length));
 	var markerPos = new google.maps.LatLng(lat, longitude);
-	
-	currentPosition.setIcon(ghostMarkerImg);
-	previousLocations.push(currentPosition);
-	//alert(currentPosition.icon);
-	currentPosition = new google.maps.Marker({
+	if(currentPosition) {
+		currentPosition.setIcon(ghostMarkerImg);
+		previousLocations.push(currentPosition);
+		//alert(currentPosition.icon);
+		currentPosition = new google.maps.Marker({
+	            position: markerPos,
+				icon: markerImg,
+	            map: map,
+	            title: 'New Location'
+	    });
+	} else {
+		currentPosition = new google.maps.Marker({
             position: markerPos,
 			icon: markerImg,
             map: map,
-            title: 'New Location'
+            title: 'Default Location'
         });
+	}
 }
 
 socket.onclose = function() {

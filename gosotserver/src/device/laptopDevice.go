@@ -45,7 +45,7 @@ func (ld *LaptopDevice) UpdateKeylog() bool {
 	payload := append(id, keylog...)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
-		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.CheckDeviceStolen, Payload: payload,
+		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.UpdateUserKeylogData, Payload: payload,
 		Response: response}
 	toServer <- req
 	fmt.Println("UpdateKeylogData request created and sent")
@@ -64,7 +64,7 @@ func (ld *LaptopDevice) UpdateTraceroute() bool {
 	payload := append(id, tracerouteBytes...)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
-		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.CheckDeviceStolen, Payload: payload,
+		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.UpdateUserIPTraceData, Payload: payload,
 		Response: response}
 	toServer <- req
 	fmt.Println("UpdateTracerouteData request created and sent")

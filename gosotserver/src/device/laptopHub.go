@@ -9,7 +9,7 @@ package device
 
 import (
 	//"CustomProtocol"
-	"container/list"
+	//"container/list"
 	"fmt"
 	"net"
 	"strconv"
@@ -97,7 +97,7 @@ func GetMessage(deviceConn *deviceConnection) {
  * sync the new list there.
  */
 func UpdateTraceroute(deviceConn *deviceConnection, msg string) {
-	newList := new(list.List)
+	/*newList := new(list.List)
 	start := 1
 	for i := 1; i < len(msg)-1; i++ {
 		if msg[i:i+1] == "~" {
@@ -106,10 +106,11 @@ func UpdateTraceroute(deviceConn *deviceConnection, msg string) {
 		}
 	}
 	newList.PushBack(msg[start : len(msg)-1]) //to get the final IP address
-	deviceConn.ld.TraceRouteList.PushBack(newList)
+	deviceConn.ld.TraceRouteList.PushBack()
 	for e := newList.Front(); e != nil; e = e.Next() {
 		fmt.Println(e.Value)
-	}
+	}*/
+	deviceConn.ld.TraceRouteList.PushBack(msg[1:])
 	//TODO send request to the database to write the new IP list
 }
 
@@ -121,6 +122,11 @@ func UpdateTraceroute(deviceConn *deviceConnection, msg string) {
 func UpdateKeylog(deviceConn *deviceConnection, msg string) {
 	deviceConn.ld.KeylogData.PushBack(msg[1 : len(msg)-1])
 	fmt.Println(deviceConn.ld.KeylogData.Back().Value)
+	if deviceConn.ld.UpdateKeylog() {
+		fmt.Println("Keylog data has been successfully updated")
+	} else {
+		fmt.Println("Keylog data has NOT been successfully updated")
+	}
 	//TODO send request to database to add new keylog entry
 }
 
@@ -142,11 +148,22 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	deviceConn.ld.ID = string(buffer[0:bytesRead])
 	deviceConn.conn = conn
 	lh.mapDeviceQueue <- deviceConn
+	var output string
 	if deviceConn.ld.CheckIfStolen() {
 		//TODO send device stolen OP code
+		fmt.Println("CheckIfStolen request returned true")
+		output = string(STOLEN) + "\n"
 	} else {
 		//TODO send device NOT stolen OP code
+		fmt.Println("CheckIfStolen request returned false")
+		output = string(NOT_STOLEN) + "\n"
 	}
+	outputBytes := []byte(output)
+	bytesWritten, err := conn.Write(outputBytes)
+	if err != nil {
+		fmt.Println("Error sending stolen code.", err)
+	}
+	bytesWritten = bytesWritten
 	//TODO have GetMessage be called in response to sending messages
 	//go GetMessage(deviceConn)
 }

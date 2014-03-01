@@ -48,7 +48,7 @@ func SmsConnection() {
 				fmt.Println("smsCh: ", string(m))
 				smsConn.Write(m)
 			default:
-				fmt.Println("Waiting to read from smsdevice")
+				//fmt.Println("Waiting to read from smsdevice")
 				bytesRead, _ := smsConn.Read(buffer)
 				if bytesRead > 0 {
 					if bytesRead > 10 {

@@ -3,7 +3,7 @@ package device
 import (
 	"CustomProtocol"
 	//"container/list"
-	//"fmt"
+	"fmt"
 	//"net"
 	//"strconv"
 	//"strings"
@@ -32,13 +32,34 @@ var fromServer chan *CustomProtocol.Request
 	Listen(listener)
 }*/
 
-func StartDeviceServer(fromServerIn chan *CustomProtocol.Request, toServerIn chan *CustomProtocol.Request) {
+func StartDeviceServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *CustomProtocol.Request) {
 	toServer = toServerIn
 	fromServer = fromServerIn
 	go MapDeviceID()
 	go SmsConnection()
+	go chanHandler()
 	listener := Connect()
 	Listen(listener)
+}
+
+func chanHandler() {
+	for {
+		select {
+		case req := <-fromServer:
+			fmt.Println("Device received request from server")
+			go processRequest(req)
+		}
+	}
+}
+
+func processRequest(req *CustomProtocol.Request) {
+	switch req.OpCode {
+	case CustomProtocol.ActivateGPS:
+		fmt.Println("processing activate gps")
+		smsCh <- req.Payload
+		fmt.Println("Message Sent: ", string(req.Payload))
+		req.Response <- []byte{1}
+	}
 }
 
 // Test code for server.go

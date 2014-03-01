@@ -30,20 +30,20 @@
   <div class="col-md-5">
   		<h1> Sign Up </h1>
   		<br></br>
-  		<form id="signup-form">
-	  		<input type="text" id="firstName" class="form-control" placeholder="First Name" required="autofocus"></input>
+  		<form id="signup-form" action="signup" method="POST">
+	  		<input type="text" id="firstName" name="firstName" class="form-control" placeholder="First Name" required="autofocus"></input>
 	  		<br></br>
-	  		<input type="text" id="lastName" class="form-control" placeholder="Last Name" required="autofocus"></input>
+	  		<input type="text" id="lastName" name="lastName" class="form-control" placeholder="Last Name" required="autofocus"></input>
 	  		<br></br>
-	  		<input type="email" id="email" class="form-control" placeholder="Email address" required="autofocus"></input>
+	  		<input type="email" id="email" name="email" class="form-control" placeholder="Email address" required="autofocus"></input>
 	  		<br></br>
-	  		<input type="text" id="phoneNumber" class="form-control" placeholder="Phone Number" required="autofocus"></input>
+	  		<input type="text" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="Phone Number" required="autofocus"></input>
 	  		<br></br>
-	  		<input type="password" id="password" class="form-control" placeholder="Desired Password" required="autofocus"></input>
+	  		<input type="password" id="password" name="password" class="form-control" placeholder="Desired Password" required="autofocus"></input>
 			<br></br>
 			<input type="password" id="confirmPassword" class="form-control" placeholder="Confirm Password" required="autofocus"></input>
 			<br></br>
-	        <button id="signUp" class="btn btn-lg btn-priority btn-block" onclick="signup()" type="submit">Sign Up!</button>
+	        <button id="signUp" class="btn btn-lg btn-priority btn-block" type="submit">Sign Up!</button>
 	        <br></br>
 		</form>
   </div>
@@ -51,7 +51,7 @@
   <div class="col-md-1"></div>
   
   <div class="col-md-4">
-		<form id="login-form" action="/login" method="POST">
+		<form id="login-form" action="login" method="POST">
   		<h1> Login </h1>
   		<br></br>
         	<input id="loginName" name="loginName" type="email" class="form-control" placeholder="Email address" required= "autofocus"></input>

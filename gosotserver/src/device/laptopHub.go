@@ -8,7 +8,7 @@
 package device
 
 import (
-	//"CustomRequest"
+	//"CustomProtocol"
 	"container/list"
 	"fmt"
 	"net"

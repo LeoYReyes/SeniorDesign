@@ -32,8 +32,6 @@ func main() {
 	//go device.StartDeviceServer(testDeviceCh)
 	for {
 		select {
-		case req := <-testDeviceCh:
-			testWebCh <- req
 		case req := <-fromWebCh:
 			reRoute(req)
 		case req := <-fromDeviceCh:

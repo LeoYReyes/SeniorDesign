@@ -24,14 +24,6 @@ const (
 var toServer chan *CustomProtocol.Request
 var fromServer chan *CustomProtocol.Request
 
-/*func StartDeviceServer(toServerIn chan []byte) {
-	toServerT = toServerIn
-	go MapDeviceID()
-	go SmsConnection()
-	listener := Connect()
-	Listen(listener)
-}*/
-
 func StartDeviceServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *CustomProtocol.Request) {
 	toServer = toServerIn
 	fromServer = fromServerIn

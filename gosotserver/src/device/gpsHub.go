@@ -18,54 +18,55 @@ import (
 	"strings"
 )
 
-var smsConn net.Conn
-var smsCh = make(chan []byte)
+var toServerT chan []byte
 
-func SmsConnection() {
-	//connect
+func GPSConnect() net.Listener {
 	listener, err := net.Listen(CONN_TYPE, CONN_PORT_SMS)
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 	} else {
 
 	}
-
 	fmt.Println("Connection created on " + CONN_TYPE + " " + CONN_PORT_SMS)
+	return listener
+}
 
-	//send & receive
+func GPSListen(listener net.Listener) net.Conn {
 	for {
-		smsConn, err := listener.Accept()
+		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Error connecting", err)
 		}
-		buffer := make([]byte, 512)
 		fmt.Println("Connection established with SMS client")
+		GPSGetMessages(conn)
+	}
+}
 
-		msg := ""
-		for {
-			select {
-			case m := <-smsCh:
-				fmt.Println("smsCh: ", string(m))
-				smsConn.Write(m)
-			default:
-				//fmt.Println("Waiting to read from smsdevice")
-				bytesRead, _ := smsConn.Read(buffer)
-				if bytesRead > 0 {
-					if bytesRead > 10 {
-						received := string(buffer[0:bytesRead])
-						msg = googleMapLinkParser(received)
-						fmt.Println("Received msg: ", msg)
-						req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Web, Source: CustomProtocol.DeviceGPS,
-							OpCode: CustomProtocol.UpdateWebMap, Payload: []byte(msg)}
-						toServer <- req
-						fmt.Println("Req sent to server")
-					} else {
-						smsConn.Write([]byte("|"))
-					}
-				}
+func GPSGetMessages(conn net.Conn) {
+	msg := ""
+	for {
+		buffer := make([]byte, 512)
+		bytesRead, _ := conn.Read(buffer)
+		if bytesRead > 0 {
+			if bytesRead > 10 {
+				received := string(buffer[0:bytesRead])
+				msg = googleMapLinkParser(received)
+				fmt.Println("Received msg: ", msg)
+				req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Web, Source: CustomProtocol.DeviceGPS,
+					OpCode: CustomProtocol.UpdateWebMap, Payload: []byte(msg)}
+				toServer <- req
+			} else {
+				conn.Write([]byte("|"))
 			}
 		}
 	}
+}
+
+func SmsConnection() {
+	//connect
+	listener := GPSConnect()
+	GPSListen(listener)
+	//send & receive
 
 }
 

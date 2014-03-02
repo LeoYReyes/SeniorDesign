@@ -178,9 +178,9 @@ func processRequest(req *CustomProtocol.Request) {
 	case CustomProtocol.GetDevice:
 	case CustomProtocol.SetDevice:
 	case CustomProtocol.GetDeviceList:
-	case CustomProtocol.CheckDeviceStolen:
-	case CustomProtocol.UpdateUserKeylogData:
-	case CustomProtocol.UpdateUserIPTraceData:
+	case CustomProtocol.CheckDeviceStolen: // in: id string, out: boolean
+	case CustomProtocol.UpdateUserKeylogData: // in: id string, string keylog out: boolean
+	case CustomProtocol.UpdateUserIPTraceData: // in: id string, traceroute string, out: boolean
 	default:
 	}
 }
@@ -206,8 +206,8 @@ func checkedResult(rows []mysql.Row, res mysql.Result, err error) ([]mysql.Row, 
 
 func connect() (connection mysql.Conn) {
 	user := "root"
-	pass := "toor"
-	dbname := "trackerdb"
+	pass := ""
+	dbname := "test"
 	proto := "tcp"
 	addr := "127.0.0.1:3306"
 
@@ -253,6 +253,84 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 	disconnect(db)
 
 	return
+}
+
+
+/*
+*  IsDeviceStolen(deviceId string) (bool) takes in device id and return a
+*  boolean indicating whether that device is marked stolen.
+*
+*
+* Steven Whaley Mar, 1 - created
+ */
+
+func IsDeviceStolen(deviceId string) (bool) {
+
+  bool1 := false
+  
+  db := connect()
+
+  rows, res, err := db.Query("select isStolen from gpsDevice where id = '" + deviceId + "'")
+  if err != nil {
+    panic(err)
+  }
+
+  res = res
+
+  for _, row := range rows {
+    for _, col := range row {
+      if col == nil {
+        // col has NULL value
+      } else {
+        // Do something with text in col (type []byte)
+      }
+    }
+
+    var err2 error
+
+    val1 := row[0].([]byte)
+
+    temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
+    err2 = err2
+
+    if temp == 1 {
+      bool1 = true
+    } else {
+      bool1 = false
+    }
+  }
+
+  rows2, res2, err3 := db.Query("select isStolen from laptopDevice where id = '" + deviceId + "'")
+  if err3 != nil {
+    panic(err3)
+  }
+
+  res2 = res2
+
+  for _, row := range rows2 {
+    for _, col := range row {
+      if col == nil {
+        // col has NULL value
+      } else {
+        // Do something with text in col (type []byte)
+      }
+    }
+
+    val2 := row[0].([]byte)
+
+    temp2, err4 := strconv.ParseInt(string(val2[:]), 10, 64)
+    err4 = err4
+
+    if temp2 == 1 {
+      bool1 = true
+    } else {
+      bool1 = false
+    }
+  }
+
+  disconnect(db)
+
+  return bool1
 }
 
 /*
@@ -306,7 +384,6 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 
 	return bool1, bool2
 }
-
 /*
 * Takes in user email address, and returns a slice of strings containing the names
 * of all the devices owned by the user.

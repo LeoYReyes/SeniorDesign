@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:m="http://code.google.com/p/gmaps4jsf/">
+<head>
+	<!--<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>-->
+	<link type="text/css" rel="stylesheet" href="css/default.css"/>
+	<script type="text/javascript" src="js/map.js"></script>
+	<script type="text/javascript" src="https://maps.gstatic.com/intl/en_us/mapfiles/api-3/15/9/main.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css"></link>
+	<link rel="stylesheet" type="text/css" href="css/default.css"></link>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css"></link>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"></link>
+	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+</head>
+	<body>
+
+<style>
+   			#wrapper { position: relative; }
+   			#over_map { position: absolute; top: 10px; left: 10px; z-index: 99; }
+		</style>
+		
+	
+<div id="wrapper">
+   <div id="google_map">
+		<div id="map-canvas">
+					<script type="text/javascript" src="js/map.js"></script>
+		</div>	
+   </div>
+
+   <div id="over_map">
+   <!-- Nav Bar -->
+   <nav class="navbar navbar-default" role="navigation">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="#">SENIOR DESIGN: Object Tracker</a>
+    </div>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+              	
+              	
+              	<li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">All Devices <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+          	<li><a href="#">All Devices</a></li>
+    		<li class="divider"></li>
+    		<li><a href="#">Device One</a></li>
+    		<li class="divider"></li>
+    		<li><a href="#">Device Two</a></li>
+          </ul>
+        </li>
+        
+        
+      </ul> 
+
+      <ul class="nav navbar-nav navbar-right">
+      	<li class="dropdown">
+      	<li><a href="#">AccountName</a></li></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+   
+	<!-- SHOW right side of screen code -->
+	<div class='container'; opacity:0.8;>
+	
+	<!-- HIDE right side of screen code -->
+	<!-- <div class='container'; style="visibility: hidden;"> -->
+	
+		<div class='row'>
+			<!-- Left side w/o map code -->
+			<div class='col-md-9'></div>
+			<div class='col-md-3'>
+				
+					<div class='row'>
+						<div class='col-md-12'>
+							<nav class="navbar-default navbar-static-side" role="navigation" id="DeviceOneInfo">
+            <div class="sidebar-collapse">
+                <ul class="nav" id="side-menu">
+                    <div class='row'>
+                    <div class='col-md-1'></div>
+                    <div class='col-md-10'>
+                    <li><h3 >Device One</h3></li>
+					<li><h4>Tracking Details:</h4></li>
+					<li><h4>Lost</h4></li>
+					<li><small>Last Update: Date and Time</small></li>
+					</div></div>
+                    <li>
+                        <a><i class="fa fa-dashboard fa-fw" ></i>Update Location</a>
+                    </li>
+                    <li>
+                        <a data-toggle="modal" data-target="#modalKeylogger"><i class="fa fa-dashboard fa-fw" ></i>Keylogger File</a>
+                    </li>
+                    <li>
+                        <a data-toggle="modal" data-target="#modalRename"><i class="fa fa-dashboard fa-fw" ></i>Rename</a>
+                    </li>
+                    <li>
+                        <a data-toggle="modal" data-target="#modalDelete"><i class="fa fa-dashboard fa-fw" ></i>Delete</a>
+                    </li>
+                    <li>
+                        <a><i class="fa fa-dashboard fa-fw" ></i>Toggle Previous Location</a>
+                    </li>
+                    
+                </ul>
+                <!-- /#side-menu -->
+            </div>
+            <!-- /.sidebar-collapse -->
+        </nav>
+						
+						</div> <!-- /'col-md-6' -->
+					</div> <!-- /row -->
+			</div> <!-- /'col-md-4' -->
+			<!-- Google Map Rendering Code -->
+			<div class='col-md-1'>
+			</div> <!-- /'col-md-8' -->
+		</div> <!-- /row -->
+    </div> <!-- /Container -->
+   </div>
+</div>
+   </div>
+</div>
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        <h4 class="modal-title" id="myModalLabel">Rename Device: Device Name</h4>
+      </div>
+      <div class="row" >
+      	<div class="col-md-2"></div>
+      	<div class="col-md-8">
+      	<br></br>
+      	<input type="text" class="form-control" placeholder="New Device Name" required="autofocus"></input>
+      	</div>
+      	<div class="col-md-2"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        <h4 class="modal-title" id="myModalLabel">Device Name</h4>
+      </div>
+      	<div class="modal-body">
+        <h4 class="modal-title" id="myModalLabel">Are you sure you want to delete device "Device Name"?</h4>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+		<f:view contentType="text/html">
+        	
+	            <div class="row">
+	            	<div class="col-md-1"></div>
+	            	<div class="col-md-10">
+	            		<h:form id="map">
+		         	   		<m:map width="1000px" height="600px">
+		       					<m:marker>
+		          		  			<m:htmlInformationWindow htmlText="Hello" />
+		            			</m:marker>
+		       				</m:map>
+	       				</h:form>
+	       			</div>
+	       			<div class="col-md-1"></div>
+	       		</div>
+	       		
+		</f:view>
+		<br></br>
+
+
+
+	<!-- Rename Device PopOut -->
+	<div class="modal fade" id="modalRename" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        			<h4 class="modal-title" id="myModalLabel">Rename Device: iPhone 5s</h4>
+      			</div>
+      			<div class="row" >
+      				<div class="col-md-2"></div>
+      					<div class="col-md-8">
+      						<br></br>
+      						<input type="text" class="form-control" placeholder="New Device Name" required="autofocus"></input>
+      					</div>
+      				<div class="col-md-2"></div>
+      			</div>
+      			<div class="modal-footer">
+        			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+       				<button type="button" class="btn btn-primary">Save changes</button>
+      			</div>
+    		</div>
+  		</div>
+	</div>
+	
+	<!-- Keylogger PopOut -->
+	<div class="modal fade" id="modalKeylogger" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  		<div class="modal-dialog">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        			<h4 class="modal-title" id="myModalLabel">Keylog:</h4>
+     			</div>
+      			<div class="modal-body">
+        			<h4 class="modal-title" id="myModalLabel">Keylog Text goes here..</h4>
+      			</div>
+      			<div class="modal-footer">
+        			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        			<button type="button" class="btn btn-primary">Download File</button>
+      			</div>
+    		</div>
+  		</div>
+	</div> 
+	
+	<!-- Delete Device PopOut -->
+	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  		<div class="modal-dialog">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        			<h4 class="modal-title" id="myModalLabel">Device Name</h4>
+     			</div>
+      			<div class="modal-body">
+        			<h4 class="modal-title" id="myModalLabel">Are you sure you want to delete device "iPhone5s"?</h4>
+      			</div>
+      			<div class="modal-footer">
+        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        			<button type="button" class="btn btn-danger">Delete</button>
+      			</div>
+    		</div>
+  		</div>
+	</div> 
+
+	</body>
+</html>

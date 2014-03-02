@@ -74,7 +74,7 @@ public class SMSActivity extends Activity
 	 * Makes the text fields uneditable and changes the button text to a disconnect
 	 * prompt. Starts an AsyncTask (thread) which handles TCP and SMS messaging.
 	 */
-	public void connect()
+	private void connect()
 	{
 		EditText ipText = (EditText) findViewById(R.id.hostIPText);
 		EditText portText = (EditText) findViewById(R.id.hostPortText);
@@ -95,7 +95,7 @@ public class SMSActivity extends Activity
 	/**
 	 * Sets the AsyncTask handling TCP and SMS communications to expire
 	 */
-	public void disconnect()
+	private void disconnect()
 	{
 		tcp.endTask();
 		
@@ -116,7 +116,7 @@ public class SMSActivity extends Activity
 	 * Makes the text fields editable and re-enables the button (if it
 	 * is not already). Call when the AsyncTask handling TCP and SMS ends.
 	 */
-	public void disconnected()
+	protected void disconnected()
 	{
 		EditText ipText = (EditText) findViewById(R.id.hostIPText);
 		EditText portText = (EditText) findViewById(R.id.hostPortText);
@@ -134,7 +134,7 @@ public class SMSActivity extends Activity
 	/**
 	 * Sets text saying the app is not connected to server
 	 */
-	public void notConnected()
+	protected void notConnected()
 	{
 		TextView connectionText = (TextView) findViewById(R.id.connectionStatus);
 		connectionText.setText(getResources().getString(R.string.connection_connecting));
@@ -143,7 +143,7 @@ public class SMSActivity extends Activity
 	/**
 	 * Sets text saying the app is connected to server
 	 */
-	public void connected()
+	protected void connected()
 	{
 		TextView connectionText = (TextView) findViewById(R.id.connectionStatus);
 		connectionText.setText(getResources().getString(R.string.connection_connected));

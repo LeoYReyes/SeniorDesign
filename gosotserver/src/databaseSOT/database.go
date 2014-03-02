@@ -165,6 +165,9 @@ func processRequest(req *CustomProtocol.Request) {
 	case CustomProtocol.GetDevice:
 	case CustomProtocol.SetDevice:
 	case CustomProtocol.GetDeviceList:
+	case CustomProtocol.CheckDeviceStolen:
+	case CustomProtocol.UpdateUserKeylogData:
+	case CustomProtocol.UpdateUserIPTraceData:
 	default:
 	}
 }

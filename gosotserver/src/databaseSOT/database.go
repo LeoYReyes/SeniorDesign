@@ -128,7 +128,20 @@ func chanHandler() {
 	}
 }
 
+func parsePayload(payload []byte) []string {
+	str := []string{}
+	pos := 1
+	for index, element := range payload {
+		if element == 0x1B {
+			str = append(str, string(payload[pos:index-1]))
+			pos = index + 2
+		}
+	}
+	return str
+}
+
 func processRequest(req *CustomProtocol.Request) {
+	payload := parsePayload(req.Payload)
 	switch req.OpCode {
 	case CustomProtocol.NewAccount:
 	case CustomProtocol.NewDevice:
@@ -136,7 +149,7 @@ func processRequest(req *CustomProtocol.Request) {
 	case CustomProtocol.UpdateDeviceIP:
 	case CustomProtocol.UpdateDeviceKeylog:
 	case CustomProtocol.VerifyLoginCredentials:
-		str := []string{}
+		/*str := []string{}
 		pos := 1
 		for index, element := range req.Payload {
 			if element == 0x1B {
@@ -144,8 +157,8 @@ func processRequest(req *CustomProtocol.Request) {
 				pos = index + 2
 			}
 		}
-		fmt.Println(str)
-		accountValid, passwordValid := VerifyAccountInfo(str[0], str[1])
+		fmt.Println(str)*/
+		accountValid, passwordValid := VerifyAccountInfo(payload[0], payload[1])
 		res := make([]byte, 2)
 		if accountValid {
 			res[0] = 1

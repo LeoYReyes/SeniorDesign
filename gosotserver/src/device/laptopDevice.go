@@ -42,7 +42,8 @@ func (ld *LaptopDevice) CheckIfStolen() bool {
 func (ld *LaptopDevice) UpdateKeylog() bool {
 	id := []byte(ld.Device.ID)
 	keylog := ld.KeylogData.Back().Value.(string)
-	payload := append(id, keylog...)
+	payload := append(id, 0x1B)
+	payload = append(payload, keylog...)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
 		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.UpdateUserKeylogData, Payload: payload,
@@ -61,7 +62,8 @@ func (ld *LaptopDevice) UpdateTraceroute() bool {
 	id := []byte(ld.Device.ID)
 	traceroute := ld.TraceRouteList.Back().Value.(string)
 	tracerouteBytes := []byte(traceroute)
-	payload := append(id, tracerouteBytes...)
+	payload := append(id, 0x1B)
+	payload = append(payload, tracerouteBytes...)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
 		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.UpdateUserIPTraceData, Payload: payload,

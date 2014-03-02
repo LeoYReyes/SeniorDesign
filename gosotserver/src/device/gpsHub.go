@@ -21,7 +21,11 @@ import (
 var smsConn net.Conn
 var smsCh = make(chan []byte)
 
-func SmsConnection() {
+/*
+ * This method creates a connection which creates a new socket, opens the port
+ * that connections go through, and returns a listener.
+ */
+func GPSConnect() net.Listener {
 	//connect
 	listener, err := net.Listen(CONN_TYPE, CONN_PORT_SMS)
 	if err != nil {
@@ -29,46 +33,74 @@ func SmsConnection() {
 	} else {
 
 	}
-
 	fmt.Println("Connection created on " + CONN_TYPE + " " + CONN_PORT_SMS)
+	return listener
+}
 
-	//send & receive
+/*
+ * This method takes in the listener object created by the GPSConnect function
+ * and begins accepting connections through it. After creating a connection
+ * with a device it then calls the GPSCommunicate function.
+ */
+func GPSListen(listener net.Listener) {
 	for {
 		smsConn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Error connecting", err)
 		}
-		buffer := make([]byte, 512)
 		fmt.Println("Connection established with SMS client")
+		GPSCommunicate(smsConn)
+	}
+}
 
-		msg := ""
-		for {
-			select {
-			case m := <-smsCh:
-				fmt.Println("smsCh: ", string(m))
-				smsConn.Write(m)
-			default:
-				//fmt.Println("Waiting to read from smsdevice")
-				bytesRead, _ := smsConn.Read(buffer)
-				if bytesRead > 0 {
-					if bytesRead > 10 {
-						received := string(buffer[0:bytesRead])
-						msg = googleMapLinkParser(received)
-						fmt.Println("Received msg: ", msg)
-						req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Web, Source: CustomProtocol.DeviceGPS,
-							OpCode: CustomProtocol.UpdateWebMap, Payload: []byte(msg)}
-						toServer <- req
-						fmt.Println("Req sent to server")
-					} else {
-						smsConn.Write([]byte("|"))
-					}
+/*
+ * This method takes in the connection created in the GPSListen function and
+ * receives GPS coordinates through it. Any coordinates it receives it then
+ * sends to the database.
+ */
+func GPSCommunicate(conn net.Conn) {
+	buffer := make([]byte, 512)
+	msg := ""
+	for {
+		select {
+		case m := <-smsCh:
+			fmt.Println("smsCh: ", string(m))
+			conn.Write(m)
+		default:
+			//fmt.Println("Waiting to read from smsdevice")
+			bytesRead, _ := conn.Read(buffer)
+			if bytesRead > 0 {
+				if bytesRead > 10 {
+					received := string(buffer[0:bytesRead])
+					msg = googleMapLinkParser(received)
+					fmt.Println("Received msg: ", msg)
+					req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Web, Source: CustomProtocol.DeviceGPS,
+						OpCode: CustomProtocol.UpdateWebMap, Payload: []byte(msg)}
+					//TODO send GPS coordinates to the database
+					toServer <- req
+					fmt.Println("Req sent to server")
+				} else {
+					conn.Write([]byte("|"))
 				}
 			}
 		}
 	}
-
 }
 
+/*
+ * This method is the "main" method for the gpsHub file. When it's called it
+ * begins and keeps GPS tracker communications open and running
+ */
+func SmsConnection() {
+	//send & receive
+	listener := GPSConnect()
+	GPSListen(listener)
+}
+
+/*
+ * This method takes in string that was received in a text message and parses
+ * out the GPS coordinates, and then returns the coordinates as a string.
+ */
 func googleMapLinkParser(input string) string {
 	result := ""
 	str := input

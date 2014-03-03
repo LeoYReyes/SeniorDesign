@@ -130,11 +130,11 @@ func chanHandler() {
 
 func parsePayload(payload []byte) []string {
 	str := []string{}
-	pos := 1
+	pos := 0
 	for index, element := range payload {
 		if element == 0x1B {
-			str = append(str, string(payload[pos:index-1]))
-			pos = index + 2
+			str = append(str, string(payload[pos:index]))
+			pos = index + 1
 		}
 	}
 	return str
@@ -255,7 +255,6 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 	return
 }
 
-
 /*
 *  IsDeviceStolen(deviceId string) (bool) takes in device id and return a
 *  boolean indicating whether that device is marked stolen.
@@ -264,73 +263,73 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 * Steven Whaley Mar, 1 - created
  */
 
-func IsDeviceStolen(deviceId string) (bool) {
+func IsDeviceStolen(deviceId string) bool {
 
-  bool1 := false
-  
-  db := connect()
+	bool1 := false
 
-  rows, res, err := db.Query("select isStolen from gpsDevice where id = '" + deviceId + "'")
-  if err != nil {
-    panic(err)
-  }
+	db := connect()
 
-  res = res
+	rows, res, err := db.Query("select isStolen from gpsDevice where phoneNumber = '" + deviceId + "'")
+	if err != nil {
+		panic(err)
+	}
 
-  for _, row := range rows {
-    for _, col := range row {
-      if col == nil {
-        // col has NULL value
-      } else {
-        // Do something with text in col (type []byte)
-      }
-    }
+	res = res
 
-    var err2 error
+	for _, row := range rows {
+		for _, col := range row {
+			if col == nil {
+				// col has NULL value
+			} else {
+				// Do something with text in col (type []byte)
+			}
+		}
 
-    val1 := row[0].([]byte)
+		var err2 error
 
-    temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
-    err2 = err2
+		val1 := row[0].([]byte)
 
-    if temp == 1 {
-      bool1 = true
-    } else {
-      bool1 = false
-    }
-  }
+		temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
+		err2 = err2
 
-  rows2, res2, err3 := db.Query("select isStolen from laptopDevice where id = '" + deviceId + "'")
-  if err3 != nil {
-    panic(err3)
-  }
+		if temp == 1 {
+			bool1 = true
+		} else {
+			bool1 = false
+		}
+	}
 
-  res2 = res2
+	rows2, res2, err3 := db.Query("select isStolen from laptopDevice where macAddress = '" + deviceId + "'")
+	if err3 != nil {
+		panic(err3)
+	}
 
-  for _, row := range rows2 {
-    for _, col := range row {
-      if col == nil {
-        // col has NULL value
-      } else {
-        // Do something with text in col (type []byte)
-      }
-    }
+	res2 = res2
 
-    val2 := row[0].([]byte)
+	for _, row := range rows2 {
+		for _, col := range row {
+			if col == nil {
+				// col has NULL value
+			} else {
+				// Do something with text in col (type []byte)
+			}
+		}
 
-    temp2, err4 := strconv.ParseInt(string(val2[:]), 10, 64)
-    err4 = err4
+		val2 := row[0].([]byte)
 
-    if temp2 == 1 {
-      bool1 = true
-    } else {
-      bool1 = false
-    }
-  }
+		temp2, err4 := strconv.ParseInt(string(val2[:]), 10, 64)
+		err4 = err4
 
-  disconnect(db)
+		if temp2 == 1 {
+			bool1 = true
+		} else {
+			bool1 = false
+		}
+	}
 
-  return bool1
+	disconnect(db)
+
+	return bool1
 }
 
 /*
@@ -384,6 +383,7 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 
 	return bool1, bool2
 }
+
 /*
 * Takes in user email address, and returns a slice of strings containing the names
 * of all the devices owned by the user.

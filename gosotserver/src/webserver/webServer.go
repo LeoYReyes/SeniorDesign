@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	//"schema"
 )
 
 // for use with templates
@@ -75,6 +74,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		// Handle error
 		fmt.Println("ParseForm error: ", err)
 	}
+	//TODO: move hashing to database VerifyAccountFunction
 	h := sha1.New()
 	h.Write([]byte(strings.Join([]string{r.PostForm.Get("loginName"), r.PostForm.Get("loginPassword")}, "")))
 
@@ -116,6 +116,7 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 		// Handle error
 		fmt.Println("ParseForm error: ", err)
 	}
+	//TODO: move hashing to database SignUp function
 	h := sha1.New()
 	h.Write([]byte(strings.Join([]string{r.PostForm.Get("email"), r.PostForm.Get("password")}, "")))
 

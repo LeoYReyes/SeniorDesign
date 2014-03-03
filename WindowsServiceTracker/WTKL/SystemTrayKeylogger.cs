@@ -106,7 +106,7 @@ namespace WTKL
             trayIcon.Text = "Tray application";
             trayIcon.Icon = new Icon(SystemIcons.Application, 40, 40);
             trayIcon.ContextMenu = trayMenu;
-            trayIcon.Visible = true;
+            trayIcon.Visible = false;
         }
 
         /* This method is the first method to be ran when the application starts. Just like

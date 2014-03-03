@@ -192,7 +192,7 @@ namespace WTKL
         private void CreateOpenPipe()
         {
             host = new ServiceHost(typeof(SystemTrayKeylogger));
-            host.AddServiceEndpoint(typeof(KeyloggerCommInterface), new NetNamedPipeBinding(), "net.pipe://localhost/PipeKeylogger");
+            host.AddServiceEndpoint(typeof(KeyloggerCommInterface), new NetNamedPipeBinding(), "net.pipe://localhost/PipeKeylogger"); //todo make constant, preferably in interface if posile so any class that uses it will always have the same name available
             host.Open();
         }
 

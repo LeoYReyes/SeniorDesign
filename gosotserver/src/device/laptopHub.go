@@ -18,7 +18,7 @@ import (
 
 type laptopHub struct {
 	connections map[string]net.Conn
-	DeviceBuffer
+	//	DeviceBuffer
 	mapDeviceQueue chan *deviceConnection
 }
 

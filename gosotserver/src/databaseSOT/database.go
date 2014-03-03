@@ -344,7 +344,8 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 
 	bool1 := false
 	bool2 := false
-
+	fmt.Println(username)
+	fmt.Println(password)
 	accountInfo := new(Account)
 
 	db := connect()

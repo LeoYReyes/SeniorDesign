@@ -8,7 +8,7 @@
 
 package device
 
-import "net"
+//import "net"
 
 type Device struct {
 	ID string

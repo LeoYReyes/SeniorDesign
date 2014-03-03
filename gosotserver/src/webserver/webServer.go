@@ -8,7 +8,6 @@ import (
 	"html/template"
 	"mux"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -75,17 +74,17 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("ParseForm error: ", err)
 	}
 	//TODO: move hashing to database VerifyAccountFunction
-	h := sha1.New()
-	h.Write([]byte(strings.Join([]string{r.PostForm.Get("loginName"), r.PostForm.Get("loginPassword")}, "")))
+	ha := sha1.New()
+	ha.Write([]byte(strings.Join([]string{r.PostForm.Get("loginName"), r.PostForm.Get("loginPassword")}, "")))
 
 	fmt.Println(r.PostForm.Get("loginName"))
 	fmt.Println(r.PostForm.Get("loginPassword"))
-	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
+	hashedPass := fmt.Sprintf("%x", ha.Sum(nil))
 
 	buf := []byte{}
-	buf = strconv.AppendQuoteToASCII(buf, r.PostForm.Get("loginName"))
+	buf = append(buf, []byte(r.PostForm.Get("loginName"))...)
 	buf = append(buf, 0x1B)
-	buf = strconv.AppendQuoteToASCII(buf, hashedPass)
+	buf = append(buf, []byte(hashedPass)...)
 	buf = append(buf, 0x1B)
 
 	resCh := make(chan []byte)
@@ -157,6 +156,7 @@ func StartWebServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *
 	r.HandleFunc(handle("messager"))
 	r.HandleFunc(handle("devices"))
 	r.HandleFunc(handle("users"))
+	r.HandleFunc(handle("UserMapNEW"))
 	r.HandleFunc("/signup", signUpHandler)
 	r.HandleFunc("/login", loginHandler)
 	r.HandleFunc("/logout", logoutHandler)

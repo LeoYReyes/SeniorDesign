@@ -2,3 +2,8 @@ lessons learned
 
 Initially we had decided to code our server in java.  Because all of our group members are skilled with coding in java and all of the java libraries that would be at our disposal, it sounded like a good idea.  We then designed our java server and began to code it.  After getting into the code, our java was very difficult to implement.  While it would have been possible to continue coding our server in java, it was becoming a arduous task.  Java didn’t have features that would make coding the server much easier (such as HTTP handling and multithreading capabilities) built into the language like other languages available do. We decided that the costs of learning a new language and refactoring the server was worth the time and effort.  Based on our needs, we decided to go with Google’s GoLang.
 
+When designing our server we spent a lot of time discussing many intricate details. Often these discussions
+would eventually lead to the efficiency of these details, and many times we found ourselves spending way too
+much time arguing these minute details leading to stand-stills in design development. We realized that 
+spending so much time discussing these details would probably have little to no effect on our final product
+and that the more obvious and major design decisions were the discussions that were worth arguing over.

@@ -1,0 +1,37 @@
+Task Assignments 
+
+By: Steven Whaley and Denney Burkholder
+
+1.
+
+Each group member has been significantly involved in each major area of development at least in terms of input on design issues and more generally participation in frequent group discussions. The decision to refactor the server from java to GoLang was based on brainstorming sessions involving research and active discussion between all six members. Tasks related to documentation (such as the creation of UML diagrams, code comments, etc.) have been shared between all members as well. 
+
+Beyond design decisions, a few tasks were explicitly defined to specific people. To save time while refactoring the server, the group members roughly stayed within the area they worked on for the architectural spike.
+
+Server Development: 
+Leo Reyes: Combining the different aspects of the server, http functionality and creating client sessions. 
+Steven Whaley: The database communication portion of the server.
+Rizwan Pirani: The device communication portion of the server. 
+Denney Burkholder: The http communication portion of the server. 
+Nathan Plotts: The laptop device and GPS device portion of the server.  
+Charlie Baker:  The android app to allow communication between the server and the geogram.
+
+
+IDEs: 
+LiteIDE
+Eclipse
+Tools:
+GitHub  
+
+2. Development Schedule
+
+At the end of the architectural spike, we were left with the task of refactoring our server to a different language. For the first week, we discussed the different options we had language wise. We researched and met to discuss ideas frequently during this period. After a few discussions, it was decided that GoLang would be the best option. GoLang automated many of the features we were planning to implement in java.   After coming to this conclusion, we sat down and created the design for our server.  Because GoLang offers many resources for handling multithreading, most of the design discussion was trying to figure out how to best implement these features without underdoing or overdoing it, for the needs of our system. After much discussion, we had our server redesigned. We started to divide up tasks at this point.  Immediately following the architectural spike, the GeoGram also arrived. We put off incorporating the GeoGram initially as we figured out the server.  Afterwards, we began trying to send and receive texts to the GeoGram.  This was done through an android application we developed.  Around the end of the second week, we had the GeoGram sending locations, which were translated by the server into locations that are put on the google map as markers.  We also have the server communicating with the different components of our system. The key logger has also seen some improvements this week.  It can now more accurately identify and capture when a key is modified by shift or capslock.  At this point we chose our code and freeze date to be March 1, 2014.  From this point on, until the end of Cycle One we are focusing on finishing documentation and preparing for our presentation. Our next goal is to being working on incorporating the functionality of our system to the website to allow users to access and modify all of the information our system keeps track off. We also need to optimize communication between all of the devices and the server.  
+
+
+3. Planned Code/Feature Freeze
+
+   March 1st was our Cycle One code/feature freeze
+ 
+
+
+

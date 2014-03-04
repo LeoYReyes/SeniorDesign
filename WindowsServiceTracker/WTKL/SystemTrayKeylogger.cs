@@ -124,7 +124,7 @@ namespace WTKL
             CreateOpenPipe();
 
             //For debugging only
-            StartKeylogger();
+            //StartKeylogger();
         }
 
         /* Array of strings describing keys. A keys description is indexed by its

@@ -20,6 +20,20 @@ public class server {
 	private static Socket connection;
 	private static BufferedReader fromClient;
 	private static DataOutputStream toClient;
+	private static char single[] = new char[1];
+	
+	/**
+	 * remove next char, useful for leftover newlines
+	 */
+	private static void removeNewline()
+	{
+		try {
+			fromClient.read(single);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	
 	/**
 	 * Opens a server socket on port 10011 and accepts the first connection
@@ -27,10 +41,10 @@ public class server {
 	private static void connect()
 	{
 		try {
-			ServerSocket ss = new ServerSocket(10011);
-			Socket connection = ss.accept();
-			BufferedReader fromClient = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			DataOutputStream toClient = new DataOutputStream(connection.getOutputStream());
+			ss = new ServerSocket(10011);
+			connection = ss.accept();
+			fromClient = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			toClient = new DataOutputStream(connection.getOutputStream());
 			System.out.println("Connected");
 		} catch (Exception e)
 		{}
@@ -47,16 +61,128 @@ public class server {
 			fromClient.close();
 			connection.close();
 			ss.close();
+			System.out.println("Disconnected");
 		} catch (Exception e)
 		{}
 	}
 	
+	/**
+	 * adds a separator line to make tests easily distinguishable in the console
+	 */
+	private static void separator()
+	{
+		System.out.println("\n===============================================");
+	}
+	
+	/**
+	 * tests that the service sends its MAC address immediately upon connection
+	 */
 	private static void testConnect()
 	{
+		separator();
 		System.out.println("Testing connection and MAC address sending...");
 		connect();
 		try {
 			System.out.println(fromClient.readLine());
+			fromClient.readLine(); //remove left over newline
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		disconnect();
+	}
+	
+	private static void testKeylogger()
+	{
+		separator();
+		System.out.println("Testing turning keylogger on/off and receiving key log files...");
+		connect();
+		try 
+		{
+			fromClient.readLine(); // get rid of MAC address
+			fromClient.readLine(); //remove left over newline
+			System.out.print("Type here (off): ");
+			Thread.sleep(10000);
+			System.out.println("\nTurning keylogger on");
+			System.out.print("Type here (on): ");
+			toClient.writeByte(0);
+			Thread.sleep(10000);
+			System.out.println("\nTurning keylogger off");
+			toClient.writeByte(1);
+			System.out.print("Type here (off): ");
+			Thread.sleep(10000);
+			System.out.println("\nRequesting keylog...");
+			toClient.writeByte(3);
+			Thread.sleep(1000);
+			while (fromClient.ready()) {
+				char single[] = new char[1];
+				fromClient.read(single);
+				System.out.println("op code: " + (byte)single[0]);
+				System.out.println("Keylog: " + fromClient.readLine());
+				fromClient.readLine(); //remove left over newline
+				Thread.sleep(100);
+			}
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		disconnect();
+	}
+	
+	private static void testIPTrace()
+	{
+		separator();
+		System.out.println("IP trace route...");
+		connect();
+		try 
+		{
+			fromClient.readLine(); // get rid of MAC address
+			fromClient.readLine(); //remove left over newline
+			System.out.println("Requesting trace route...");
+			toClient.writeByte(2);
+			Thread.sleep(1000);
+			while (fromClient.ready()) {
+				char single[] = new char[1];
+				fromClient.read(single);
+				System.out.println("op code: " + (byte)single[0]);
+				System.out.println("IP trace route: " + fromClient.readLine());
+				fromClient.readLine(); //remove left over newline
+				Thread.sleep(100);
+			}
+		} catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		disconnect();
+	}
+	
+	private static void testReconnect()
+	{
+		separator();
+		System.out.println("Testing reconnect times...");
+		connect();
+		try {
+			System.out.println("\nNot flagged as stolen");
+			disconnect();
+			long dis = System.currentTimeMillis();
+			connect();
+			long con = System.currentTimeMillis();
+			System.out.println("Reconnect time (ms): " + (con - dis));
+			
+			System.out.println("\nReporting stolen");
+			toClient.writeByte(5);
+			disconnect();
+			dis = System.currentTimeMillis();
+			connect();
+			con = System.currentTimeMillis();
+			System.out.println("Reconnect time (ms): " + (con - dis));
+			System.out.println("\nReporting not stolen");
+			toClient.writeByte(4);
+			disconnect();
+			dis = System.currentTimeMillis();
+			connect();
+			con = System.currentTimeMillis();
+			System.out.println("Reconnect time (ms): " + (con - dis));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -66,62 +192,9 @@ public class server {
 	
 	public static void main(String args[]) throws Exception {
 		testConnect();
-		/*
-		ServerSocket ss = new ServerSocket(10011);
-		
-		while(true) {
-			byte[] buffer = new byte[256];
-			
-			boolean stolen = false;
-			Random rand = new Random();
-			rand.setSeed(System.currentTimeMillis());
-			
-			stolen = rand.nextBoolean();
-			
-			System.out.println("\n=========================\n\nWaiting for tcp connection...");
-			Socket connection = ss.accept();
-			BufferedReader fromClient = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-			DataOutputStream toClient = new DataOutputStream(connection.getOutputStream());
-			System.out.println("Connection from: " + connection.getInetAddress().toString());
-			System.out.println("By machine: " + fromClient.readLine());
-			Thread.sleep(5000);
-			if (stolen)
-			{
-				System.out.println("Reporting stolen");
-				toClient.writeByte(5);
-			}
-			else
-			{
-				System.out.println("Reporting not stolen");
-				toClient.writeByte(4);
-				continue;
-			}
-			Thread.sleep(5000);
-			System.out.println("Turning keylogger on...");
-			toClient.writeByte(0);
-			Thread.sleep(15000);
-			System.out.println("Turning keylogger off...");
-			toClient.writeByte(1);
-			Thread.sleep(5000);
-			System.out.println("Requesting keylog...");
-			toClient.writeByte(3);
-			System.out.println("Keyloggy stuff: " + fromClient.readLine());
-			Thread.sleep(1000);
-			while (fromClient.ready()) {
-				System.out.println("Keyloggy stuff: " + fromClient.readLine());
-				Thread.sleep(1000);
-			}
-			Thread.sleep(1000);
-			System.out.println("Requesting trace route...");
-			toClient.writeByte(2);
-			System.out.println(fromClient.readLine());
-			Thread.sleep(7000);
-			connection.close();
-			//udp.close();
-			
-			//Thread.sleep(6000);
-			//connection.close();
-		}*/
+		testKeylogger();
+		testIPTrace();
+		testReconnect();
 	}
 	
 }

@@ -105,9 +105,16 @@ func googleMapLinkParser(input string) string {
 	result := ""
 	str := input
 	//str := "[1111111111]http://maps.google.com/maps?q=32+36.3143,-085+29.1954+()&z=19|"
-	str = str[strings.Index(str, "=")+1:]
-	latDecimal, _ := strconv.ParseFloat(str[3:10], 16)
-	longDecimal, _ := strconv.ParseFloat(str[16:23], 16)
+	index := strings.Index(str, "=")
+	if index == -1 {
+		return ""
+	}
+	str = str[index+1:]
+	latDecimal, err1 := strconv.ParseFloat(str[3:10], 16)
+	longDecimal, err2 := strconv.ParseFloat(str[16:23], 16)
+	if err1 != nil || err2 != nil {
+		return ""
+	}
 	latDecimal = latDecimal / 60
 	longDecimal = longDecimal / 60
 	latStr := []byte{}

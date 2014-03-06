@@ -1,9 +1,9 @@
 package databaseSOT
 
 import (
-	"crypto/sha1"
-	"fmt"
-	"strings"
+	//"crypto/sha1"
+	//"fmt"
+	//"strings"
 	"testing"
 )
 

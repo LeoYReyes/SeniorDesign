@@ -3,7 +3,7 @@ package webserver
 import (
 	"CustomProtocol"
 	"crypto/sha1"
-	"databaseSOT"
+	//"databaseSOT"
 	"fmt"
 	"html/template"
 	"mux"
@@ -88,7 +88,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	buf = append(buf, 0x1B)
 
 	resCh := make(chan []byte)
-	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: 1, Source: 2,
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 		OpCode: CustomProtocol.VerifyLoginCredentials, Payload: buf, Response: resCh}
 	toServer <- req
 	res := <-resCh
@@ -126,8 +126,27 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.PostForm.Get("password"))
 	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
 	fmt.Println(hashedPass)
-	databaseSOT.SignUp(r.PostForm.Get("firstName"), r.PostForm.Get("lastName"),
-		r.PostForm.Get("email"), r.PostForm.Get("phoneNumber"), hashedPass)
+
+	buf := []byte{}
+	buf = append(buf, []byte(r.PostForm.Get("firstName"))...)
+	buf = append(buf, 0x1B)
+	buf = append(buf, []byte(r.PostForm.Get("lastName"))...)
+	buf = append(buf, 0x1B)
+	buf = append(buf, []byte(r.PostForm.Get("email"))...)
+	buf = append(buf, 0x1B)
+	buf = append(buf, []byte(r.PostForm.Get("phoneNumber"))...)
+	buf = append(buf, 0x1B)
+	buf = append(buf, []byte(hashedPass)...)
+	buf = append(buf, 0x1B)
+
+	resCh := make(chan []byte)
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+		OpCode: CustomProtocol.NewAccount, Payload: buf, Response: resCh}
+	toServer <- req
+	res := <-resCh
+	fmt.Println("Response: ", res[0])
+	//databaseSOT.SignUp(r.PostForm.Get("firstName"), r.PostForm.Get("lastName"),
+	//	r.PostForm.Get("email"), r.PostForm.Get("phoneNumber"), hashedPass)
 	serveSession(w, r)
 }
 
@@ -161,6 +180,7 @@ func StartWebServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *
 	r.HandleFunc("/login", loginHandler)
 	r.HandleFunc("/logout", logoutHandler)
 	r.HandleFunc("/ws", serveWs)
+	r.HandleFunc("/newDevice", newDeviceHandler)
 
 	http.Handle("/", r)
 	// our server is one line!

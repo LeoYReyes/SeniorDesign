@@ -25,7 +25,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	buf = append(buf, 0x1B)
 	// Device owner, get user account info from session
 	session, _ := store.Get(r, "userSession")
-	buf = append(buf, []byte(session.Values["userId"])...) // NEEDS FIX
+	buf = append(buf, []byte(session.Values["userId"].([]byte))...)
 	buf = append(buf, 0x1B)
 
 	if err != nil {

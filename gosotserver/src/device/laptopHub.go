@@ -14,6 +14,7 @@ import (
 	"net"
 	"strconv"
 	//"strings"
+	"time"
 )
 
 type laptopHub struct {
@@ -148,24 +149,50 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	deviceConn.ld.ID = string(buffer[0:bytesRead])
 	deviceConn.conn = conn
 	lh.mapDeviceQueue <- deviceConn
-	var output string
+	var sentStolen bool
+	//TODO there is no guarenteed amount of time it will take to add a new
+	// connection to the map because it runs in its own thread. Causes a slight
+	// problem using the SendMsg method
+	time.Sleep(9999)
 	if deviceConn.ld.CheckIfStolen() {
 		//TODO send device stolen OP code
 		fmt.Println("CheckIfStolen request returned true")
-		output = string(STOLEN) + "\n"
+		sentStolen = SendMsg(deviceConn.ld.ID, STOLEN, "")
 	} else {
 		//TODO send device NOT stolen OP code
 		fmt.Println("CheckIfStolen request returned false")
-		output = string(NOT_STOLEN) + "\n"
+		sentStolen = SendMsg(deviceConn.ld.ID, NOT_STOLEN, "")
 	}
-	outputBytes := []byte(output)
-	bytesWritten, err := conn.Write(outputBytes)
-	if err != nil {
-		fmt.Println("Error sending stolen code.", err)
+	if !sentStolen {
+		fmt.Println("Error sending stolen code.")
 	}
-	bytesWritten = bytesWritten
 	//TODO have GetMessage be called in response to sending messages
 	//go GetMessage(deviceConn)
+}
+
+/*
+ * This method sends a message to a laptop if a connection to it is found.
+ * It uses the laptop's ID (MAC address) to search for the connection in the map
+ * of connections, and sends a message in the format <opcode><payload><newline>
+ */
+func SendMsg(id string, opcode byte, payload string) bool {
+	conn := lh.connections[id]
+	if conn == nil {
+		fmt.Println("SendMsg: Connection not found for ID " + id)
+		return false
+	}
+	var op [1]byte
+	op[0] = opcode
+	payload = payload + "\n"
+	msg := append(op[0:1], []byte(payload)...)
+	_, err := conn.Write(msg)
+	if err != nil {
+		fmt.Println("SendMsg: Error sending message to device with ID " + id)
+		return false
+	}
+	//TODO idk how to make the opcode (byte) send as a decimal number
+	fmt.Println("Message " + string(opcode) + payload + "sent to device with ID " + id)
+	return true
 }
 
 /*

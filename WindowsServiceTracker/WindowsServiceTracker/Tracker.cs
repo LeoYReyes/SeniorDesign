@@ -28,12 +28,12 @@ namespace WindowsServiceTracker
     {
         //Constants
         //127.0.0.1 = 0x0100007F because of network byte order
-        public const byte KEYLOG_ON = 0;
-        public const byte KEYLOG_OFF = 1;
-        public const byte TRACE_ROUTE = 2;
-        public const byte KEYLOG = 3;
-        public const byte NOT_STOLEN = 4;
-        public const byte STOLEN = 5;
+        public const byte KEYLOG_ON = 134;
+        public const byte KEYLOG_OFF = 135;
+        public const byte TRACE_ROUTE = 131;
+        public const byte KEYLOG = 130;
+        public const byte NOT_STOLEN = 133;
+        public const byte STOLEN = 132;
         public const byte NO_OP = 255;
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";

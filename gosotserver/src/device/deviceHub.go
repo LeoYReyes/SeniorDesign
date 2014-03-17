@@ -24,12 +24,12 @@ const (
 	CONN_TYPE     = "tcp"
 	CONN_PORT     = ":10015"
 	CONN_PORT_SMS = ":10016"
-	KEYLOG_ON     = 0
-	KEYLOG_OFF    = 1
-	TRACE_ROUTE   = 2
-	KEYLOG_GET    = 3
-	NOT_STOLEN    = 4
-	STOLEN        = 5
+	//KEYLOG_ON     = 0
+	//KEYLOG_OFF    = 1
+	//TRACE_ROUTE   = 2
+	//KEYLOG_GET    = 3
+	//NOT_STOLEN    = 4
+	//STOLEN        = 5
 )
 
 /*
@@ -89,5 +89,15 @@ func processRequest(req *CustomProtocol.Request) {
 		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
 	case CustomProtocol.UpdateUserIPTraceData:
 		go ProcessLapReq(req)
+	case CustomProtocol.FlagStolen:
+		go ProcessLapReq(req)
+	case CustomProtocol.FlagNotStolen:
+		go ProcessLapReq(req)
+	case CustomProtocol.KeyloggingOn:
+		go ProcessLapReq(req)
+	case CustomProtocol.KeyloggingOff:
+		go ProcessLapReq(req)
+	default:
+		//todo respond to requests that did not fall under a case
 	}
 }

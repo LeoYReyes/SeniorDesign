@@ -33,6 +33,10 @@ const (
 	GetUserData           = 129
 	UpdateUserKeylogData  = 130
 	UpdateUserIPTraceData = 131
+	FlagStolen            = 132
+	FlagNotStolen         = 133
+	KeyloggingOn          = 134
+	KeyloggingOff         = 135
 
 	// No OpCode 255
 	NoOp = 255

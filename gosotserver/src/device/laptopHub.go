@@ -82,9 +82,9 @@ func GetMessage(deviceConn *deviceConnection) {
 		fmt.Println("Invalid OP code", err)
 	} else {
 		switch opCode {
-		case TRACE_ROUTE:
+		case CustomProtocol.UpdateUserIPTraceData:
 			UpdateTraceroute(deviceConn, msg)
-		case KEYLOG_GET:
+		case CustomProtocol.UpdateUserKeylogData:
 			UpdateKeylog(deviceConn, msg)
 		}
 	}
@@ -153,11 +153,11 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	if /*deviceConn.ld.CheckIfStolen()*/ true { //todo remove when mehod CheckIfStolen method is properly implemented
 		//TODO send device stolen OP code
 		fmt.Println("CheckIfStolen request returned true")
-		sentStolen = SendMsg(deviceConn.ld.ID, STOLEN, "")
+		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagStolen, "")
 	} else {
 		//TODO send device NOT stolen OP code
 		fmt.Println("CheckIfStolen request returned false")
-		sentStolen = SendMsg(deviceConn.ld.ID, NOT_STOLEN, "")
+		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagNotStolen, "")
 	}
 	if !sentStolen {
 		fmt.Println("Error sending stolen code.")
@@ -169,7 +169,7 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 /*
  * This method sends a message to a laptop if a connection to it is found.
  * It uses the laptop's ID (MAC address) to search for the connection in the map
- * of connections, and sends a message in the format <opcode><payload><newline>
+ * of connections, and sends a message in the format <opcode><payload>
  */
 func SendMsg(id string, opcode byte, payload string) bool {
 	conn := lh.connections[id]
@@ -179,8 +179,7 @@ func SendMsg(id string, opcode byte, payload string) bool {
 	}
 	var op [1]byte
 	op[0] = opcode
-	payloadWithNL := payload + "\n"
-	msg := append(op[0:1], []byte(payloadWithNL)...)
+	msg := append(op[0:1], []byte(payload)...)
 	_, err := conn.Write(msg)
 	if err != nil {
 		fmt.Println("SendMsg: Error sending message to device with ID " + id)

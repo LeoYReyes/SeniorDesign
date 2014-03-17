@@ -8,18 +8,32 @@
 	<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css"></link>
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"></link>
 	<script src="http://code.jquery.com/jquery.js"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 	<script src="js/bootstrap.min.js"></script>
+	<script src="js/devices.js"></script>
 </head>
-	<body>
+<body>
 <!-- Allows the map to reside underneath other elements. -->
 <style>
 	#wrapper { position: relative; }
 	#over_map { position: absolute; top: 10px; left: 10px; z-index: 99; }
 </style>
-		
+<div id="dialog-form" title="New Device">
+	<!--<p class="validateTips">All form fields are required.</p>-->
+	<form method="post" action="/newDevice">
+		<fieldset>
+			<input type="radio" name="deviceType" id="deviceType" value="gps">GPS Device<br>
+			<input type="radio" name="deviceType" id="deviceType" value="laptop">Laptop Device<br>
+			<label for="name">Device Name</label><br>
+			<input type="text" name="deviceName" id="deviceName" class="text ui-widget-content ui-corner-all"/><br>
+			<label for="id">ID</label><br>
+			<input type="text" name="deviceId" id="deviceId" class="text ui-widget-content ui-corner-all"/>
+		</fieldset>
+	</form>
+</div>		
 	
 <div id="wrapper">
-
 	<!-- The bottom layer of elements.  Contains Google Map. -->
 	<div id="google_map">
 		<div id="map-canvas">
@@ -57,6 +71,9 @@
     							<li><a href="#">Device One</a></li>
     							<li class="divider"></li>
     							<li><a href="#">Device Two</a></li>
+								<button id="newDeviceButton">
+                    				Add Device
+                				</button>
           					</ul>
         				</li>
 					</ul> 

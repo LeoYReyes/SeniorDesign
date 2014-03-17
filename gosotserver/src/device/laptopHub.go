@@ -14,13 +14,13 @@ import (
 	"net"
 	"strconv"
 	//"strings"
-	"time"
+	//"time"
 )
 
 type laptopHub struct {
 	connections map[string]net.Conn
 	//	DeviceBuffer
-	mapDeviceQueue chan *deviceConnection
+	//mapDeviceQueue chan *deviceConnection
 }
 
 type deviceConnection struct {
@@ -29,8 +29,8 @@ type deviceConnection struct {
 }
 
 var lh = laptopHub{
-	mapDeviceQueue: make(chan *deviceConnection, 20),
-	connections:    make(map[string]net.Conn),
+	//mapDeviceQueue: make(chan *deviceConnection, 20),
+	connections: make(map[string]net.Conn),
 }
 
 var deviceConn = new(deviceConnection)
@@ -148,13 +148,9 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	deviceConn := new(deviceConnection)
 	deviceConn.ld.ID = string(buffer[0:bytesRead])
 	deviceConn.conn = conn
-	lh.mapDeviceQueue <- deviceConn
+	MapDeviceID(deviceConn)
 	var sentStolen bool
-	//TODO there is no guarenteed amount of time it will take to add a new
-	// connection to the map because it runs in its own thread. Causes a slight
-	// problem using the SendMsg method
-	time.Sleep(9999)
-	if deviceConn.ld.CheckIfStolen() {
+	if /*deviceConn.ld.CheckIfStolen()*/ true { //todo remove when mehod CheckIfStolen method is properly implemented
 		//TODO send device stolen OP code
 		fmt.Println("CheckIfStolen request returned true")
 		sentStolen = SendMsg(deviceConn.ld.ID, STOLEN, "")
@@ -183,15 +179,15 @@ func SendMsg(id string, opcode byte, payload string) bool {
 	}
 	var op [1]byte
 	op[0] = opcode
-	payload = payload + "\n"
-	msg := append(op[0:1], []byte(payload)...)
+	payloadWithNL := payload + "\n"
+	msg := append(op[0:1], []byte(payloadWithNL)...)
 	_, err := conn.Write(msg)
 	if err != nil {
 		fmt.Println("SendMsg: Error sending message to device with ID " + id)
 		return false
 	}
 	//TODO idk how to make the opcode (byte) send as a decimal number
-	fmt.Println("Message " + string(opcode) + payload + "sent to device with ID " + id)
+	fmt.Printf("Message %d"+payload+" sent to device with ID "+id+"\n", opcode)
 	return true
 }
 
@@ -217,10 +213,21 @@ func ProcessLapReq(req *CustomProtocol.Request) {
  * method runs in its own thread because must wait on its channel to be filled
  * before running the hash, so most the time it is blocking the thread.
  */
+/*
 func MapDeviceID() {
 	for {
 		dc := <-lh.mapDeviceQueue
 		lh.connections[dc.ld.ID] = dc.conn
 		fmt.Println(dc.ld.ID)
 	}
+}
+*/
+
+/*
+ * Adds a connection to the connections map keyed by the ID (MAC address)
+ * of the device connecting
+ */
+func MapDeviceID(dc *deviceConnection) {
+	lh.connections[dc.ld.ID] = dc.conn
+	fmt.Println(dc.ld.ID)
 }

@@ -52,7 +52,7 @@ var fromServer chan *CustomProtocol.Request
 func StartDeviceServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *CustomProtocol.Request) {
 	toServer = toServerIn
 	fromServer = fromServerIn
-	go MapDeviceID()
+	//go MapDeviceID()
 	go SmsConnection()
 	go chanHandler()
 	listener := Connect()

@@ -8,7 +8,7 @@
 package device
 
 import (
-	//"CustomProtocol"
+	"CustomProtocol"
 	//"container/list"
 	"fmt"
 	"net"
@@ -193,6 +193,22 @@ func SendMsg(id string, opcode byte, payload string) bool {
 	//TODO idk how to make the opcode (byte) send as a decimal number
 	fmt.Println("Message " + string(opcode) + payload + "sent to device with ID " + id)
 	return true
+}
+
+/*
+ * This method will process laptop related requests and return true if the
+ * message is sent to the laptop
+ */
+func ProcessLapReq(req *CustomProtocol.Request) {
+	id := string(req.Payload)
+	sent := SendMsg(id, req.OpCode, "")
+	var sentByte []byte
+	if sent {
+		sentByte[0] = 1
+	} else {
+		sentByte[0] = 0
+	}
+	req.Response <- sentByte
 }
 
 /*

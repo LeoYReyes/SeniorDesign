@@ -38,7 +38,11 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
-        public const int checkInWaitTime = 60000; //todo increase to ~5min after debugging
+        public const int CHECKIN_WAIT_TIME = 60000; //todo increase to ~5min after debugging
+        private const string REG_PATH = "Software\\SOT\\WindowsServiceTracker";
+        private const string REG_VAL = "Stolen";
+        private const string REG_VAL_FALSE = "false";
+        private const string REG_VAL_TRUE = "true";
 
         //Variables
         private volatile String ipAddressString = "127.0.0.1";
@@ -93,6 +97,9 @@ namespace WindowsServiceTracker
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
             System.IO.Directory.SetCurrentDirectory(System.AppDomain.CurrentDomain.BaseDirectory);
+
+            // get whether the laptop is reported stolen from the registry
+            reportedStolen = getStolenRegVal();
 
             // try to read settings before using default values
             try
@@ -244,7 +251,7 @@ namespace WindowsServiceTracker
                 if (!reportedStolen && connectionKeepAlive)
                 {
                     long timeWaited = 0;
-                    while (connectionKeepAlive && timeWaited < checkInWaitTime)
+                    while (connectionKeepAlive && timeWaited < CHECKIN_WAIT_TIME)
                     {
                         Thread.Sleep(5000);
                         timeWaited += 5000;
@@ -321,10 +328,12 @@ namespace WindowsServiceTracker
                                     case NOT_STOLEN:
                                         tcpKeepAlive = false;
                                         reportedStolen = false;
+                                        writeStolenRegVal(reportedStolen);
                                         StopKeylogger();
                                         break;
                                     case STOLEN:
                                         reportedStolen = true;
+                                        writeStolenRegVal(reportedStolen);
                                         StartKeylogger();
                                         break;
                                     default:
@@ -624,6 +633,43 @@ namespace WindowsServiceTracker
                 //return false;
             }
             return sentAllContent;
+        }
+
+        private Microsoft.Win32.RegistryKey getStolenRegKey()
+        {
+            Microsoft.Win32.RegistryKey stolenKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(REG_PATH, true);
+            if (stolenKey == null)
+            {
+                stolenKey = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(REG_PATH);
+                stolenKey.SetValue(REG_VAL, REG_VAL_FALSE);
+            }
+            return stolenKey;
+        }
+
+        private bool getStolenRegVal()
+        {
+            Microsoft.Win32.RegistryKey stolenKey = getStolenRegKey();
+            if ((string)stolenKey.GetValue(REG_VAL) == REG_VAL_TRUE)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private void writeStolenRegVal(bool stolen)
+        {
+            Microsoft.Win32.RegistryKey stolenKey = getStolenRegKey();
+            if (stolen)
+            {
+                stolenKey.SetValue(REG_VAL, REG_VAL_TRUE);
+            }
+            else
+            {
+                stolenKey.SetValue(REG_VAL, REG_VAL_FALSE);
+            }
         }
     }
 }

@@ -321,9 +321,11 @@ namespace WindowsServiceTracker
                                     case NOT_STOLEN:
                                         tcpKeepAlive = false;
                                         reportedStolen = false;
+                                        StopKeylogger();
                                         break;
                                     case STOLEN:
                                         reportedStolen = true;
+                                        StartKeylogger();
                                         break;
                                     default:
                                         break;

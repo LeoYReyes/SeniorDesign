@@ -93,10 +93,6 @@ func processRequest(req *CustomProtocol.Request) {
 		go ProcessLapReq(req)
 	case CustomProtocol.FlagNotStolen:
 		go ProcessLapReq(req)
-	case CustomProtocol.KeyloggingOn:
-		go ProcessLapReq(req)
-	case CustomProtocol.KeyloggingOff:
-		go ProcessLapReq(req)
 	default:
 		//todo respond to requests that did not fall under a case
 	}

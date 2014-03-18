@@ -255,16 +255,17 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 	return
 }
 
+//TODO I had to change some parentheses to compile it
 func registerNewDevice(deviceType string, deviceName string, deviceId string, userId string) {
 	db := connect()
-	
-	if(deviceType != "gps" || deviceType != "laptop" {
-		
+
+	if deviceType != "gps" || deviceType != "laptop" {
+
 	} else {
-		queryStr := "INSERT INTO " + deviceType +"Device (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
-		
+		queryStr := "INSERT INTO " + deviceType + "Device (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'"
+
 		db.Query(queryStr)
-		
+
 		disconnect(db)
 	}
 }

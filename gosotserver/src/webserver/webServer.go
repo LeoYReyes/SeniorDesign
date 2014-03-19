@@ -14,7 +14,6 @@ import (
 // for use with templates
 type Page struct {
 	UserName string
-	Title    string
 }
 
 var templates = template.Must(template.ParseGlob("templates/*.html"))
@@ -36,7 +35,7 @@ func handle(t string) (string, http.HandlerFunc) {
 		if t != "home" {
 			if sesh.Values["isLoggedIn"] == "true" {
 				userName := string(sesh.Values["userId"].(string))
-				p := &Page{UserName: userName, Title: t}
+				p := &Page{UserName: userName}
 				err := templates.ExecuteTemplate(w, t+".html", p)
 				if err != nil {
 					http.NotFound(w, r)

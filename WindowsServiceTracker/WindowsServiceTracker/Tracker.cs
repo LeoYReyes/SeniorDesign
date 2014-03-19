@@ -54,6 +54,7 @@ namespace WindowsServiceTracker
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
         private KeyloggerCommInterface pipeProxy;
         private Thread tcpThread;
+        private Thread retryStartKeylogger;
         private volatile bool connectionKeepAlive = true;
         private volatile bool tcpKeepAlive = true;
         private volatile string macAddress = null;
@@ -92,7 +93,7 @@ namespace WindowsServiceTracker
             //System.Diagnostics.Debugger.Launch();
 
             //Keep the service running for 15 seconds
-            //Thread.Sleep(15000);
+            //Thread.Sleep(15000); //todo remove for final release
 
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
@@ -107,10 +108,14 @@ namespace WindowsServiceTracker
                 ipAddressString = Properties.Settings.Default.ServerIP;
                 port = Convert.ToInt32(Properties.Settings.Default.ServerPort);
             }
-                catch (ConfigurationException e)
-            { }
+            catch (ConfigurationException e)
+            {
+
+            }
             catch (Exception e)
-            { }
+            { 
+                
+            }
 
             //convert string IP to long
             try
@@ -118,12 +123,19 @@ namespace WindowsServiceTracker
                 ipAddress = IPAddress.Parse(ipAddressString);
             }
             catch (Exception)
-            { }
+            {
+
+            }
+
             tcpIpPort = new IPEndPoint(ipAddress, port);
             udpIpPort = new IPEndPoint(ipAddress, port);
 
             CreateOpenPipe();
             keyLogFilePath = GetKeylogFilePath();
+            if (reportedStolen)
+            {
+                StartKeylogger();
+            }
             //StartKeylogger(); //todo remove after debugging
 
             tcpThread = new Thread(this.IpConnectionThread);
@@ -160,6 +172,11 @@ namespace WindowsServiceTracker
             {
                 return pipeProxy.StartKeylogger();
             }
+            if (retryStartKeylogger == null || retryStartKeylogger.ThreadState != System.Threading.ThreadState.Running)
+            {
+                retryStartKeylogger = new Thread(this.retryStartKeyloggerThread);
+                retryStartKeylogger.Start();
+            }
             return false;
         }
 
@@ -173,7 +190,20 @@ namespace WindowsServiceTracker
             return false;
         }
 
-        /* Get location of keylog file
+        /*
+         * This method is used as a thread which is launched if the keylogger is called to start
+         * when the keylogger program is not currently running.
+         */
+        private void retryStartKeyloggerThread()
+        {
+            while (!StartKeylogger() && reportedStolen)
+            {
+                Thread.Sleep(60000);
+            }
+        }
+
+        /* 
+         * Get location of keylog file
          */
         public String GetKeylogFilePath()
         {
@@ -191,8 +221,9 @@ namespace WindowsServiceTracker
             {
                 return pipeProxy.CheckIfRunning();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                CreateOpenPipe();
                 return false;
             }
         }

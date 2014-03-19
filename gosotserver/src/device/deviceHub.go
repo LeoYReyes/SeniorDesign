@@ -85,6 +85,10 @@ func processRequest(req *CustomProtocol.Request) {
 		smsCh <- req.Payload
 		fmt.Println("Message Sent: ", string(req.Payload))
 		req.Response <- []byte{1}
+	case CustomProtocol.ActivateGeofence:
+		fmt.Println("processing activate geofence")
+	case CustomProtocol.SleepGeogram:
+		fmt.Println("processing sleep geogram")
 	case CustomProtocol.UpdateUserKeylogData:
 		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
 	case CustomProtocol.UpdateUserIPTraceData:
@@ -94,6 +98,7 @@ func processRequest(req *CustomProtocol.Request) {
 	case CustomProtocol.FlagNotStolen:
 		go ProcessLapReq(req)
 	default:
+		req.Response <- []byte{0}
 		//todo respond to requests that did not fall under a case
 	}
 }

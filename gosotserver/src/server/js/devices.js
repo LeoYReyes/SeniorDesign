@@ -54,4 +54,12 @@ $(function() {
 		$("input:radio[name=deviceType]").click(function() {
     		deviceType = $(this);
 		});
+		$( "#deviceOne" )
+		  .click(function() {
+			$("#deviceOneBox").toggle();
+		});
+		$( "#deviceTwo" )
+		  .click(function() {
+			$(this).toggle();
+		});
 });

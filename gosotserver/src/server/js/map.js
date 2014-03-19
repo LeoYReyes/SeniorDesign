@@ -7,7 +7,7 @@ var socket = new WebSocket("ws://" + window.location.href.substring(window.locat
 
 var mapOptions = {
     zoom: 8,
-    mapTypeId: google.maps.MapTypeId.HYBRID
+    //mapTypeId: google.maps.MapTypeId.HYBRID
 }
 
 var previousLocations = new Array();

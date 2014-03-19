@@ -13,8 +13,7 @@
 package device
 
 import (
-	//"CustomProtocol"
-	"databaseSOT"
+	"CustomProtocol"
 	"fmt"
 )
 
@@ -82,7 +81,7 @@ func chanHandler() {
  * GPS req payload structure (esc character delimiter):
  * <phone number><PIN><variable numnber of params>
  */
-func processRequest(req *CustomProtocol.Request) {
+func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arrays and payload validation
 	switch req.OpCode {
 	//params: none
 	case CustomProtocol.ActivateGPS:
@@ -92,6 +91,7 @@ func processRequest(req *CustomProtocol.Request) {
 		smsCh <- msg
 		fmt.Println("Message Sent: ", msg)
 		req.Response <- []byte{1}
+	//activates geofence 1
 	//params: active/deactive (1/0), radius (feet)
 	case CustomProtocol.ActivateGeofence:
 		fmt.Println("processing activate geofence")
@@ -116,6 +116,22 @@ func processRequest(req *CustomProtocol.Request) {
 		smsCh <- msg
 		fmt.Println("Message Sent: ", msg)
 		req.Response <- []byte{1}
+	// sets location for geofence 1
+	// latitude format ddmm.mmmm without the '.', longitude format dddmm.mmmm without the '.'
+	case CustomProtocol.SetGeofence:
+		fmt.Println("processing set geofence")
+		payload := CustomProtocol.ParsePayload(req.Payload)
+		//lat
+		latMsg := "[" + payload[0] + "]" + payload[1] + ".6.128." + payload[2] + ".|"
+		smsCh <- latMsg
+		fmt.Println("Message Sent: ", latMsg)
+		//long
+		longMsg := "[" + payload[0] + "]" + payload[1] + ".6.132." + payload[3] + ".|"
+		smsCh <- longMsg
+		fmt.Println("Message Sent: ", longMsg)
+		req.Response <- []byte{1}
+	//todo find where this is in memory
+	case CustomProtocol.SetAwakenMsg:
 	case CustomProtocol.UpdateUserKeylogData:
 		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
 	case CustomProtocol.UpdateUserIPTraceData:

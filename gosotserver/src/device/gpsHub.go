@@ -19,7 +19,7 @@ import (
 )
 
 var smsConn net.Conn
-var smsCh = make(chan []byte)
+var smsCh = make(chan string)
 
 /*
  * This method creates a connection which creates a new socket, opens the port
@@ -64,8 +64,8 @@ func GPSCommunicate(conn net.Conn) {
 	for {
 		select {
 		case m := <-smsCh:
-			fmt.Println("smsCh: ", string(m))
-			conn.Write(m)
+			fmt.Println("smsCh: " + m)
+			conn.Write([]byte(m))
 		default:
 			//fmt.Println("Waiting to read from smsdevice")
 			bytesRead, _ := conn.Read(buffer)

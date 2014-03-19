@@ -30,6 +30,8 @@ const (
 	SleepGeogram        = 97
 	ActivateGeofence    = 98
 	ActivateIntervalGps = 99
+	SetGeofence         = 100
+	SetAwakenMsg        = 101
 
 	// Laptop opcodes 128 - 159
 	CheckDeviceStolen     = 128

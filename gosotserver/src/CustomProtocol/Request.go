@@ -80,6 +80,18 @@ func (req *Request) isThisForMe(i int) bool {
 	return true
 }
 
+func ParsePayload(payload []byte) []string {
+	str := []string{}
+	pos := 0
+	for index, element := range payload {
+		if element == 0x1B {
+			str = append(str, string(payload[pos:index]))
+			pos = index + 1
+		}
+	}
+	return str
+}
+
 /*//tests if request is for the calling source
 func (req *Request) isThisForMe(int i) bool {
 	if req.Destination = i  {

@@ -13,7 +13,8 @@
 package device
 
 import (
-	"CustomProtocol"
+	//"CustomProtocol"
+	"databaseSOT"
 	"fmt"
 )
 
@@ -77,11 +78,15 @@ func chanHandler() {
 /*
  * This method takes requests from the fromServer request channel and parses the request.
  * It then uses the OpCode from the request to reroute the request to the correct hub.
+ *
+ * GPS req payload structure (esc character delimiter):
+ * <phone number><PIN><variable numnber of params>
  */
 func processRequest(req *CustomProtocol.Request) {
 	switch req.OpCode {
 	case CustomProtocol.ActivateGPS:
 		fmt.Println("processing activate gps")
+		CustomProtocol.ParsePayload(req.Payload)
 		smsCh <- req.Payload
 		fmt.Println("Message Sent: ", string(req.Payload))
 		req.Response <- []byte{1}

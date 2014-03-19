@@ -128,20 +128,8 @@ func chanHandler() {
 	}
 }
 
-func parsePayload(payload []byte) []string {
-	str := []string{}
-	pos := 0
-	for index, element := range payload {
-		if element == 0x1B {
-			str = append(str, string(payload[pos:index]))
-			pos = index + 1
-		}
-	}
-	return str
-}
-
 func processRequest(req *CustomProtocol.Request) {
-	payload := parsePayload(req.Payload)
+	payload := CustomProtocol.ParsePayload(req.Payload)
 	switch req.OpCode {
 	case CustomProtocol.NewAccount:
 	case CustomProtocol.NewDevice:

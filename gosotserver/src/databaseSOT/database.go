@@ -51,6 +51,7 @@ import (
 	"github.com/ziutek/mymysql/mysql"
 	"os"
 	"strconv"
+	"strings"
 	//_ "github.com/ziutek/mymysql/native" // Native engine
 	_ "github.com/ziutek/mymysql/thrsafe" // Thread safe engine
 )
@@ -243,20 +244,30 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 	return
 }
 
-//TODO I had to change some parentheses to compile it
+/*
+*  
+*
+*
+* Steven Whaley Mar, 18 - created
+*/
+
 func registerNewDevice(deviceType string, deviceName string, deviceId string, userId string) {
 	db := connect()
+	print(deviceType)
+	
+		if (deviceType != "gps" && deviceType != "laptop") {
+			print("invalid device type")
+		} else {
+			if (deviceType == "gps" ){
+				db.Query("INSERT INTO gpsDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
+			} else if (deviceType == "laptop"){
+				db.Query("INSERT INTO laptopDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
+			}
+		}
 
-	if deviceType != "gps" || deviceType != "laptop" {
-
-	} else {
-		queryStr := "INSERT INTO " + deviceType + "Device (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'"
-
-		db.Query(queryStr)
-
-		disconnect(db)
-	}
+	disconnect(db)
 }
+
 
 /*
 *  IsDeviceStolen(deviceId string) (bool) takes in device id and return a
@@ -333,6 +344,178 @@ func IsDeviceStolen(deviceId string) bool {
 	disconnect(db)
 
 	return bool1
+}
+
+
+
+
+
+
+/*
+* 
+*
+*
+* Steven Whaley Mar, 1 - created
+* Mar 17 - seems to be working
+*/
+
+func UpdateKeyLog(deviceId string, keylog string) (bool) {
+
+  bool1 := true
+
+  db := connect()
+ 
+    rows, res, err := db.Query("UPDATE keylogs SET data = concat(data, 'it worked!') WHERE deviceId = 1")
+    rows = rows
+    res = res
+
+    if err != nil {
+    panic(err)
+    }
+
+  disconnect(db)
+
+  return bool1
+}
+
+/*
+* 
+*
+*
+* Steven Whaley Mar, 17 - created
+* 
+*/
+
+func UpdateTraceRoute(deviceId string, traceRoute string) (bool) {
+
+  bool1 := true
+  max := int64(-1)
+
+  db := connect()
+
+  	
+ 	db.Query("INSERT INTO ipList (deviceId) VALUES ('" + deviceId + "')")
+
+ 	rows, res, err := db.Query("SELECT MAX(id) FROM ipList");
+   
+    //rows, res, err := db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + deviceId + "', '" + ip + "')")
+    
+    for _, row := range rows {
+    for _, col := range row {
+      if col == nil {
+        // col has NULL value
+      } else {
+        // Do something with text in col (type []byte)
+      }
+    }
+    err = err
+
+    val1 := row[0].([]byte)
+
+    temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
+
+    max = temp
+
+
+
+    err2 = err2
+    rows = rows
+    res = res
+}
+
+maxs := strconv.FormatInt(max, 10)
+
+print(max, "\n")
+print(maxs + "\n")
+
+	var list []string
+
+  	list = parseTraceRouteString(traceRoute)
+ 	
+  	
+  	for i := 0; i < len(list); i++ {
+
+  		db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + maxs + "', '" + list[i] + "')")
+  	}
+
+  disconnect(db)
+
+  return bool1
+}
+
+func parseTraceRouteString(traceRoute string) (arr []string){
+
+	var list []string
+	
+	trace := "127.0.01231.1~123.1.1.1~123.2.23.2~123.3.3.3"
+	print(trace +"\n")
+	num := strings.Count("127.0.0.1~123.1.1.1~123.2.2.2~123.3.3.3", "~") + 1
+	
+	address1 := ""
+	
+	for i := 0; i < num; i++ {
+		
+		if(i != num - 1) {
+			address1 = trace[0:strings.Index(trace, "~")]
+			list = append(list, address1)
+		fmt.Println("extracted: " + list[i])
+
+		trace = trace[strings.Index(trace, "~") + 1:len(trace)]
+		} else {
+			address1 = trace
+			list = append(list, address1)
+			fmt.Println("extracted: " + list[i])
+		}
+	}
+	return list
+}
+
+/*
+*  
+*
+* Steven Whaley Mar, 1 - created
+*/
+
+func IsGpsDevice(deviceId string) (bool) {
+
+  bool1 := false
+  
+  db := connect()
+
+  rows, res, err := db.Query("select * from gpsDevice where id = '" + deviceId + "'")
+  if err != nil {
+    panic(err)
+  }
+
+  res = res
+
+  for _, row := range rows {
+    for _, col := range row {
+      if col == nil {
+        // col has NULL value
+      } else {
+        // Do something with text in col (type []byte)
+      }
+    }
+
+    var err2 error
+    temp := int64(-1)
+
+    val1 := row[0].([]byte)
+
+    temp, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
+    err2 = err2
+
+    if temp != -1 {
+      bool1 = true
+    } else {
+      bool1 = false
+    }
+  }
+
+  disconnect(db)
+
+  return bool1
 }
 
 /*

@@ -26,7 +26,10 @@ const (
 	// Device opcodes 96 - 159
 
 	// Geogram opcodes 96 - 127
-	ActivateGPS = 96
+	ActivateGPS         = 96
+	SleepGeogram        = 97
+	ActivateGeofence    = 98
+	ActivateIntervalGps = 99
 
 	// Laptop opcodes 128 - 159
 	CheckDeviceStolen     = 128
@@ -76,6 +79,18 @@ func AssignRequestId() int {
 
 func (req *Request) isThisForMe(i int) bool {
 	return true
+}
+
+func ParsePayload(payload []byte) []string {
+	str := []string{}
+	pos := 0
+	for index, element := range payload {
+		if element == 0x1B {
+			str = append(str, string(payload[pos:index]))
+			pos = index + 1
+		}
+	}
+	return str
 }
 
 /*//tests if request is for the calling source

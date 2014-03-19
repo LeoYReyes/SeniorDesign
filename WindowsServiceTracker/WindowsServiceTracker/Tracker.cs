@@ -666,6 +666,8 @@ namespace WindowsServiceTracker
             return sentAllContent;
         }
 
+        /* Retrieves the RegistreyKey and returns it. Contains persistent information for the service.
+         */
         private Microsoft.Win32.RegistryKey getStolenRegKey()
         {
             Microsoft.Win32.RegistryKey stolenKey = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(REG_PATH, true);
@@ -677,6 +679,8 @@ namespace WindowsServiceTracker
             return stolenKey;
         }
 
+        /* Gets the value from the registry that indicates whether the device is stolen.
+         */ 
         private bool getStolenRegVal()
         {
             Microsoft.Win32.RegistryKey stolenKey = getStolenRegKey();
@@ -690,6 +694,9 @@ namespace WindowsServiceTracker
             }
         }
 
+        /* Writes either true or false to the registry to store the stolen state
+         * of the device for persistence through turning on and off.
+         */
         private void writeStolenRegVal(bool stolen)
         {
             Microsoft.Win32.RegistryKey stolenKey = getStolenRegKey();

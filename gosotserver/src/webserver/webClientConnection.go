@@ -167,6 +167,6 @@ func serveSession(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Println("Session save error")
 	} else {
-		http.Redirect(w, r, "/mapUser", http.StatusFound)
+		http.Redirect(w, r, "/UserMapNEW", http.StatusFound)
 	}
 }

@@ -13,8 +13,8 @@ import (
 
 // for use with templates
 type Page struct {
-	Name  string
-	Title string
+	UserName string
+	Title    string
 }
 
 var templates = template.Must(template.ParseGlob("templates/*.html"))
@@ -33,9 +33,10 @@ func handle(t string) (string, http.HandlerFunc) {
 			fmt.Println("Cookie userid: ", sesh.Values["userId"])
 			fmt.Println("Cookie isLoggedIn: ", sesh.Values["isLoggedIn"])
 		}
-		p := &Page{Name: "Leo Reyes", Title: t}
 		if t != "home" {
 			if sesh.Values["isLoggedIn"] == "true" {
+				userName := string(sesh.Values["userId"].(string))
+				p := &Page{UserName: userName, Title: t}
 				err := templates.ExecuteTemplate(w, t+".html", p)
 				if err != nil {
 					http.NotFound(w, r)
@@ -44,6 +45,7 @@ func handle(t string) (string, http.HandlerFunc) {
 				http.Error(w, "Not Logged In", 000)
 			}
 		} else {
+			p := &Page{}
 			err := templates.ExecuteTemplate(w, "home.html", p)
 			if err != nil {
 				http.NotFound(w, r)
@@ -105,6 +107,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "userSession")
 	session.Values["isLoggedIn"] = "false"
+	session.Options.MaxAge = -1
 	session.Save(r, w)
 	http.Redirect(w, r, "/home", http.StatusFound)
 }

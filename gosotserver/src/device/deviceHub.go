@@ -84,16 +84,38 @@ func chanHandler() {
  */
 func processRequest(req *CustomProtocol.Request) {
 	switch req.OpCode {
+	//params: none
 	case CustomProtocol.ActivateGPS:
 		fmt.Println("processing activate gps")
-		CustomProtocol.ParsePayload(req.Payload)
-		smsCh <- req.Payload
-		fmt.Println("Message Sent: ", string(req.Payload))
+		payload := CustomProtocol.ParsePayload(req.Payload)
+		msg := "[" + payload[0] + "]" + payload[1] + ".0.|"
+		smsCh <- msg
+		fmt.Println("Message Sent: ", msg)
 		req.Response <- []byte{1}
+	//params: active/deactive (1/0), radius (feet)
 	case CustomProtocol.ActivateGeofence:
 		fmt.Println("processing activate geofence")
+		payload := CustomProtocol.ParsePayload(req.Payload)
+		msg := "[" + payload[0] + "]" + payload[1] + "." + payload[2] + ".1.1.0." + payload[3] + ".|"
+		smsCh <- msg
+		fmt.Println("Message Sent: ", msg)
+		req.Response <- []byte{1}
+	//params: none
 	case CustomProtocol.SleepGeogram:
 		fmt.Println("processing sleep geogram")
+		payload := CustomProtocol.ParsePayload(req.Payload)
+		msg := "[" + payload[0] + "]" + payload[1] + ".1.|"
+		smsCh <- msg
+		fmt.Println("Message Sent: ", msg)
+		req.Response <- []byte{1}
+	//params: interval (seconds) (0 to disable)
+	case CustomProtocol.ActivateIntervalGps:
+		fmt.Println("processing activate internal gps")
+		payload := CustomProtocol.ParsePayload(req.Payload)
+		msg := "[" + payload[0] + "]" + payload[1] + ".4." + payload[2] + ".|"
+		smsCh <- msg
+		fmt.Println("Message Sent: ", msg)
+		req.Response <- []byte{1}
 	case CustomProtocol.UpdateUserKeylogData:
 		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
 	case CustomProtocol.UpdateUserIPTraceData:

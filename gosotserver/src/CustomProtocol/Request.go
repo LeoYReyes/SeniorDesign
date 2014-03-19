@@ -26,9 +26,10 @@ const (
 	// Device opcodes 96 - 159
 
 	// Geogram opcodes 96 - 127
-	ActivateGPS      = 96
-	SleepGeogram     = 97
-	ActivateGeofence = 98
+	ActivateGPS         = 96
+	SleepGeogram        = 97
+	ActivateGeofence    = 98
+	ActivateIntervalGps = 99
 
 	// Laptop opcodes 128 - 159
 	CheckDeviceStolen     = 128

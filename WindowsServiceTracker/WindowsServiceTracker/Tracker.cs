@@ -40,7 +40,8 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
         public const int CHECKIN_WAIT_TIME = 60000; //todo increase to ~5min after debugging
         private const string REG_PATH = "Software\\SOT\\WindowsServiceTracker";
-        private const string REG_VAL = "Stolen";
+        private const string REG_FIELD_STOLEN = "Stolen";
+        private const string REG_FIELD_MAC = "MAC";
         private const string REG_VAL_FALSE = "false";
         private const string REG_VAL_TRUE = "true";
 
@@ -136,6 +137,7 @@ namespace WindowsServiceTracker
             {
                 StartKeylogger();
             }
+            macAddress = getMacAddress();
             //StartKeylogger(); //todo remove after debugging
 
             tcpThread = new Thread(this.IpConnectionThread);
@@ -239,43 +241,13 @@ namespace WindowsServiceTracker
             EventLog.WriteEntry(ERROR_LOG_SOURCE, eventLogInput, EventLogEntryType.Information);
         }
 
-        /* Gets the MAC address of the laptop. The method loops through all existing network
-         * adapters looking for an ethernet adapter, if one is found then it is immediately
-         * returned. If not, then it looks for the first WiFi adapter in the list. If it finds 
-         * a wifi adapter it will continue looping to prioritize for ethernet. If neither WiFi 
-         * nor Ethernet is found then the MAC address of the active adapter is used.
-         */
-        private string getMacAddress()
-        {
-            string mac = string.Empty;
-
-            bool keepUnlessEthernet = false;
-            foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
-            {
-                if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
-                {
-                    return nic.GetPhysicalAddress().ToString();
-                }
-                else if (!keepUnlessEthernet && nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
-                {
-                    mac = nic.GetPhysicalAddress().ToString();
-                    keepUnlessEthernet = true;
-                }
-                else if (mac == string.Empty && nic.OperationalStatus == OperationalStatus.Up)
-                {
-                    mac = nic.GetPhysicalAddress().ToString();
-                }
-            }
-
-            return mac;
-        }
+        
 
         /* Tries to connect to the server and sleeps for a given amount of time
          * if the server reports it is not stolen.
          */
         private void IpConnectionThread()
         {
-            macAddress = getMacAddress();
             while (connectionKeepAlive)
             {
                 MaintainServerConnection();
@@ -674,7 +646,6 @@ namespace WindowsServiceTracker
             if (stolenKey == null)
             {
                 stolenKey = Microsoft.Win32.Registry.LocalMachine.CreateSubKey(REG_PATH);
-                stolenKey.SetValue(REG_VAL, REG_VAL_FALSE);
             }
             return stolenKey;
         }
@@ -683,8 +654,17 @@ namespace WindowsServiceTracker
          */ 
         private bool getStolenRegVal()
         {
+            string stolen = "";
             Microsoft.Win32.RegistryKey stolenKey = getStolenRegKey();
-            if ((string)stolenKey.GetValue(REG_VAL) == REG_VAL_TRUE)
+            try
+            {
+                stolen = stolenKey.GetValue(REG_FIELD_STOLEN).ToString();
+            } catch (NullReferenceException)
+            {
+                stolenKey.SetValue(REG_FIELD_STOLEN, REG_VAL_FALSE);
+            }
+
+            if (stolen == REG_VAL_TRUE)
             {
                 return true;
             }
@@ -702,12 +682,72 @@ namespace WindowsServiceTracker
             Microsoft.Win32.RegistryKey stolenKey = getStolenRegKey();
             if (stolen)
             {
-                stolenKey.SetValue(REG_VAL, REG_VAL_TRUE);
+                stolenKey.SetValue(REG_FIELD_STOLEN, REG_VAL_TRUE);
             }
             else
             {
-                stolenKey.SetValue(REG_VAL, REG_VAL_FALSE);
+                stolenKey.SetValue(REG_FIELD_STOLEN, REG_VAL_FALSE);
             }
+        }
+        
+        /* Attempts to get the MAC address from the registry. If unsuccesful, gets it from
+         * the hardware and stores that in the registry;
+         */
+        private string getMacAddress()
+        {
+            string mac = "";
+
+            Microsoft.Win32.RegistryKey stolenKey = getStolenRegKey();
+            try
+            {
+                mac = stolenKey.GetValue(REG_FIELD_MAC).ToString();
+            }
+            catch (NullReferenceException)
+            {
+                stolenKey.SetValue(REG_FIELD_STOLEN, "");
+            }
+
+            if (mac == "")
+            {
+                mac = getMacAddressFromHardware();
+                stolenKey.SetValue(REG_FIELD_MAC, mac);
+                return mac;
+            }
+            else
+            {
+                return mac;
+            }
+        }
+
+        /* Gets the MAC address of the laptop. The method loops through all existing network
+         * adapters looking for an ethernet adapter, if one is found then it is immediately
+         * returned. If not, then it looks for the first WiFi adapter in the list. If it finds 
+         * a wifi adapter it will continue looping to prioritize for ethernet. If neither WiFi 
+         * nor Ethernet is found then the MAC address of the active adapter is used.
+         */
+        private string getMacAddressFromHardware()
+        {
+            string mac = string.Empty;
+
+            bool keepUnlessEthernet = false;
+            foreach (NetworkInterface nic in NetworkInterface.GetAllNetworkInterfaces())
+            {
+                if (nic.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+                {
+                    return nic.GetPhysicalAddress().ToString();
+                }
+                else if (!keepUnlessEthernet && nic.NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
+                {
+                    mac = nic.GetPhysicalAddress().ToString();
+                    keepUnlessEthernet = true;
+                }
+                else if (mac == string.Empty && nic.OperationalStatus == OperationalStatus.Up)
+                {
+                    mac = nic.GetPhysicalAddress().ToString();
+                }
+            }
+
+            return mac;
         }
     }
 }

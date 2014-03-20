@@ -96,7 +96,7 @@ func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arr
 	case CustomProtocol.ActivateGeofence:
 		fmt.Println("processing activate geofence")
 		payload := CustomProtocol.ParsePayload(req.Payload)
-		msg := "[" + payload[0] + "]" + payload[1] + "." + payload[2] + ".1.1.0." + payload[3] + ".|"
+		msg := "[" + payload[0] + "]" + payload[1] + ".2." + payload[2] + ".1.0." + payload[3] + ".|"
 		smsCh <- msg
 		fmt.Println("Message Sent: ", msg)
 		req.Response <- []byte{1}
@@ -110,14 +110,14 @@ func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arr
 		req.Response <- []byte{1}
 	//params: interval (seconds) (0 to disable)
 	case CustomProtocol.ActivateIntervalGps:
-		fmt.Println("processing activate internal gps")
+		fmt.Println("processing activate interval gps")
 		payload := CustomProtocol.ParsePayload(req.Payload)
 		msg := "[" + payload[0] + "]" + payload[1] + ".4." + payload[2] + ".|"
 		smsCh <- msg
 		fmt.Println("Message Sent: ", msg)
 		req.Response <- []byte{1}
 	// sets location for geofence 1
-	// latitude format ddmm.mmmm without the '.', longitude format dddmm.mmmm without the '.'
+	// params: latitude format ddmm.mmmm without the '.', longitude format dddmm.mmmm without the '.'
 	case CustomProtocol.SetGeofence:
 		fmt.Println("processing set geofence")
 		payload := CustomProtocol.ParsePayload(req.Payload)

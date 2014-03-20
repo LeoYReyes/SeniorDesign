@@ -80,7 +80,7 @@ func GPSCommunicate(conn net.Conn) {
 					toServer <- req
 					fmt.Println("Req sent to server")
 				} else {
-					conn.Write([]byte("|"))
+					conn.Write([]byte("|")) //heartbeat response to ensure connection is alive
 				}
 			}
 		}

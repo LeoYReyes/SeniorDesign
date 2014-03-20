@@ -31,11 +31,38 @@ func hack() {
 	}
 }
 
-func TestActivateGps(t *testing.T) {
-	//toDeviceCh := make(chan *CustomProtocol.Request)
-	//fromDeviceCh := make(chan *CustomProtocol.Request)
+func TestFreestyleMsg(t *testing.T) {
 	go StartDeviceServer(fromDeviceCh, toDeviceCh)
 	go hack()
+
+	time.Sleep(10000 * time.Millisecond)
+
+	resCh := make(chan []byte)
+
+	buf := []byte{}
+	buf = append(buf, []byte(phoneNumber)...)
+	buf = append(buf, 0x1B)
+	buf = append(buf, []byte("Begin Tests :D")...)
+	buf = append(buf, 0x1B)
+
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
+		OpCode: CustomProtocol.FreestyleMsg, Payload: buf, Response: resCh}
+
+	toDeviceCh <- req
+
+	time.Sleep(10000 * time.Millisecond)
+
+	select {
+	case m := <-resCh:
+		if m[0] == 0 {
+			t.Error("Response to requests indicate it was not fullfilled")
+		}
+	default:
+		t.Error("No response on activate gps request")
+	}
+}
+
+func TestActivateGps(t *testing.T) {
 
 	time.Sleep(10000 * time.Millisecond)
 
@@ -65,11 +92,6 @@ func TestActivateGps(t *testing.T) {
 }
 
 func TestActivateGeofence(t *testing.T) {
-	//toDeviceCh := make(chan *CustomProtocol.Request)
-	//fromDeviceCh := make(chan *CustomProtocol.Request)
-	//go StartDeviceServer(fromDeviceCh, toDeviceCh)
-
-	//time.Sleep(10000 * time.Millisecond)
 
 	resCh := make(chan []byte)
 
@@ -101,11 +123,6 @@ func TestActivateGeofence(t *testing.T) {
 }
 
 func TestSleepGeogram(t *testing.T) {
-	//toDeviceCh := make(chan *CustomProtocol.Request)
-	//fromDeviceCh := make(chan *CustomProtocol.Request)
-	//go StartDeviceServer(fromDeviceCh, toDeviceCh)
-
-	//time.Sleep(10000 * time.Millisecond)
 
 	resCh := make(chan []byte)
 
@@ -133,11 +150,6 @@ func TestSleepGeogram(t *testing.T) {
 }
 
 func TestActivateIntervalGps(t *testing.T) {
-	//toDeviceCh := make(chan *CustomProtocol.Request)
-	//fromDeviceCh := make(chan *CustomProtocol.Request)
-	//go StartDeviceServer(fromDeviceCh, toDeviceCh)
-
-	//time.Sleep(10000 * time.Millisecond)
 
 	resCh := make(chan []byte)
 
@@ -167,11 +179,6 @@ func TestActivateIntervalGps(t *testing.T) {
 }
 
 func TestSetGeofence(t *testing.T) {
-	//toDeviceCh := make(chan *CustomProtocol.Request)
-	//fromDeviceCh := make(chan *CustomProtocol.Request)
-	//go StartDeviceServer(fromDeviceCh, toDeviceCh)
-
-	//time.Sleep(10000 * time.Millisecond)
 
 	resCh := make(chan []byte)
 

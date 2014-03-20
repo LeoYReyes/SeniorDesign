@@ -80,10 +80,14 @@ func chanHandler() {
  *
  * GPS req payload structure (esc character delimiter):
  * <phone number><PIN><variable numnber of params>
+ * exception: FreestyleMsg does not require a PIN, as it lets the message
+ * be completely customizable.
+ * note: '[', ']', and '|' are reserved as delimiters and should not be included
+ * in any parameters
  */
-func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arrays and payload validation
+func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arrays and payload validation (strip reserved chars)
 	switch req.OpCode {
-	//params: none
+	//params: phone naumber, PIN
 	case CustomProtocol.ActivateGPS:
 		fmt.Println("processing activate gps")
 		payload := CustomProtocol.ParsePayload(req.Payload)
@@ -92,7 +96,7 @@ func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arr
 		fmt.Println("Message Sent: ", msg)
 		req.Response <- []byte{1}
 	//activates geofence 1
-	//params: active/deactive (1/0), radius (feet)
+	//params: phone naumber, PIN, active/deactive (1/0), radius (feet)
 	case CustomProtocol.ActivateGeofence:
 		fmt.Println("processing activate geofence")
 		payload := CustomProtocol.ParsePayload(req.Payload)
@@ -100,7 +104,7 @@ func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arr
 		smsCh <- msg
 		fmt.Println("Message Sent: ", msg)
 		req.Response <- []byte{1}
-	//params: none
+	//params: phone naumber, PIN
 	case CustomProtocol.SleepGeogram:
 		fmt.Println("processing sleep geogram")
 		payload := CustomProtocol.ParsePayload(req.Payload)
@@ -108,7 +112,7 @@ func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arr
 		smsCh <- msg
 		fmt.Println("Message Sent: ", msg)
 		req.Response <- []byte{1}
-	//params: interval (seconds) (0 to disable)
+	//params: phone naumber, PIN, interval (seconds) (0 to disable)
 	case CustomProtocol.ActivateIntervalGps:
 		fmt.Println("processing activate interval gps")
 		payload := CustomProtocol.ParsePayload(req.Payload)
@@ -117,7 +121,8 @@ func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arr
 		fmt.Println("Message Sent: ", msg)
 		req.Response <- []byte{1}
 	// sets location for geofence 1
-	// params: latitude format ddmm.mmmm without the '.', longitude format dddmm.mmmm without the '.'
+	// params: phone naumber, PIN, latitude format ddmm.mmmm without the '.',
+	// longitude format dddmm.mmmm without the '.'
 	case CustomProtocol.SetGeofence:
 		fmt.Println("processing set geofence")
 		payload := CustomProtocol.ParsePayload(req.Payload)
@@ -132,6 +137,14 @@ func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arr
 		req.Response <- []byte{1}
 	//todo find where this is in memory
 	case CustomProtocol.SetAwakenMsg:
+	//params: phone naumber, message
+	case CustomProtocol.FreestyleMsg:
+		fmt.Println("processing freestyle msg")
+		payload := CustomProtocol.ParsePayload(req.Payload)
+		msg := "[" + payload[0] + "]" + payload[1] + "|"
+		smsCh <- msg
+		fmt.Println("Message Sent: ", msg)
+		req.Response <- []byte{1}
 	case CustomProtocol.UpdateUserKeylogData:
 		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
 	case CustomProtocol.UpdateUserIPTraceData:

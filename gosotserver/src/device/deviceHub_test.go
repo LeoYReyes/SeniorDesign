@@ -1,3 +1,13 @@
+/* This is a number of tests for deviceHub. Right now, it currently tests the
+ * ability to process gps requests. It requires a little bit of manual work
+ * work to confirm some of the outputs. To run the tests, make sure a phone
+ * is running the SMS Gateway app and ready to connect to when the tests begin.
+ * The phoneNumber variable below determines what phone number the processed
+ * requests will be sent to. The unit tests themselves only check that a
+ * response is received from each processed request (responses are sent through
+ * and channel that is passed in the request) and it is the expected value.
+ */
+
 package device
 
 import (

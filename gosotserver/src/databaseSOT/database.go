@@ -134,6 +134,10 @@ func processRequest(req *CustomProtocol.Request) {
 	switch req.OpCode {
 	case CustomProtocol.NewAccount:
 	case CustomProtocol.NewDevice:
+		registerNewDevice(payload[0], payload[1], payload[2], payload[3])
+		res := make([]byte, 2)
+		res[0] = 1
+		req.Response <- res
 	case CustomProtocol.UpdateDeviceGPS:
 	case CustomProtocol.UpdateDeviceIP:
 	case CustomProtocol.UpdateDeviceKeylog:
@@ -245,29 +249,28 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 }
 
 /*
-*  
+*
 *
 *
 * Steven Whaley Mar, 18 - created
-*/
+ */
 
-func registerNewDevice(deviceType string, deviceName string, deviceId string, userId string) {
+func registerNewDevice(deviceType string, deviceId string, deviceName string, userId string) {
 	db := connect()
-	print(deviceType)
-	
-		if (deviceType != "gps" && deviceType != "laptop") {
-			print("invalid device type")
-		} else {
-			if (deviceType == "gps" ){
-				db.Query("INSERT INTO gpsDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
-			} else if (deviceType == "laptop"){
-				db.Query("INSERT INTO laptopDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
-			}
+
+	if deviceType != "gps" && deviceType != "laptop" {
+		print("invalid device type")
+	} else {
+		if deviceType == "gps" {
+			db.Query("INSERT INTO gpsDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
+		} else if deviceType == "laptop" {
+			fmt.Println("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
+			db.Query("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
 		}
+	}
 
 	disconnect(db)
 }
-
 
 /*
 *  IsDeviceStolen(deviceId string) (bool) takes in device id and return a
@@ -346,121 +349,112 @@ func IsDeviceStolen(deviceId string) bool {
 	return bool1
 }
 
-
-
-
-
-
 /*
-* 
+*
 *
 *
 * Steven Whaley Mar, 1 - created
 * Mar 17 - seems to be working
-*/
+ */
 
-func UpdateKeyLog(deviceId string, keylog string) (bool) {
+func UpdateKeyLog(deviceId string, keylog string) bool {
 
-  bool1 := true
+	bool1 := true
 
-  db := connect()
- 
-    rows, res, err := db.Query("UPDATE keylogs SET data = concat(data, 'it worked!') WHERE deviceId = 1")
-    rows = rows
-    res = res
+	db := connect()
 
-    if err != nil {
-    panic(err)
-    }
+	rows, res, err := db.Query("UPDATE keylogs SET data = concat(data, 'it worked!') WHERE deviceId = 1")
+	rows = rows
+	res = res
 
-  disconnect(db)
+	if err != nil {
+		panic(err)
+	}
 
-  return bool1
+	disconnect(db)
+
+	return bool1
 }
 
 /*
-* 
+*
 *
 *
 * Steven Whaley Mar, 17 - created
-* 
-*/
+*
+ */
 
-func UpdateTraceRoute(deviceId string, traceRoute string) (bool) {
+func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 
-  bool1 := true
-  max := int64(-1)
+	bool1 := true
+	max := int64(-1)
 
-  db := connect()
+	db := connect()
 
-  	
- 	db.Query("INSERT INTO ipList (deviceId) VALUES ('" + deviceId + "')")
+	db.Query("INSERT INTO ipList (deviceId) VALUES ('" + deviceId + "')")
 
- 	rows, res, err := db.Query("SELECT MAX(id) FROM ipList");
-   
-    //rows, res, err := db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + deviceId + "', '" + ip + "')")
-    
-    for _, row := range rows {
-    for _, col := range row {
-      if col == nil {
-        // col has NULL value
-      } else {
-        // Do something with text in col (type []byte)
-      }
-    }
-    err = err
+	rows, res, err := db.Query("SELECT MAX(id) FROM ipList")
 
-    val1 := row[0].([]byte)
+	//rows, res, err := db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + deviceId + "', '" + ip + "')")
 
-    temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
+	for _, row := range rows {
+		for _, col := range row {
+			if col == nil {
+				// col has NULL value
+			} else {
+				// Do something with text in col (type []byte)
+			}
+		}
+		err = err
 
-    max = temp
+		val1 := row[0].([]byte)
 
+		temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
 
+		max = temp
 
-    err2 = err2
-    rows = rows
-    res = res
-}
+		err2 = err2
+		rows = rows
+		res = res
+	}
 
-maxs := strconv.FormatInt(max, 10)
+	maxs := strconv.FormatInt(max, 10)
 
-print(max, "\n")
-print(maxs + "\n")
+	print(max, "\n")
+	print(maxs + "\n")
 
 	var list []string
 
-  	list = parseTraceRouteString(traceRoute)
- 	
-  	
-  	for i := 0; i < len(list); i++ {
+	list = parseTraceRouteString(traceRoute)
 
-  		db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + maxs + "', '" + list[i] + "')")
-  	}
+	for i := 0; i < len(list); i++ {
 
-  disconnect(db)
+		db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + maxs + "', '" + list[i] + "')")
+	}
 
-  return bool1
+	disconnect(db)
+
+	return bool1
 }
 
-func parseTraceRouteString(traceRoute string) (arr []string){
+func parseTraceRouteString(traceRoute string) (arr []string) {
 
 	var list []string
-	
+
 	trace := "127.0.01231.1~123.1.1.1~123.2.23.2~123.3.3.3"
-	print(trace +"\n")
+	print(trace + "\n")
 	num := strings.Count("127.0.0.1~123.1.1.1~123.2.2.2~123.3.3.3", "~") + 1
-	
+
 	address1 := ""
-	
+
 	for i := 0; i < num; i++ {
-		
-		if(i != num - 1) {
+
+		if i != num-1 {
 			address1 = trace[0:strings.Index(trace, "~")]
 			list = append(list, address1)
-		fmt.Println("extracted: " + list[i])
+			fmt.Println("extracted: " + list[i])
 
-		trace = trace[strings.Index(trace, "~") + 1:len(trace)]
+			trace = trace[strings.Index(trace, "~")+1 : len(trace)]
 		} else {
 			address1 = trace
 			list = append(list, address1)
@@ -471,51 +465,51 @@ func parseTraceRouteString(traceRoute string) (arr []string){
 }
 
 /*
-*  
+*
 *
 * Steven Whaley Mar, 1 - created
-*/
+ */
 
-func IsGpsDevice(deviceId string) (bool) {
+func IsGpsDevice(deviceId string) bool {
 
-  bool1 := false
-  
-  db := connect()
+	bool1 := false
 
-  rows, res, err := db.Query("select * from gpsDevice where id = '" + deviceId + "'")
-  if err != nil {
-    panic(err)
-  }
+	db := connect()
 
-  res = res
+	rows, res, err := db.Query("select * from gpsDevice where id = '" + deviceId + "'")
+	if err != nil {
+		panic(err)
+	}
 
-  for _, row := range rows {
-    for _, col := range row {
-      if col == nil {
-        // col has NULL value
-      } else {
-        // Do something with text in col (type []byte)
-      }
-    }
+	res = res
 
-    var err2 error
-    temp := int64(-1)
+	for _, row := range rows {
+		for _, col := range row {
+			if col == nil {
+				// col has NULL value
+			} else {
+				// Do something with text in col (type []byte)
+			}
+		}
 
-    val1 := row[0].([]byte)
+		var err2 error
+		temp := int64(-1)
 
-    temp, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-    err2 = err2
+		val1 := row[0].([]byte)
 
-    if temp != -1 {
-      bool1 = true
-    } else {
-      bool1 = false
-    }
-  }
+		temp, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
+		err2 = err2
 
-  disconnect(db)
+		if temp != -1 {
+			bool1 = true
+		} else {
+			bool1 = false
+		}
+	}
 
-  return bool1
+	disconnect(db)
+
+	return bool1
 }
 
 /*
@@ -609,7 +603,7 @@ func GetUserDevices(email string) []string {
 	}
 
 	//adding laptopDevices to the the devices list
-	rows2, res2, err2 := db.Query("select deviceName from laptopDevice where customerId = '" + customerId + "'")
+	rows2, res2, err2 := db.Query("select deviceName, deviceId, isStolen from laptopDevice where customerId = '" + customerId + "'")
 	if err2 != nil {
 		panic(err2)
 	}

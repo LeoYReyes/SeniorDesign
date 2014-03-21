@@ -56,6 +56,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Toggles the device's stolen status
 func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {

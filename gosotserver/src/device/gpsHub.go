@@ -79,7 +79,8 @@ func GPSCommunicate(conn net.Conn) {
 					//TODO send GPS coordinates to the database
 					toServer <- req
 					fmt.Println("Req sent to server")
-				} else {
+				} else if buffer[0] == '|' {
+					//fmt.Println("Heartbeat <3")
 					conn.Write([]byte("|")) //heartbeat response to ensure connection is alive
 				}
 			}

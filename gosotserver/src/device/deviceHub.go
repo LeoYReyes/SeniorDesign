@@ -135,7 +135,7 @@ func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arr
 		smsCh <- longMsg
 		fmt.Println("Message Sent: ", longMsg)
 		req.Response <- []byte{1}
-	//todo find where this is in memory
+	//todo find where this is in memory. found it, at 200
 	case CustomProtocol.SetAwakenMsg:
 	//params: phone naumber, message
 	case CustomProtocol.FreestyleMsg:

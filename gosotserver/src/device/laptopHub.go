@@ -111,7 +111,7 @@ func UpdateTraceroute(deviceConn *deviceConnection, msg string) {
 	for e := newList.Front(); e != nil; e = e.Next() {
 		fmt.Println(e.Value)
 	}*/
-	deviceConn.ld.TraceRouteList.PushBack(msg[1:])
+	deviceConn.ld.TraceRouteList = append(deviceConn.ld.TraceRouteList, msg[1:])
 	//TODO send request to the database to write the new IP list
 }
 
@@ -121,8 +121,8 @@ func UpdateTraceroute(deviceConn *deviceConnection, msg string) {
  * to the database to update with the new keylog data.
  */
 func UpdateKeylog(deviceConn *deviceConnection, msg string) {
-	deviceConn.ld.KeylogData.PushBack(msg[1 : len(msg)-1])
-	fmt.Println(deviceConn.ld.KeylogData.Back().Value)
+	deviceConn.ld.KeylogData = append(deviceConn.ld.KeylogData, msg[1:len(msg)-1])
+	fmt.Println(deviceConn.ld.KeylogData[len(deviceConn.ld.KeylogData)-1])
 	if deviceConn.ld.UpdateKeylog() {
 		fmt.Println("Keylog data has been successfully updated")
 	} else {

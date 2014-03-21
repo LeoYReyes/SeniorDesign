@@ -8,7 +8,7 @@ package device
 
 import (
 	"CustomProtocol"
-	"container/list"
+	//"container/list"
 	"fmt"
 )
 
@@ -18,8 +18,8 @@ import (
  * data.
  */
 type LaptopDevice struct {
-	TraceRouteList list.List
-	KeylogData     list.List
+	TraceRouteList []string
+	KeylogData     []string
 	Device
 }
 
@@ -58,7 +58,7 @@ func (ld *LaptopDevice) CheckIfStolen() bool {
  */
 func (ld *LaptopDevice) UpdateKeylog() bool {
 	id := []byte(ld.Device.ID)
-	keylog := ld.KeylogData.Back().Value.(string)
+	keylog := ld.KeylogData[len(ld.KeylogData)-1]
 	payload := append(id, 0x1B)
 	payload = append(payload, keylog...)
 	response := make(chan []byte)
@@ -82,7 +82,7 @@ func (ld *LaptopDevice) UpdateKeylog() bool {
  */
 func (ld *LaptopDevice) UpdateTraceroute() bool {
 	id := []byte(ld.Device.ID)
-	traceroute := ld.TraceRouteList.Back().Value.(string)
+	traceroute := ld.TraceRouteList[len(ld.TraceRouteList)-1]
 	tracerouteBytes := []byte(traceroute)
 	payload := append(id, 0x1B)
 	payload = append(payload, tracerouteBytes...)

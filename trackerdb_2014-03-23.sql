@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.6.15)
 # Database: trackerdb
-# Generation Time: 2014-03-23 17:49:30 +0000
+# Generation Time: 2014-03-23 21:35:35 +0000
 # ************************************************************
 
 
@@ -26,22 +26,34 @@
 DROP TABLE IF EXISTS `account`;
 
 CREATE TABLE `account` (
-  `customerId` int(11) NOT NULL,
+  `customerId` int(11) DEFAULT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `userName` varchar(30) DEFAULT NULL,
   `password` char(40) DEFAULT NULL COMMENT 'TODO: change from char to binary to save space',
-  PRIMARY KEY (`id`)
+  `admin` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `accountToCustomer` (`customerId`),
+  CONSTRAINT `accountToCustomer` FOREIGN KEY (`customerId`) REFERENCES `customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `account` WRITE;
-/*!40000 ALTER TABLE `account` DISABLE KEYS */;
 
-INSERT INTO `account` (`customerId`, `id`, `userName`, `password`)
-VALUES
-	(1,1,'test@email.com','ee946cfd0649268eae325634c974646f9547ee86');
 
-/*!40000 ALTER TABLE `account` ENABLE KEYS */;
-UNLOCK TABLES;
+# Dump of table coordinates
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coordinates`;
+
+CREATE TABLE `coordinates` (
+  `deviceId` int(11) NOT NULL,
+  `latitude` double DEFAULT NULL,
+  `longitude` double DEFAULT NULL,
+  `timestamp` timestamp NULL DEFAULT NULL,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
+  KEY `coordsToGpsDevice` (`deviceId`),
+  CONSTRAINT `coordsToGpsDevice` FOREIGN KEY (`deviceId`) REFERENCES `gpsDevice` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 
 # Dump of table customer
@@ -59,15 +71,6 @@ CREATE TABLE `customer` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `customer` WRITE;
-/*!40000 ALTER TABLE `customer` DISABLE KEYS */;
-
-INSERT INTO `customer` (`id`, `phoneNumber`, `address`, `email`, `firstName`, `lastName`)
-VALUES
-	(1,'6661231234',NULL,'test@email.com','steven','whaley');
-
-/*!40000 ALTER TABLE `customer` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table gpsDevice
@@ -76,27 +79,16 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `gpsDevice`;
 
 CREATE TABLE `gpsDevice` (
-  `id` varchar(50) NOT NULL DEFAULT '',
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `deviceName` varchar(50) DEFAULT NULL,
-  `customerId` varchar(50) DEFAULT NULL,
-  `latitude` varchar(50) DEFAULT NULL,
-  `longitude` varchar(50) DEFAULT NULL,
-  `isStolen` tinyint(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `customerId` int(11) DEFAULT NULL,
+  `deviceId` varchar(10) DEFAULT NULL COMMENT 'deviceId for gpsDevices are phone numbers',
+  `isStolen` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `gpsDeviceToCustomer` (`customerId`),
+  CONSTRAINT `gpsDeviceToCustomer` FOREIGN KEY (`customerId`) REFERENCES `customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `gpsDevice` WRITE;
-/*!40000 ALTER TABLE `gpsDevice` DISABLE KEYS */;
-
-INSERT INTO `gpsDevice` (`id`, `deviceName`, `customerId`, `latitude`, `longitude`, `isStolen`)
-VALUES
-	('1','name','1',NULL,NULL,NULL),
-	('111111111111','device1','12','33.5522','14.2233',0),
-	('222222222222','device2','13','66.1111','18.1111',1),
-	('333333333333','device3','14','88.1111','19.3333',0);
-
-/*!40000 ALTER TABLE `gpsDevice` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table ipAddress
@@ -105,32 +97,14 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `ipAddress`;
 
 CREATE TABLE `ipAddress` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `listId` int(11) NOT NULL,
   `ipAddress` varchar(15) DEFAULT NULL,
-  `listId` int(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
+  KEY `ipAddressToList` (`listId`),
+  CONSTRAINT `ipAddressToList` FOREIGN KEY (`listId`) REFERENCES `ipList` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `ipAddress` WRITE;
-/*!40000 ALTER TABLE `ipAddress` DISABLE KEYS */;
-
-INSERT INTO `ipAddress` (`id`, `ipAddress`, `listId`)
-VALUES
-	(1,'127.0.01231.1',1),
-	(2,'123.1.1.1',1),
-	(3,'123.2.23.2',1),
-	(4,'123.3.3.3',1),
-	(5,'127.0.01231.1',2),
-	(6,'123.1.1.1',2),
-	(7,'123.2.23.2',2),
-	(8,'123.3.3.3',2),
-	(9,'127.0.01231.1',3),
-	(10,'123.1.1.1',3),
-	(11,'123.2.23.2',3),
-	(12,'123.3.3.3',3);
-
-/*!40000 ALTER TABLE `ipAddress` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table ipList
@@ -147,17 +121,6 @@ CREATE TABLE `ipList` (
   CONSTRAINT `ipListToDevice` FOREIGN KEY (`deviceId`) REFERENCES `laptopDevice` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `ipList` WRITE;
-/*!40000 ALTER TABLE `ipList` DISABLE KEYS */;
-
-INSERT INTO `ipList` (`id`, `deviceId`, `timestamp`)
-VALUES
-	(1,1,NULL),
-	(2,1,NULL),
-	(3,1,NULL);
-
-/*!40000 ALTER TABLE `ipList` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table keyLogs
@@ -173,15 +136,6 @@ CREATE TABLE `keyLogs` (
   CONSTRAINT `keyLogToDevice` FOREIGN KEY (`deviceId`) REFERENCES `laptopDevice` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `keyLogs` WRITE;
-/*!40000 ALTER TABLE `keyLogs` DISABLE KEYS */;
-
-INSERT INTO `keyLogs` (`deviceId`, `timestamp`, `data`)
-VALUES
-	(1,NULL,'it worked!keylog test');
-
-/*!40000 ALTER TABLE `keyLogs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table laptopDevice
@@ -193,20 +147,13 @@ CREATE TABLE `laptopDevice` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `deviceName` varchar(30) DEFAULT NULL,
   `customerId` int(11) DEFAULT NULL,
-  `macAddress` varchar(12) DEFAULT NULL,
-  `isStolen` tinyint(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `deviceId` varchar(12) DEFAULT NULL COMMENT 'deviceId for laptopDevices are macAddresses',
+  `isStolen` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `laptopToCustomer` (`customerId`),
+  CONSTRAINT `laptopToCustomer` FOREIGN KEY (`customerId`) REFERENCES `customer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-LOCK TABLES `laptopDevice` WRITE;
-/*!40000 ALTER TABLE `laptopDevice` DISABLE KEYS */;
-
-INSERT INTO `laptopDevice` (`id`, `deviceName`, `customerId`, `macAddress`, `isStolen`)
-VALUES
-	(1,NULL,NULL,NULL,1);
-
-/*!40000 ALTER TABLE `laptopDevice` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 

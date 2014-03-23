@@ -112,6 +112,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func signUpHandler(w http.ResponseWriter, r *http.Request) {
+	//TODO: check for blank inputs
 	err := r.ParseForm()
 	if err != nil {
 		// Handle error

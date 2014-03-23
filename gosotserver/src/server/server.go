@@ -27,9 +27,6 @@ func main() {
 	go device.StartDeviceServer(fromDeviceCh, toDeviceCh)
 	go databaseSOT.StartDatabaseServer(fromDatabaseCh, toDatabaseCh)
 
-	// FOR TESTING
-	//go webserver.StartWebServer(testWebCh)
-	//go device.StartDeviceServer(testDeviceCh)
 	for {
 		select {
 		case req := <-fromWebCh:

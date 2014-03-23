@@ -64,3 +64,7 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("ParseForm error: ", err)
 	}
 }
+
+func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
+
+}

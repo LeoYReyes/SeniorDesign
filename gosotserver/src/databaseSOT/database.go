@@ -133,6 +133,10 @@ func processRequest(req *CustomProtocol.Request) {
 	payload := CustomProtocol.ParsePayload(req.Payload)
 	switch req.OpCode {
 	case CustomProtocol.NewAccount:
+		SignUp(payload[0], payload[1], payload[2], payload[3], payload[4])
+		res := make([]byte, 2)
+		res[0] = 1
+		req.Response <- res
 	case CustomProtocol.NewDevice:
 		registerNewDevice(payload[0], payload[1], payload[2], payload[3])
 		res := make([]byte, 2)
@@ -171,28 +175,28 @@ func processRequest(req *CustomProtocol.Request) {
 	case CustomProtocol.GetDevice:
 	case CustomProtocol.SetDevice:
 	case CustomProtocol.GetDeviceList:
-	case CustomProtocol.CheckDeviceStolen: // 
+	case CustomProtocol.CheckDeviceStolen: //
 		isStolen := IsDeviceStolen(payload[0])
 		res := make([]byte, 1)
-		if (isStolen == true) {
+		if isStolen == true {
 			res[0] = 1
 		} else {
 			res[0] = 0
 		}
 		req.Response <- res
-	case CustomProtocol.UpdateUserKeylogData: // 
+	case CustomProtocol.UpdateUserKeylogData: //
 		boolResult := IsDeviceStolen(payload[0])
 		res := make([]byte, 1)
-		if (boolResult == true) {
+		if boolResult == true {
 			res[0] = 1
 		} else {
 			res[0] = 0
 		}
 		req.Response <- res
-	case CustomProtocol.UpdateUserIPTraceData: // 
+	case CustomProtocol.UpdateUserIPTraceData: //
 		boolResult := UpdateTraceRoute(payload[0], payload[1])
 		res := make([]byte, 1)
-		if (boolResult == true) {
+		if boolResult == true {
 			res[0] = 1
 		} else {
 			res[0] = 0

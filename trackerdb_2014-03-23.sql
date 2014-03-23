@@ -6,7 +6,7 @@
 # http://code.google.com/p/sequel-pro/
 #
 # Host: 127.0.0.1 (MySQL 5.6.15)
-# Database: trackerDb
+# Database: trackerdb
 # Generation Time: 2014-03-23 17:49:30 +0000
 # ************************************************************
 

@@ -98,7 +98,7 @@ func sanitizeGPSInput(params []string) []string { //todo
  * note: '[', ']', and '|' are reserved as delimiters and should not be included
  * in any parameters
  */
-func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arrays and payload validation (strip reserved chars)
+func processRequest(req *CustomProtocol.Request) {
 	switch req.OpCode {
 	//params: phone number, PIN
 	case CustomProtocol.ActivateGPS:
@@ -192,6 +192,5 @@ func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arr
 		go ProcessLapReq(req)
 	default:
 		req.Response <- []byte{0}
-		//todo respond to requests that did not fall under a case
 	}
 }

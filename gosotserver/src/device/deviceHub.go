@@ -100,64 +100,88 @@ func sanitizeGPSInput(params []string) []string { //todo
  */
 func processRequest(req *CustomProtocol.Request) { //todo bounds checking on arrays and payload validation (strip reserved chars)
 	switch req.OpCode {
-	//params: phone naumber, PIN
+	//params: phone number, PIN
 	case CustomProtocol.ActivateGPS:
 		fmt.Println("processing activate gps")
-		payload := CustomProtocol.ParsePayload(req.Payload)
-		msg := "[" + payload[0] + "]" + payload[1] + ".0.|"
-		smsCh <- msg
-		fmt.Println("Message Sent: ", msg)
-		req.Response <- []byte{1}
+		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
+		if len(payload) >= 2 {
+			msg := "[" + payload[0] + "]" + payload[1] + ".0.|"
+			smsCh <- msg
+			fmt.Println("Message Sent: ", msg)
+			req.Response <- []byte{1}
+		} else {
+			req.Response <- []byte{0}
+		}
 	//activates geofence 1
-	//params: phone naumber, PIN, active/deactive (1/0), radius (feet)
+	//params: phone number, PIN, active/deactive (1/0), radius (feet)
 	case CustomProtocol.ActivateGeofence:
 		fmt.Println("processing activate geofence")
-		payload := CustomProtocol.ParsePayload(req.Payload)
-		msg := "[" + payload[0] + "]" + payload[1] + ".2." + payload[2] + ".1.0." + payload[3] + ".|"
-		smsCh <- msg
-		fmt.Println("Message Sent: ", msg)
-		req.Response <- []byte{1}
-	//params: phone naumber, PIN
+		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
+		if len(payload) >= 4 {
+			msg := "[" + payload[0] + "]" + payload[1] + ".2." + payload[2] + ".1.0." + payload[3] + ".|"
+			smsCh <- msg
+			fmt.Println("Message Sent: ", msg)
+			req.Response <- []byte{1}
+		} else {
+			req.Response <- []byte{0}
+		}
+	//params: phone number, PIN
 	case CustomProtocol.SleepGeogram:
 		fmt.Println("processing sleep geogram")
-		payload := CustomProtocol.ParsePayload(req.Payload)
-		msg := "[" + payload[0] + "]" + payload[1] + ".1.|"
-		smsCh <- msg
-		fmt.Println("Message Sent: ", msg)
-		req.Response <- []byte{1}
-	//params: phone naumber, PIN, interval (seconds) (0 to disable)
+		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
+		if len(payload) >= 2 {
+			msg := "[" + payload[0] + "]" + payload[1] + ".1.|"
+			smsCh <- msg
+			fmt.Println("Message Sent: ", msg)
+			req.Response <- []byte{1}
+		} else {
+			req.Response <- []byte{0}
+		}
+	//params: phone number, PIN, interval (seconds) (0 to disable)
 	case CustomProtocol.ActivateIntervalGps:
 		fmt.Println("processing activate interval gps")
-		payload := CustomProtocol.ParsePayload(req.Payload)
-		msg := "[" + payload[0] + "]" + payload[1] + ".4." + payload[2] + ".|"
-		smsCh <- msg
-		fmt.Println("Message Sent: ", msg)
-		req.Response <- []byte{1}
+		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
+		if len(payload) >= 3 {
+			msg := "[" + payload[0] + "]" + payload[1] + ".4." + payload[2] + ".|"
+			smsCh <- msg
+			fmt.Println("Message Sent: ", msg)
+			req.Response <- []byte{1}
+		} else {
+			req.Response <- []byte{0}
+		}
 	// sets location for geofence 1
-	// params: phone naumber, PIN, latitude format ddmm.mmmm without the '.',
+	// params: phone number, PIN, latitude format ddmm.mmmm without the '.',
 	// longitude format dddmm.mmmm without the '.'
 	case CustomProtocol.SetGeofence:
 		fmt.Println("processing set geofence")
-		payload := CustomProtocol.ParsePayload(req.Payload)
-		//lat
-		latMsg := "[" + payload[0] + "]" + payload[1] + ".6.128." + payload[2] + ".|"
-		smsCh <- latMsg
-		fmt.Println("Message Sent: ", latMsg)
-		//long
-		longMsg := "[" + payload[0] + "]" + payload[1] + ".6.132." + payload[3] + ".|"
-		smsCh <- longMsg
-		fmt.Println("Message Sent: ", longMsg)
-		req.Response <- []byte{1}
+		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
+		if len(payload) >= 4 {
+			//lat
+			latMsg := "[" + payload[0] + "]" + payload[1] + ".6.128." + payload[2] + ".|"
+			smsCh <- latMsg
+			fmt.Println("Message Sent: ", latMsg)
+			//long
+			longMsg := "[" + payload[0] + "]" + payload[1] + ".6.132." + payload[3] + ".|"
+			smsCh <- longMsg
+			fmt.Println("Message Sent: ", longMsg)
+			req.Response <- []byte{1}
+		} else {
+			req.Response <- []byte{0}
+		}
 	//todo find where this is in memory. found it, at 200
 	case CustomProtocol.SetAwakenMsg:
-	//params: phone naumber, message
+	//params: phone number, message
 	case CustomProtocol.FreestyleMsg:
 		fmt.Println("processing freestyle msg")
-		payload := CustomProtocol.ParsePayload(req.Payload)
-		msg := "[" + payload[0] + "]" + payload[1] + "|"
-		smsCh <- msg
-		fmt.Println("Message Sent: ", msg)
-		req.Response <- []byte{1}
+		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
+		if len(payload) >= 2 {
+			msg := "[" + payload[0] + "]" + payload[1] + "|"
+			smsCh <- msg
+			fmt.Println("Message Sent: ", msg)
+			req.Response <- []byte{1}
+		} else {
+			req.Response <- []byte{0}
+		}
 	case CustomProtocol.UpdateUserKeylogData:
 		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
 	case CustomProtocol.UpdateUserIPTraceData:

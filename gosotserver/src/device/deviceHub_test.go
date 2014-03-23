@@ -58,7 +58,7 @@ func TestFreestyleMsg(t *testing.T) {
 			t.Error("Response to requests indicate it was not fullfilled")
 		}
 	default:
-		t.Error("No response on activate gps request")
+		t.Error("No response on activate freestyle message request")
 	}
 }
 
@@ -118,7 +118,7 @@ func TestActivateGeofence(t *testing.T) {
 			t.Error("Response to requests indicate it was not fullfilled")
 		}
 	default:
-		t.Error("No response on activate gps request")
+		t.Error("No response on activate geofence request")
 	}
 }
 
@@ -145,7 +145,7 @@ func TestSleepGeogram(t *testing.T) {
 			t.Error("Response to requests indicate it was not fullfilled")
 		}
 	default:
-		t.Error("No response on activate gps request")
+		t.Error("No response on activate sleep geogram request")
 	}
 }
 
@@ -174,7 +174,7 @@ func TestActivateIntervalGps(t *testing.T) {
 			t.Error("Response to requests indicate it was not fullfilled")
 		}
 	default:
-		t.Error("No response on activate gps request")
+		t.Error("No response on activate interval gps request")
 	}
 }
 
@@ -197,7 +197,7 @@ func TestSetGeofence(t *testing.T) {
 
 	toDeviceCh <- req
 
-	time.Sleep(10000 * time.Millisecond)
+	time.Sleep(20000 * time.Millisecond)
 
 	select {
 	case m := <-resCh:
@@ -205,6 +205,6 @@ func TestSetGeofence(t *testing.T) {
 			t.Error("Response to requests indicate it was not fullfilled")
 		}
 	default:
-		t.Error("No response on activate gps request")
+		t.Error("No response on activate set geofence request")
 	}
 }

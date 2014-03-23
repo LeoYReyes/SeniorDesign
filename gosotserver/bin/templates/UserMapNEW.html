@@ -1,55 +1,46 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:m="http://code.google.com/p/gmaps4jsf/">
+<html>
 <head>
-	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
-	<link type="text/css" rel="stylesheet" href="css/default.css"/>
-	<script type="text/javascript" src="js/map.js"></script>
-	<script type="text/javascript" src="https://maps.gstatic.com/intl/en_us/mapfiles/api-3/15/9/main.js"></script>
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.css"></link>
-	<link rel="stylesheet" type="text/css" href="css/default.css"></link>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+	<!--<link rel="stylesheet" type="text/css" href="css/bootstrap.css"></link>-->
 	<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css"></link>
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"></link>
 	<script src="http://code.jquery.com/jquery.js"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 	<script src="js/bootstrap.min.js"></script>
+	<script src="js/devices.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/default.css"></link>
 </head>
-	<body>
+<body>
 <!-- Allows the map to reside underneath other elements. -->
 <style>
-	#wrapper { position: relative; }
+	#wrapper { position: relative; height: 100%; }
 	#over_map { position: absolute; top: 10px; left: 10px; z-index: 99; }
 </style>
-		
+<div id="dialog-form" title="New Device">
+	<!--<p class="validateTips">All form fields are required.</p>-->
+	<form method="post" action="/newDevice">
+		<fieldset>
+			<input type="radio" name="deviceType" id="deviceType" value="gps">GPS Device<br>
+			<input type="radio" name="deviceType" id="deviceType" value="laptop">Laptop Device<br>
+			<label for="name">Device Name</label><br>
+			<input type="text" name="deviceName" id="deviceName" class="text ui-widget-content ui-corner-all"/><br>
+			<label for="id">ID</label><br>
+			<input type="text" name="deviceId" id="deviceId" class="text ui-widget-content ui-corner-all"/>
+		</fieldset>
+	</form>
+</div>		
 	
 <div id="wrapper">
-
 	<!-- The bottom layer of elements.  Contains Google Map. -->
 	<div id="google_map">
 		<div id="map-canvas">
-			<script type="text/javascript" src="js/map.js"></script>
-			<f:view contentType="text/html">
-	            <div class="row">
-	            	<div class="col-md-1"></div>
-	            	<div class="col-md-10">
-	            		<h:form id="map">
-		         	   		<m:map width="1000px" height="600px">
-		       					<m:marker>
-		          		  			<m:htmlInformationWindow htmlText="Hello" />
-		            			</m:marker>
-		       				</m:map>
-	       				</h:form>
-	       			</div>
-	       			<div class="col-md-1"></div>
-	       		</div>
-			</f:view>
-		</div>	
-	</div>
-	
+			<script type="text/javascript" src="js/map.js"></script>  
+	 </div>	
+	</div> <!-- END #google_map -->
 	<!-- Top layer of elements. -->
-	<div id="over_map">
+	<!--<div id="over_map">-->
    		
    		<!-- Navigation Bar -->
 		<nav class="navbar navbar-default" role="navigation">
@@ -72,9 +63,19 @@
           					<ul class="dropdown-menu">
           						<li><a href="#">All Devices</a></li>
     							<li class="divider"></li>
-    							<li><a href="#">Device One</a></li>
+                             <button id="deviceOne">
+                             	Device One
+                             </button>
+    							<!--<li><a href="#">Device One</a></li>-->
     							<li class="divider"></li>
-    							<li><a href="#">Device Two</a></li>
+                             <button id="deviceTwo">
+                             	Device Two
+                             </button>
+    							<!--<li><a href="#">Device Two</a></li>-->
+                             <li class="divider"></li>
+								<button id="newDeviceButton">
+                    				Add Device
+                				</button>
           					</ul>
         				</li>
 					</ul> 
@@ -82,15 +83,15 @@
 					<!-- Items in the nav-bar to the RIGHT. -->
       				<ul class="nav navbar-nav navbar-right">
       					<li class="dropdown">
-      					<li><a href="#">AccountName</a></li></li>
+      					<li><a href="#">{{.UserName}}</a></li></li>
         				<li><a href="/logout">Logout</a></li>
       				</ul>
 				</div><!-- /.navbar-collapse -->
 			</div><!-- /.container-fluid -->
 		</nav> <!-- End of Navigation Bar -->
-   
+
 		<!-- SHOW right side of screen code -->
-		<div class='container'; opacity:0.8;>
+		<div id="deviceOneBox" class='container'; opacity:0.8;>
 	
 			<div class='row'>
 				<!-- Left side w/o map code -->
@@ -114,7 +115,7 @@
                     					<li><a data-toggle="modal" data-target="#modalKeylogger"><i class="fa fa-dashboard fa-fw" ></i>Keylogger File</a></li>
                     					<li><a data-toggle="modal" data-target="#modalRename"><i class="fa fa-dashboard fa-fw" ></i>Rename</a></li>
                     					<li><a data-toggle="modal" data-target="#modalDelete"><i class="fa fa-dashboard fa-fw" ></i>Delete</a></li>
-                    					<li><a><i class="fa fa-dashboard fa-fw" ></i>Toggle Previous Location</a></li>
+                    					<li><a><i id="togglePrevLoc" class="fa fa-dashboard fa-fw" ></i>Toggle Previous Location</a></li>
                 					</ul> <!-- /#side-menu -->
             					</div> <!-- /.sidebar-collapse -->
         					</nav>
@@ -124,8 +125,8 @@
 				<div class='col-md-1'></div> <!-- /'col-md-1' -->
 			</div> <!-- /row -->
 		</div> <!-- /Container -->
-	</div><!-- End of Top layer of elements. Id: "over_map" -->
-</div> <!-- /Id: "wrapper" -->
+	<!--</div><!-- End of Top layer of elements. Id: "over_map" -->
+<!--</div> <!-- /Id: "wrapper" -->
 
 
 <!-- Modals: -->
@@ -191,6 +192,6 @@
     		</div>
   		</div>
 	</div> 
-
+</div> <!-- END #wrapper -->
 	</body>
 </html>

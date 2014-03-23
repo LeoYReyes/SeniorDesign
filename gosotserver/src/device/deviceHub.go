@@ -15,6 +15,7 @@ package device
 import (
 	"CustomProtocol"
 	"fmt"
+	"strings"
 )
 
 /*
@@ -72,6 +73,18 @@ func chanHandler() {
 			go processRequest(req)
 		}
 	}
+}
+
+/*
+ * Remove '[', ']', and '|' from params
+ */
+func sanitizeGPSInput(params []string) []string { //todo
+	for i := 0; i < len(params); i++ {
+		params[i] = strings.Replace(params[i], "[", "", -1)
+		params[i] = strings.Replace(params[i], "]", "", -1)
+		params[i] = strings.Replace(params[i], "|", "", -1)
+	}
+	return params
 }
 
 /*

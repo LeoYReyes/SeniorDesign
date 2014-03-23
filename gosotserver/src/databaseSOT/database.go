@@ -185,7 +185,7 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 		req.Response <- res
 	case CustomProtocol.UpdateUserKeylogData: //
-		boolResult := IsDeviceStolen(payload[0])
+		boolResult := UpdateKeylog(payload[0])
 		res := make([]byte, 1)
 		if boolResult == true {
 			res[0] = 1
@@ -391,7 +391,7 @@ func UpdateKeyLog(deviceId string, keylog string) bool {
 
 	db := connect()
 
-	rows, res, err := db.Query("UPDATE keylogs SET data = concat(data, '" + keylog + "') WHERE deviceId = 1")
+	rows, res, err := db.Query("UPDATE keylogs SET data = concat(data, '" + keylog + "') WHERE deviceId = '" + deviceId + "'")
 	rows = rows
 	res = res
 

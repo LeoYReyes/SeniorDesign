@@ -131,7 +131,9 @@ func chanHandler() {
 
 func processRequest(req *CustomProtocol.Request) {
 	payload := CustomProtocol.ParsePayload(req.Payload)
-	fmt.Println(payload)
+	/*for index, element := range payload {
+		fmt.Println("Payload element", index, ": ", element)
+	}*/
 	switch req.OpCode {
 	case CustomProtocol.NewAccount:
 		SignUp(payload[0], payload[1], payload[2], payload[3], payload[4])
@@ -314,62 +316,64 @@ func IsDeviceStolen(deviceId string) bool {
 	bool1 := false
 
 	db := connect()
+	if len(deviceId) != 12 {
+		rows, res, err := db.Query("select isStolen from gpsDevice where phoneNumber = '" + deviceId + "'")
+		if err != nil {
+			panic(err)
+		}
 
-	rows, res, err := db.Query("select isStolen from gpsDevice where phoneNumber = '" + deviceId + "'")
-	if err != nil {
-		panic(err)
-	}
+		res = res
 
-	res = res
+		for _, row := range rows {
+			for _, col := range row {
+				if col == nil {
+					// col has NULL value
+				} else {
+					// Do something with text in col (type []byte)
+				}
+			}
 
-	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
+			var err2 error
+
+			val1 := row[0].([]byte)
+
+			temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
+			err2 = err2
+
+			if temp == 1 {
+				bool1 = true
 			} else {
-				// Do something with text in col (type []byte)
+				bool1 = false
 			}
 		}
+	} else {
 
-		var err2 error
-
-		val1 := row[0].([]byte)
-
-		temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
-		err2 = err2
-
-		if temp == 1 {
-			bool1 = true
-		} else {
-			bool1 = false
+		rows2, res2, err3 := db.Query("select isStolen from laptopDevice where macAddress = '" + deviceId + "'")
+		if err3 != nil {
+			panic(err3)
 		}
-	}
 
-	rows2, res2, err3 := db.Query("select isStolen from laptopDevice where macAddress = '" + deviceId + "'")
-	if err3 != nil {
-		panic(err3)
-	}
+		res2 = res2
 
-	res2 = res2
-
-	for _, row := range rows2 {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
+		for _, row := range rows2 {
+			for _, col := range row {
+				if col == nil {
+					// col has NULL value
+				} else {
+					// Do something with text in col (type []byte)
+				}
 			}
-		}
 
-		val2 := row[0].([]byte)
+			val2 := row[0].([]byte)
 
-		temp2, err4 := strconv.ParseInt(string(val2[:]), 10, 64)
-		err4 = err4
+			temp2, err4 := strconv.ParseInt(string(val2[:]), 10, 64)
+			err4 = err4
 
-		if temp2 == 1 {
-			bool1 = true
-		} else {
-			bool1 = false
+			if temp2 == 1 {
+				bool1 = true
+			} else {
+				bool1 = false
+			}
 		}
 	}
 

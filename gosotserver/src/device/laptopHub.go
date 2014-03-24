@@ -150,7 +150,7 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	deviceConn.conn = conn
 	MapDeviceID(deviceConn)
 	var sentStolen bool
-	if /*deviceConn.ld.CheckIfStolen()*/ true { //todo remove comments when mehod CheckIfStolen method is properly implemented
+	if deviceConn.ld.CheckIfStolen() { //true { //todo remove comments when mehod CheckIfStolen method is properly implemented fuck you it's done
 		fmt.Println("CheckIfStolen request returned true")
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagStolen, "")
 	} else {

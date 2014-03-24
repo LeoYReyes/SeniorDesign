@@ -76,8 +76,8 @@ func GPSCommunicate(conn net.Conn) {
 					fmt.Println("Received msg: ", msg)
 					req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Web, Source: CustomProtocol.DeviceGPS,
 						OpCode: CustomProtocol.UpdateWebMap, Payload: []byte(msg)}
-					msg = strings.Replace(params[i], ",", 0x1B, -1)
-					msg = msg + 0x1B
+					msg = strings.Replace(msg, ",", string(0x1B), -1)
+					msg = msg + string(0x1B)
 					//TODO send GPS coordinates to the database
 					toServer <- req
 					fmt.Println("Req sent to server")

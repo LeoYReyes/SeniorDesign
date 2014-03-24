@@ -2,7 +2,7 @@ package device
 
 import (
 	//"crypto/sha1"
-	//"fmt"
+	"fmt"
 	//"strings"
 	"testing"
 )
@@ -14,8 +14,8 @@ func TestGoogleMapLinkParser(t *testing.T) {
 	expected2 := ""
 	result1 := googleMapLinkParser(str1)
 	result2 := googleMapLinkParser(str2)
-	//fmt.Println(result1)
-	//fmt.Println(result2)
+	fmt.Println(result1)
+	fmt.Println(result2)
 	if expected1 != result1 {
 		t.Error("Maps string parsed incorrectly")
 	}

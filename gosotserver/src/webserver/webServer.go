@@ -13,7 +13,10 @@ import (
 
 // for use with templates
 type Page struct {
-	UserName string
+	UserName      string
+	DeviceName    string
+	DeviceStatus  string
+	KeyloggerText string
 }
 
 var templates = template.Must(template.ParseGlob("templates/*.html"))
@@ -35,10 +38,11 @@ func handle(t string) (string, http.HandlerFunc) {
 		if t != "home" {
 			if sesh.Values["isLoggedIn"] == "true" {
 				userName := string(sesh.Values["userId"].(string))
-				p := &Page{UserName: userName}
+				p := &Page{UserName: userName, DeviceName: "Test Device", DeviceStatus: "Not Stolen", KeyloggerText: "Test Key Log"}
 				err := templates.ExecuteTemplate(w, t+".html", p)
 				if err != nil {
-					http.NotFound(w, r)
+					fmt.Println(err)
+					//http.NotFound(w, r)
 				}
 			} else {
 				http.Error(w, "Not Logged In", 000)

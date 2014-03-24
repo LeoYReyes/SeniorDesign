@@ -58,13 +58,28 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 // Toggles the device's stolen status
 func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	if err != nil {
-		// Handle error
-		fmt.Println("ParseForm error: ", err)
-	}
+
 }
 
 func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
-
+	buf := []byte{}
+	// Device owner, get user account info from session
+	_, cookieErr := r.Cookie("userSession")
+	if cookieErr != nil {
+		fmt.Println("Cookie Error: ", cookieErr)
+	} else {
+		sesh, _ := store.Get(r, "userSession")
+		buf = append(buf, []byte(sesh.Values["userId"].(string))...)
+		buf = append(buf, 0x1B)
+		//fmt.Println("Cookie userid: ", sesh.Values["userId"])
+		//fmt.Println("Cookie isLoggedIn: ", sesh.Values["isLoggedIn"])
+	}
+	// Create a response channel to receive response for the reqeust
+	resCh := make(chan []byte)
+	// Create request to register new device and send off request
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+		OpCode: CustomProtocol.GetDeviceList, Payload: buf, Response: resCh}
+	toServer <- req
+	res := <-resCh
+	fmt.Println("Response: ", res[0])
 }

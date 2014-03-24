@@ -59,13 +59,13 @@
       				<!-- Items in the nav-bar to the LEFT. -->
       				<ul class="nav navbar-nav">
 	              		<li class="dropdown">
-          				<a href="#" class="dropdown-toggle" data-toggle="dropdown">{{.DeviceViewing}} <b class="caret"></b></a>
+          				<a href="#" class="dropdown-toggle" data-toggle="dropdown">Devices<b class="caret"></b></a>
           					<ul class="dropdown-menu">
           						<li><a href="#" style="padding:9px;">All Devices</a></li>
-    							<li class="divider" style="margin:0px;""></li>
-    							<li id="deviceOne"><a href="#" style="padding:9px;"></i>{{.DeviceName}}</a></li>
     							<li class="divider" style="margin:0px;"></li>
-    							<li id="deviceTwo"><a href="#" style="padding:9px;">{{.DeviceName}}</a></li>
+    							<li id="deviceOne"><a href="#" style="padding:9px;"></i><!--{{.DeviceName}}--></a></li>
+    							<li class="divider" style="margin:0px;"></li>
+    							<li id="deviceTwo"><a href="#" style="padding:9px;"><!--{{.DeviceName}}--></a></li>
                              	<li class="divider" style="margin:0px;"></li>
                              	<li id="newDeviceButton"><a href="#" style="padding:9px;">Add Device</a></li>
           					</ul>
@@ -83,7 +83,7 @@
 		</nav> <!-- End of Navigation Bar -->
 
 		<!-- SHOW right side of screen code -->
-		<div id="deviceOneBox" class='container';>
+		<div id="deviceOneBox" class='container'>
 	
 			<div class='row'>
 				<!-- Left side w/o map code -->
@@ -97,10 +97,10 @@
                     					<div class='row'>
                     						<div class='col-md-1'></div>
                     						<div class='col-md-10'>
-                    							<li><h3 >{{.DeviceName}}</h3></li>
+                    							<li><h3 ><!--{{.DeviceName}}--></h3></li>
 												<li><h5>Tracking Details:</h5></li>
-												<li><h5>{{.DeviceStatus}}</h5></li>
-												<li><small>Last Update: {{.DeviceLastConnection}}</small></li>
+												<li><h5><!--{{.DeviceStatus}}--></h5></li>
+												<li><small>Last Update: </small></li>
 											</div>
 										</div>
                     					<li><a><i class="fa fa-dashboard fa-fw" ></i>Update Location</a></li>
@@ -130,7 +130,7 @@
     		<div class="modal-content">
       			<div class="modal-header">
         			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-        			<h4 class="modal-title" id="myModalLabel">Rename Device: {{.DeviceName}}</h4>
+        			<h4 class="modal-title" id="myModalLabel">Rename Device: <!--{{.DeviceName}}--></h4>
       			</div>
       			<div class="row" >
       				<div class="col-md-2"></div>
@@ -155,8 +155,8 @@
   		<div class="modal-lg" style="margin: 30px auto; margin-top: 80px">
     		<div class="modal-content">
       			<div class="modal-body">
-        			<h3 class="modal-title" id="myModalLabel">{{.DeviceName}} Keylog:</h3>
-        			<h5 class="modal-title">{{.KeyloggerText}}</h5>
+        			<h3 class="modal-title" id="myModalLabel"><!--{{.DeviceName}}--> Keylog:</h3>
+        			<h5 class="modal-title"><!--{{.KeyloggerText}}--></h5>
       			</div>
       			<div class="modal-footer">
         			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -174,10 +174,10 @@
     		<div class="modal-content">
       			<div class="modal-header">
         			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
-        			<h4 class="modal-title" id="myModalLabel">{{.DeviceName}}</h4>
+        			<h4 class="modal-title" id="myModalLabel"><!--{{.DeviceName}}--></h4>
      			</div>
       			<div class="modal-body">
-        			<h4 class="modal-title" id="myModalLabel">Are you sure you want to delete device "{{.DeviceName}}"?</h4>
+        			<h4 class="modal-title" id="myModalLabel">Are you sure you want to delete device "<!--{{.DeviceName}}-->"?</h4>
       			</div>
       			<div class="modal-footer">
         			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>

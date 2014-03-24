@@ -131,6 +131,7 @@ func chanHandler() {
 
 func processRequest(req *CustomProtocol.Request) {
 	payload := CustomProtocol.ParsePayload(req.Payload)
+	fmt.Println(payload)
 	switch req.OpCode {
 	case CustomProtocol.NewAccount:
 		SignUp(payload[0], payload[1], payload[2], payload[3], payload[4])
@@ -185,7 +186,7 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 		req.Response <- res
 	case CustomProtocol.UpdateUserKeylogData: //
-		boolResult := UpdateKeylog(payload[0])
+		boolResult := UpdateKeylog(payload[0], payload[1])
 		res := make([]byte, 1)
 		if boolResult == true {
 			res[0] = 1
@@ -385,7 +386,7 @@ func IsDeviceStolen(deviceId string) bool {
 * Mar 17 - seems to be working
  */
 
-func UpdateKeyLog(deviceId string, keylog string) bool {
+func UpdateKeylog(deviceId string, keylog string) bool {
 
 	bool1 := true
 

@@ -74,10 +74,10 @@ func GPSCommunicate(conn net.Conn) {
 					received := string(buffer[0:bytesRead])
 					msg = googleMapLinkParser(received)
 					fmt.Println("Received msg: ", msg)
-					//msg = strings.Replace(params[i], ",", 0x1b, -1)
-					//msg = msg + 0x1b
 					req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Web, Source: CustomProtocol.DeviceGPS,
 						OpCode: CustomProtocol.UpdateWebMap, Payload: []byte(msg)}
+					msg = strings.Replace(params[i], ",", 0x1B, -1)
+					msg = msg + 0x1B
 					//TODO send GPS coordinates to the database
 					toServer <- req
 					fmt.Println("Req sent to server")

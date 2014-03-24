@@ -184,7 +184,7 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 	case CustomProtocol.UpdateUserKeylogData:
 		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
-	case CustomProtocol.UpdateUserIPTraceData:
+	case CustomProtocol.UpdateUserIPTraceData: //todo include IP of connection in the trace route, currently starts at first node from router
 		go ProcessLapReq(req)
 	case CustomProtocol.FlagStolen:
 		go ProcessLapReq(req)

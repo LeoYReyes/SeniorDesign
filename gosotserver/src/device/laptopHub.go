@@ -111,6 +111,7 @@ func UpdateTraceroute(deviceConn *deviceConnection, msg string) {
 	for e := newList.Front(); e != nil; e = e.Next() {
 		fmt.Println(e.Value)
 	}*/
+	fmt.Println(msg)
 	deviceConn.ld.TraceRouteList = append(deviceConn.ld.TraceRouteList, msg[1:])
 	//TODO send request to the database to write the new IP list
 }
@@ -150,15 +151,25 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	deviceConn.conn = conn
 	MapDeviceID(deviceConn)
 	var sentStolen bool
-	if deviceConn.ld.CheckIfStolen() { //true { //todo remove comments when mehod CheckIfStolen method is properly implemented fuck you it's done
+	if deviceConn.ld.CheckIfStolen() {
 		fmt.Println("CheckIfStolen request returned true")
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagStolen, "")
-	} else {
+		if !sentStolen {
+			fmt.Println("Error sending stolen code.")
+		}
+		GetMessage(deviceConn)
+	} else { //if CheckIfStolen returns false
 		fmt.Println("CheckIfStolen request returned false")
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagNotStolen, "")
-	}
-	if !sentStolen {
-		fmt.Println("Error sending stolen code.")
+		if !sentStolen {
+			fmt.Println("Error sending stolen code.")
+		}
+		err := conn.Close()
+		if err != nil {
+			fmt.Println("Error closing laptop connection.", err)
+		}
+		fmt.Println("Connection sucks-s-foli closed")
+		//todo close connection and laptop goes into sleep mode
 	}
 	//TODO have GetMessage be called in response to sending messages
 	//go GetMessage(deviceConn)

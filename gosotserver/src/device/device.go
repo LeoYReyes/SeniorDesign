@@ -11,7 +11,9 @@ package device
 //import "net"
 
 type Device struct {
-	ID string
+	ID       string
+	Name     string
+	IsStolen byte
 }
 
 /*type Client struct {

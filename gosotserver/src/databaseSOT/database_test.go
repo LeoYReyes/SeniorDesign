@@ -1,9 +1,10 @@
 package databaseSOT
 
 import (
-	//"crypto/sha1"
-	//"fmt"
-	//"strings"
+	"CustomProtocol"
+	"crypto/sha1"
+	"fmt"
+	"strings"
 	"testing"
 )
 
@@ -18,7 +19,7 @@ func TestParsePayload(t *testing.T) {
 	buf = append(buf, 0x1B)
 	buf = append(buf, c...)
 	buf = append(buf, 0x1B)
-	payload := parsePayload(buf)
+	payload := CustomProtocol.ParsePayload(buf)
 	testArray := []string{"Param1", "Param2", "Param3"}
 	for index, element := range payload {
 		if element != testArray[index] {
@@ -28,13 +29,13 @@ func TestParsePayload(t *testing.T) {
 	t.Log("parsePayload([]byte) test passed.")
 }
 
-func TestIsDeviceStolen(t *testing.T) {
+/*func TestIsDeviceStolen(t *testing.T) {
 	if IsDeviceStolen("3344449464") {
 		t.Log("IsDeviceStolen(string) test passed.")
 	} else {
 		t.Error("IsDeviceStolen(string) did not work as expected.")
 	}
-}
+}*/
 
 func TestVerifyAccountInfo(t *testing.T) {
 	userName := "Test@Test.com"
@@ -51,13 +52,9 @@ func TestVerifyAccountInfo(t *testing.T) {
 
 }
 
-func TestGetUserDevices(t *testing.T) {
-	devices := GetUserDevices("Test@Test.com")
-	testArray := []string{"Stolen Laptop Test", "Stolen GPS Device Test"}
-	for index, element := range devices {
-		if element != testArray[index] {
-			t.Error("GetUserDevices(string) did not work as expected.")
-		}
-	}
-	t.Log("GetUserDevices(string) test passed.")
+func TestGetLaptopDevices(t *testing.T) {
+	userName := "Test@Test.com"
+	jsonList := getLaptopDevices(userName)
+	fmt.Println("GetLaptopDevice TEST")
+	fmt.Println(string(jsonList))
 }

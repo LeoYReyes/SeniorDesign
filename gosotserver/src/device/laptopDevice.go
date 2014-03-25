@@ -19,7 +19,8 @@ import (
  */
 type LaptopDevice struct {
 	TraceRouteList []string
-	KeylogData     []string
+	// List of Key Logs
+	KeylogData []string
 	Device
 }
 

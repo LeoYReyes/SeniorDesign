@@ -29,7 +29,7 @@ $(function() {
 					deviceType: deviceType.val(),
 					deviceId: deviceId.val(),
 					deviceName: deviceName.val(),
-				  },
+				  }
 			  }).done(function(response) {
 				alert(response);
 				$("#dialog-form").dialog("close");
@@ -62,4 +62,14 @@ $(function() {
 		  .click(function() {
 			$(this).toggle();
 		});
+		
+		function deviceInfo() {
+			$.ajax({
+				url: "/getDeviceInfo",
+				type: "GET",
+				
+			}).done(function(response) {
+				alert(response);
+			});
+		}
 });

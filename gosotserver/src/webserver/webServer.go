@@ -188,6 +188,7 @@ func StartWebServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *
 	r.HandleFunc("/logout", logoutHandler)
 	r.HandleFunc("/ws", serveWs)
 	r.HandleFunc("/newDevice", newDeviceHandler)
+	r.HandleFunc("/getDeviceInfo", deviceInfoHandler)
 	r.HandleFunc("/toggleDevice", toggleDeviceHandler)
 
 	http.Handle("/", r)

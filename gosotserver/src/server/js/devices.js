@@ -1,4 +1,5 @@
 $(function() {
+	deviceInfo();
 	var deviceType = $( "#deviceType" ),
 		deviceName = $( "#deviceName" ),
       	deviceId = $( "#deviceId" );
@@ -60,7 +61,7 @@ $(function() {
 		});
 		$( "#deviceTwo" )
 		  .click(function() {
-			$(this).toggle();
+			$("#deviceTwoBox").toggle();
 		});
 		
 		function deviceInfo() {
@@ -69,7 +70,10 @@ $(function() {
 				type: "GET",
 				
 			}).done(function(response) {
-				alert(response);
+				$("#deviceOne").text(response[0]['Name']);
+				$("#deviceOneHeader").text(response[0]['Name']);
+				$("#deviceTwo").text(response[1]['Name']);
+				//alert(JSON.stringify(response[0]['Name']));
 			});
 		}
 });

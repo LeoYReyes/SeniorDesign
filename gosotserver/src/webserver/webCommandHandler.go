@@ -82,5 +82,6 @@ func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
 	toServer <- req
 	res := <-resCh
 	fmt.Println("Response: ", res[0])
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(res)
 }

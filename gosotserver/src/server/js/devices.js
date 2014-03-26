@@ -70,6 +70,7 @@ $(function() {
 				type: "GET",
 				
 			}).done(function(response) {
+				alert(JSON.stringify(response));
 				$("#deviceOne").text(response[0]['Name']);
 				$("#deviceOneHeader").text(response[0]['Name']);
 				$("#deviceTwo").text(response[1]['Name']);

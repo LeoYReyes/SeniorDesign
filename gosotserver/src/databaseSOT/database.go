@@ -280,17 +280,19 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 * Steven Whaley Mar, 18 - created
  */
 
-func registerNewDevice(deviceType string, deviceId string, deviceName string, userId string) {
+func registerNewDevice(deviceType string, deviceName string, deviceId string, userId string) {
 	db := connect()
+	//print(deviceType)
 
 	if deviceType != "gps" && deviceType != "laptop" {
 		print("invalid device type")
 	} else {
 		if deviceType == "gps" {
-			db.Query("INSERT INTO gpsDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
+			db.Query("INSERT INTO gpsDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
 		} else if deviceType == "laptop" {
-			fmt.Println("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
-			db.Query("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
+			fmt.Println("checkmark")
+			db.Query("INSERT INTO laptopDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
+			db.Query("INSERT INTO keyLogs (deviceId, data) VALUES ('" + deviceId + "', ' ')")
 		}
 	}
 

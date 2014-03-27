@@ -104,4 +104,6 @@ func (ld *LaptopDevice) UpdateTraceroute() bool {
 		return false
 	}
 	//TODO possibly only deserialize the IP list when displaying on the webpage
+	//TODO add IP from conection to trace route. Remember, the trace route starts
+	// one node away from the latop
 }

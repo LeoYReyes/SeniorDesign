@@ -62,7 +62,7 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	resCh := make(chan []byte)
 	// Check for device type
 	deviceType := r.PostForm.Get("deviceType")
-	deviceId := r.PostForm.Get("deviceId")
+	//deviceId := r.PostForm.Get("deviceId")
 
 	buf = append(buf, []byte(r.PostForm.Get("deviceId"))...)
 	buf = append(buf, 0x1B)
@@ -71,9 +71,11 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	case "gps":
 		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 			OpCode: CustomProtocol.ActivateGPS, Payload: buf, Response: resCh}
+		toServer <- req
 	case "laptop":
 		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 			OpCode: CustomProtocol.FlagStolen, Payload: buf, Response: resCh}
+		toServer <- req
 	default:
 	}
 

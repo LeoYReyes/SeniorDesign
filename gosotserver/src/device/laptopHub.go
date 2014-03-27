@@ -12,7 +12,7 @@ import (
 	//"container/list"
 	"fmt"
 	"net"
-	"strconv"
+	//"strconv"
 	//"strings"
 	//"time"
 )
@@ -70,14 +70,17 @@ func Listen(listener net.Listener) {
  * parsed as a string and then the OP code from the message is read. The message
  * handling is the handed to the correct handling function.
  */
-func GetMessage(deviceConn *deviceConnection) {
+func GetMessage(deviceConn deviceConnection) {
 	buffer := make([]byte, 10240)
+	fmt.Println("Waiting for message from client...")
 	bytesRead, err := deviceConn.conn.Read(buffer)
 	if err != nil {
 		fmt.Println("Error reading", err)
 	}
-	msg := string(buffer[0:bytesRead])
-	opCode, err := strconv.Atoi(msg[0:1])
+	msg := string(buffer[1:bytesRead])
+	//opCode, err := strconv.Atoi(msg[0:1])
+	opCode := buffer[0]
+	fmt.Println("Message received with OP Code: ", opCode)
 	if err != nil {
 		fmt.Println("Invalid OP code", err)
 	} else {
@@ -97,7 +100,7 @@ func GetMessage(deviceConn *deviceConnection) {
  * client's list of TraceRoutes and a request is sent to the database to
  * sync the new list there.
  */
-func UpdateTraceroute(deviceConn *deviceConnection, msg string) {
+func UpdateTraceroute(deviceConn deviceConnection, msg string) {
 	/*newList := new(list.List)
 	start := 1
 	for i := 1; i < len(msg)-1; i++ {
@@ -121,7 +124,7 @@ func UpdateTraceroute(deviceConn *deviceConnection, msg string) {
  * constant. The new keylog file is then parsed in. A request is then sent
  * to the database to update with the new keylog data.
  */
-func UpdateKeylog(deviceConn *deviceConnection, msg string) {
+func UpdateKeylog(deviceConn deviceConnection, msg string) {
 	deviceConn.ld.KeylogData = append(deviceConn.ld.KeylogData, msg[1:len(msg)-1])
 	fmt.Println(deviceConn.ld.KeylogData[len(deviceConn.ld.KeylogData)-1])
 	if deviceConn.ld.UpdateKeylog() {
@@ -157,7 +160,7 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 		if !sentStolen {
 			fmt.Println("Error sending stolen code.")
 		}
-		GetMessage(deviceConn)
+		GetMessage(*deviceConn)
 	} else { //if CheckIfStolen returns false
 		fmt.Println("CheckIfStolen request returned false")
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagNotStolen, "")

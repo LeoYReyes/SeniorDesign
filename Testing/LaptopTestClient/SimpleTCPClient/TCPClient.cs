@@ -62,10 +62,34 @@ namespace SimpleTCPClient
             Console.WriteLine("Sent keylog data");
         }
 
+        static void test3()
+        {
+            Socket sender = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            sender.Connect(remoteEP);
+            Console.WriteLine("Socket connected to {0}", sender.RemoteEndPoint.ToString());
+
+            byte[] msg = Encoding.ASCII.GetBytes("BA9876543210");
+
+            // Send the data through the socket.
+            int bytesSent = sender.Send(msg);
+            byte[] buffer = new byte[1000];
+            sender.Receive(buffer);
+            int stolenCode = buffer[0];
+            Console.WriteLine("Received stolen code: {0}", stolenCode);
+
+            msg = Encoding.ASCII.GetBytes("125.32.192.13~124.234.134.54~145.3.21.94");
+            byte[] msgWithOpcode = new byte[msg.Length + 1];
+            Array.Copy(msg, 0, msgWithOpcode, 1, msg.Length);
+            msgWithOpcode[0] = 0x83;
+            bytesSent = sender.Send(msgWithOpcode);
+            Console.WriteLine("Sent IP traceroute data");
+        }
+
         static void Main(string[] args)
         {
             test1();
-            test2();
+            //test2();
+            test3();
             //byte[] msg2 = Encoding.ASCII.GetBytes("2192.168.0.1~127.0.0.1~72.54.10.100\n");
             //byte[] msg2 = Encoding.ASCII.GetBytes("3test keylogger data\n");
             //int bytesSent2 = sender.Send(msg2);

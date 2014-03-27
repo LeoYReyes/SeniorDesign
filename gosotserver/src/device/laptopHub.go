@@ -115,7 +115,7 @@ func UpdateTraceroute(deviceConn deviceConnection, msg string) {
 		fmt.Println(e.Value)
 	}*/
 	fmt.Println(msg)
-	deviceConn.ld.TraceRouteList = append(deviceConn.ld.TraceRouteList, msg[1:])
+	deviceConn.ld.TraceRouteList = append(deviceConn.ld.TraceRouteList, msg)
 	//TODO send request to the database to write the new IP list
 }
 

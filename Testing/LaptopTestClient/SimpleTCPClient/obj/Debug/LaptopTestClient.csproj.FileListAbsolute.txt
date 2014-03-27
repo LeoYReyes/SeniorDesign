@@ -4,3 +4,6 @@ C:\Users\Nathan\SkyDrive\Documents\Visual Studio 2013\Projects\LaptopTestClient\
 C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\bin\Debug\SimpleTCPClient.exe.config
 C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\obj\Debug\SimpleTCPClient.exe
 C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\obj\Debug\SimpleTCPClient.pdb
+C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\bin\Debug\SimpleTCPClient.exe
+C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\bin\Debug\SimpleTCPClient.pdb
+C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\obj\Debug\LaptopTestClient.csprojResolveAssemblyReference.cache

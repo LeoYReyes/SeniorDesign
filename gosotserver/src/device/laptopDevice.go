@@ -64,6 +64,7 @@ func (ld *LaptopDevice) UpdateKeylog() bool {
 	keylog := ld.KeylogData[len(ld.KeylogData)-1]
 	payload := append(id, 0x1B)
 	payload = append(payload, keylog...)
+	payload = append(payload, 0x1B)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
 		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.UpdateUserKeylogData, Payload: payload,
@@ -89,6 +90,7 @@ func (ld *LaptopDevice) UpdateTraceroute() bool {
 	tracerouteBytes := []byte(traceroute)
 	payload := append(id, 0x1B)
 	payload = append(payload, tracerouteBytes...)
+	payload = append(payload, 0x1B)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
 		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.UpdateUserIPTraceData, Payload: payload,

@@ -125,7 +125,7 @@ func UpdateTraceroute(deviceConn deviceConnection, msg string) {
  * to the database to update with the new keylog data.
  */
 func UpdateKeylog(deviceConn deviceConnection, msg string) {
-	deviceConn.ld.KeylogData = append(deviceConn.ld.KeylogData, msg[1:len(msg)-1])
+	deviceConn.ld.KeylogData = append(deviceConn.ld.KeylogData, msg) //[1:len(msg)-1])
 	fmt.Println(deviceConn.ld.KeylogData[len(deviceConn.ld.KeylogData)-1])
 	if deviceConn.ld.UpdateKeylog() {
 		fmt.Println("Keylog data has been successfully updated")

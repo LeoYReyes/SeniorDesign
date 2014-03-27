@@ -58,12 +58,25 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 // Toggles the device's stolen status
 func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
-	//buf := []byte{}
-	//resCh := make(chan []byte)
+	buf := []byte{}
+	resCh := make(chan []byte)
 	// Check for device type
+	deviceType := r.PostForm.Get("deviceType")
+	deviceId := r.PostForm.Get("deviceId")
 
-	//req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
-	//	OpCode: CustomProtocol.ActivateGPS, Payload: buf, Response: resCh}
+	buf = append(buf, []byte(r.PostForm.Get("deviceId"))...)
+	buf = append(buf, 0x1B)
+
+	switch deviceType {
+	case "gps":
+		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+			OpCode: CustomProtocol.ActivateGPS, Payload: buf, Response: resCh}
+	case "laptop":
+		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+			OpCode: CustomProtocol.FlagStolen, Payload: buf, Response: resCh}
+	default:
+	}
+
 }
 
 func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {

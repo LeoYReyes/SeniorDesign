@@ -112,6 +112,8 @@ func processRequest(req *CustomProtocol.Request) {
 		fmt.Println("Payload element", index, ": ", element)
 	}*/
 	switch req.OpCode {
+	case CustomProtocol.ActivateGPS:
+	case CustomProtocol.FlagStolen:
 	case CustomProtocol.NewAccount:
 		SignUp(payload[0], payload[1], payload[2], payload[3], payload[4])
 		res := make([]byte, 2)
@@ -288,10 +290,10 @@ func registerNewDevice(deviceType string, deviceName string, deviceId string, us
 		print("invalid device type")
 	} else {
 		if deviceType == "gps" {
-			db.Query("INSERT INTO gpsDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
+			db.Query("INSERT INTO gpsDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
 		} else if deviceType == "laptop" {
 			fmt.Println("checkmark")
-			db.Query("INSERT INTO laptopDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
+			db.Query("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
 			db.Query("INSERT INTO keyLogs (deviceId, data) VALUES ('" + deviceId + "', ' ')")
 		}
 	}
@@ -455,6 +457,10 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 	disconnect(db)
 
 	return bool1
+}
+
+func flagStolen(deviceType string, deviceId string) {
+
 }
 
 /*

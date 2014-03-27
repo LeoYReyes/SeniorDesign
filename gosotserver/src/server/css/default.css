@@ -13,8 +13,9 @@
 	margin-left: 130px;
 }
 
-.container {
+.deviceInfo {
 	display: none;
+	margin-top: -900px;
 }
 
 #google_map {
@@ -24,8 +25,4 @@
 
 button {
 	margin-left: 30px;
-}
-
-.container {
-	margin-top: -900px;
 }

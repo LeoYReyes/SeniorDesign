@@ -30,7 +30,7 @@ function initialize() {
             map: map,
             title: 'Default Location'
         });*/
-	document.getElementById("togglePrevLoc").addEventListener('click', togglePreviousLocations, false);
+	//document.getElementById("togglePrevLoc").addEventListener('click', togglePreviousLocations, false);
 }
 
 //TODO: take in an array of markers as parameter to toggle visibility

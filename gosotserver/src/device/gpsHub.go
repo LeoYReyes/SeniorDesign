@@ -10,7 +10,7 @@
 package device
 
 import (
-	"CustomProtocol"
+	//"CustomProtocol"
 	//"container/list"
 	"fmt"
 	"net"
@@ -72,15 +72,12 @@ func GPSCommunicate(conn net.Conn) {
 			if bytesRead > 0 {
 				if bytesRead > 10 {
 					received := string(buffer[0:bytesRead])
+					number := parsePhoneNumber(received)
 					msg = googleMapLinkParser(received)
 					fmt.Println("Received msg: ", msg)
-					req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Web, Source: CustomProtocol.DeviceGPS,
-						OpCode: CustomProtocol.UpdateWebMap, Payload: []byte(msg)}
 					msg = strings.Replace(msg, ",", string(0x1B), -1)
-					msg = msg + string(0x1B)
-					//TODO send GPS coordinates to the database
-					toServer <- req
-					fmt.Println("Req sent to server")
+					msg = number + string(0x1B) + msg + string(0x1B)
+					go UpdateMapCoords(msg)
 				} else if buffer[0] == '|' {
 					//fmt.Println("Heartbeat <3")
 					conn.Write([]byte("|")) //heartbeat response to ensure connection is alive
@@ -88,6 +85,15 @@ func GPSCommunicate(conn net.Conn) {
 			}
 		}
 	}
+}
+
+func parsePhoneNumber(msg string) string {
+	indexStart := strings.Index(msg, "[")
+	indexEnd := strings.Index(msg, "]")
+	if indexStart > -1 && indexEnd > -1 && indexEnd > indexStart {
+		return msg[indexStart+1 : indexEnd]
+	}
+	return ""
 }
 
 /*

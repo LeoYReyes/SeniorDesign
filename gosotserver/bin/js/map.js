@@ -30,7 +30,7 @@ function initialize() {
             map: map,
             title: 'Default Location'
         });*/
-	document.getElementById("togglePrevLoc").addEventListener('click', togglePreviousLocations, false);
+	//document.getElementById("togglePrevLoc").addEventListener('click', togglePreviousLocations, false);
 }
 
 //TODO: take in an array of markers as parameter to toggle visibility
@@ -49,8 +49,8 @@ socket.onopen = function() {
 
 socket.onmessage = function(msg){
     //alert(msg.data); //Awesome!
-	var lat = parseFloat(msg.data.substring(0, msg.data.lastIndexOf(0x1B)));
-	var longitude = parseFloat(msg.data.substring(msg.data.lastIndexOf(0x1B) + 1,msg.data.length-1));
+	var lat = parseFloat(msg.data.substring(0, msg.data.lastIndexOf(",")));
+	var longitude = parseFloat(msg.data.substring(msg.data.lastIndexOf(",") + 1,msg.data.length));
 	var markerPos = new google.maps.LatLng(lat, longitude);
 	if(currentPosition) {
 		currentPosition.setIcon(ghostMarkerImg);

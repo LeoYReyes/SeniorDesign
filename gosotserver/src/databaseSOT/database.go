@@ -461,7 +461,8 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 
 func flagStolen(deviceType string, deviceId string) {
 
-	db := connect()
+	/*db := connect()
+	queryStr*/
 }
 
 /*

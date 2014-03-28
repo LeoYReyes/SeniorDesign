@@ -360,7 +360,7 @@ func IsDeviceStolen(deviceId string) bool {
 		}
 	} else {
 
-		rows2, res2, err3 := db.Query("select isStolen from laptopDevice where deviceId = '" + deviceId + "'")
+		rows2, res2, err3 := db.Query("select isStolen from laptopDevice where macAddress = '" + deviceId + "'")
 		if err3 != nil {
 			panic(err3)
 		}

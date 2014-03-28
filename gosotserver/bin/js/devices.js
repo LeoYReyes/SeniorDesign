@@ -1,5 +1,4 @@
 $(function() {
-	deviceInfo();
 	var deviceType = $( "#deviceType" ),
 		deviceName = $( "#deviceName" ),
       	deviceId = $( "#deviceId" );
@@ -30,7 +29,7 @@ $(function() {
 					deviceType: deviceType.val(),
 					deviceId: deviceId.val(),
 					deviceName: deviceName.val(),
-				  }
+				  },
 			  }).done(function(response) {
 				alert(response);
 				$("#dialog-form").dialog("close");
@@ -61,57 +60,6 @@ $(function() {
 		});
 		$( "#deviceTwo" )
 		  .click(function() {
-			$("#deviceTwoBox").toggle();
+			$(this).toggle();
 		});
-
-		function deviceInfo() {
-			$.ajax({
-				url: "/getDeviceInfo",
-				type: "GET",
-				
-			}).done(function(response) {
-				alert(JSON.stringify(response));
-				//$("#deviceOne").text(response[0]['Name']);
-				//$("#deviceOneHeader").text(response[0]['Name']);
-				//$("#deviceTwo").text(response[1]['Name']);
-				for(i = 0; i < response.length; i++) {
-					$("#deviceBoxRow").append(createDeviceBox(JSON.stringify(response[i]['Name']), JSON.stringify(response[i]['IsStolen'])));
-				}
-				
-				$("#deviceBoxRow").append($("<div>", {class: "col-md-1"}));
-				//alert(JSON.stringify(response[0]['Name']));
-			});
-		}
-		
-		function createDeviceBox(deviceNameIn, deviceStatusIn) {
-			var deviceDiv = $("<div>", {id: deviceNameIn, class: "col-md-3 deviceInfo"});
-			var row = $("<div>", {class: "row"});
-			var colmd12 = $("<div>", {class: "col-md-12"});
-			var nav = $("<nav>", {class: "navbar-default navbar-static-side", role:"navigation"});
-			var side = $("<div>", {class: "sidebar-collapse"});
-			var ul = $("<ul>", {class: "nav", id: "side-menu"});
-			var row2 = $("<div>", {class: "row"});
-			var colmd1 = $("<div>", {class: "col-md-1"});
-			var colmd10 = $("<div>", {class: "col-md-10"});
-			var li = $("<li>");
-			var deviceName = $("<h3>");
-			deviceName.text(deviceNameIn);
-			var li2 = $("<li>");
-			var deviceStatus = $("<h5>");
-			deviceStatus.text(deviceStatusIn);
-			
-			li2.append(deviceStatus);
-			li.append(deviceName);
-			colmd10.append(li);
-			colmd10.append(li2);
-			row2.append(colmd1);
-			row2.append(colmd10);
-			ul.append(row2);
-			side.append(ul);
-			nav.append(side);
-			colmd12.append(nav);
-			row.append(colmd12);
-			deviceDiv.append(row);
-			return deviceDiv;
-		}
 });

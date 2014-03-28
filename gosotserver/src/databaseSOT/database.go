@@ -182,16 +182,6 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 		req.Response <- res
 	case CustomProtocol.GetDevice:
-		res := make([]byte, 5)
-
-		if payload[0] == "gps" {
-			res = getGpsDevices(payload[1])
-		} else if payload[0] == "laptop" {
-			res = getLaptopDevices(payload[1])
-		} else {
-			fmt.Println("CustomProtocol.GetDevice payload[0] must be either gps or laptop")
-		}
-		req.Response <- res
 	case CustomProtocol.SetDevice:
 	case CustomProtocol.GetDeviceList:
 		res := []byte{}
@@ -693,7 +683,7 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 * of all the devices owned by the user.
 *
 *
-*  Leo Reyes
+* Steven Whaley Feb, 26 - created
  */
 func getLaptopDevices(email string) []byte {
 
@@ -764,43 +754,6 @@ func getLaptopDevices(email string) []byte {
 		// Create LaptopDevice struct and append to list of devices
 		list = append(list, device.LaptopDevice{traceRouteList, keyLogList,
 			device.Device{macAddress, laptopName, isStolen[0]}})
-	}
-
-	disconnect(db)
-	deviceListJson, _ := json.Marshal(list)
-
-	return deviceListJson
-}
-
-func getGpsDevices(email string) []byte {
-
-	var list []device.GPSDevice
-
-	db := connect()
-
-	//finding customerId to be used for selecting devices
-	rows, _, err := db.Query("select customerId from account where userName = '" + email + "'")
-	if err != nil {
-		panic(err)
-	}
-
-	customerId := string(rows[0][0].([]byte))
-
-	//adding laptopDevices to the the devices list
-	gpsRows, _, gpsErr := db.Query("select * from gpsDevice where customerId = '" + customerId + "'")
-	if gpsErr != nil {
-		panic(gpsErr)
-	}
-
-	for _, gps := range gpsRows {
-
-		//gpsId := string(gps[0].([]byte))
-		gpsName := string(gps[1].([]byte))
-		deviceId := string(gps[3].([]byte))
-		isStolen := gps[4].([]byte)
-
-		// Create GpsDevice struct and append to list of devices
-		list = append(list, device.GPSDevice{device.Device{deviceId, gpsName, isStolen[0]}})
 	}
 
 	disconnect(db)

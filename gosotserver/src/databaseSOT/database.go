@@ -122,6 +122,11 @@ func processRequest(req *CustomProtocol.Request) {
 		res := make([]byte, 2)
 		res[0] = 1
 		req.Response <- res
+	case CustomProtocol.FlagNotStolen:
+		flagNotStolen("laptop", payload[0])
+		res := make([]byte, 2)
+		res[0] = 1
+		req.Response <- res
 	case CustomProtocol.NewAccount:
 		SignUp(payload[0], payload[1], payload[2], payload[3], payload[4])
 		res := make([]byte, 2)
@@ -472,6 +477,14 @@ func flagStolen(deviceType string, deviceId string) {
 
 	db := connect()
 	queryStr := "UPDATE " + deviceType + "Device " + "SET isStolen = 1, WHERE deviceId='" + deviceId + "'"
+	db.Query(queryStr)
+	disconnect(db)
+}
+
+func flagNotStolen(deviceType string, deviceId string) {
+
+	db := connect()
+	queryStr := "UPDATE " + deviceType + "Device " + "SET isStolen = 0, WHERE deviceId='" + deviceId + "'"
 	db.Query(queryStr)
 	disconnect(db)
 }

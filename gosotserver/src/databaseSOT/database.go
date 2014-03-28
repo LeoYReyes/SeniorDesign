@@ -112,6 +112,21 @@ func processRequest(req *CustomProtocol.Request) {
 		fmt.Println("Payload element", index, ": ", element)
 	}*/
 	switch req.OpCode {
+	case CustomProtocol.ActivateGPS:
+		flagStolen("gps", payload[0])
+		res := make([]byte, 2)
+		res[0] = 1
+		req.Response <- res
+	case CustomProtocol.FlagStolen:
+		flagStolen("laptop", payload[0])
+		res := make([]byte, 2)
+		res[0] = 1
+		req.Response <- res
+	case CustomProtocol.FlagNotStolen:
+		flagNotStolen("laptop", payload[0])
+		res := make([]byte, 2)
+		res[0] = 1
+		req.Response <- res
 	case CustomProtocol.NewAccount:
 		SignUp(payload[0], payload[1], payload[2], payload[3], payload[4])
 		res := make([]byte, 2)
@@ -167,6 +182,16 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 		req.Response <- res
 	case CustomProtocol.GetDevice:
+		res := make([]byte, 5)
+
+		if payload[0] == "gps" {
+			res = getGpsDevices(payload[1])
+		} else if payload[0] == "laptop" {
+			res = getLaptopDevices(payload[1])
+		} else {
+			fmt.Println("CustomProtocol.GetDevice payload[0] must be either gps or laptop")
+		}
+		req.Response <- res
 	case CustomProtocol.SetDevice:
 	case CustomProtocol.GetDeviceList:
 		res := []byte{}
@@ -280,18 +305,19 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 * Steven Whaley Mar, 18 - created
  */
 
-func registerNewDevice(deviceType string, deviceName string, deviceId string, userId string) {
+func registerNewDevice(deviceType string, deviceId string, deviceName string, userId string) {
 	db := connect()
 	//print(deviceType)
 
 	if deviceType != "gps" && deviceType != "laptop" {
 		print("invalid device type")
 	} else {
+		// query does not work on VARCHAR with length of 50
 		if deviceType == "gps" {
-			db.Query("INSERT INTO gpsDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
+			db.Query("INSERT INTO gpsDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
 		} else if deviceType == "laptop" {
 			fmt.Println("checkmark")
-			db.Query("INSERT INTO laptopDevice (deviceName, id, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE id='" + userId + "'")
+			db.Query("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
 			db.Query("INSERT INTO keyLogs (deviceId, data) VALUES ('" + deviceId + "', ' ')")
 		}
 	}
@@ -344,7 +370,7 @@ func IsDeviceStolen(deviceId string) bool {
 		}
 	} else {
 
-		rows2, res2, err3 := db.Query("select isStolen from laptopDevice where macAddress = '" + deviceId + "'")
+		rows2, res2, err3 := db.Query("select isStolen from laptopDevice where deviceId = '" + deviceId + "'")
 		if err3 != nil {
 			panic(err3)
 		}
@@ -444,7 +470,7 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 
 	db := connect()
 
-	rows, res, err := db.Query("UPDATE gpsDevice SET latitude = '" + latitude + "', longitude = '" + longitude + "' WHERE id = '" + deviceId + "'")
+	rows, res, err := db.Query("UPDATE gpsDevice SET latitude = '" + latitude + "', longitude = '" + longitude + "' WHERE deviceId = '" + deviceId + "'")
 	rows = rows
 	res = res
 
@@ -455,6 +481,22 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 	disconnect(db)
 
 	return bool1
+}
+
+func flagStolen(deviceType string, deviceId string) {
+
+	db := connect()
+	queryStr := "UPDATE " + deviceType + "Device " + "SET isStolen = 1, WHERE deviceId='" + deviceId + "'"
+	db.Query(queryStr)
+	disconnect(db)
+}
+
+func flagNotStolen(deviceType string, deviceId string) {
+
+	db := connect()
+	queryStr := "UPDATE " + deviceType + "Device " + "SET isStolen = 0, WHERE deviceId='" + deviceId + "'"
+	db.Query(queryStr)
+	disconnect(db)
 }
 
 /*
@@ -651,7 +693,7 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 * of all the devices owned by the user.
 *
 *
-* Steven Whaley Feb, 26 - created
+*  Leo Reyes
  */
 func getLaptopDevices(email string) []byte {
 
@@ -722,6 +764,43 @@ func getLaptopDevices(email string) []byte {
 		// Create LaptopDevice struct and append to list of devices
 		list = append(list, device.LaptopDevice{traceRouteList, keyLogList,
 			device.Device{macAddress, laptopName, isStolen[0]}})
+	}
+
+	disconnect(db)
+	deviceListJson, _ := json.Marshal(list)
+
+	return deviceListJson
+}
+
+func getGpsDevices(email string) []byte {
+
+	var list []device.GPSDevice
+
+	db := connect()
+
+	//finding customerId to be used for selecting devices
+	rows, _, err := db.Query("select customerId from account where userName = '" + email + "'")
+	if err != nil {
+		panic(err)
+	}
+
+	customerId := string(rows[0][0].([]byte))
+
+	//adding laptopDevices to the the devices list
+	gpsRows, _, gpsErr := db.Query("select * from gpsDevice where customerId = '" + customerId + "'")
+	if gpsErr != nil {
+		panic(gpsErr)
+	}
+
+	for _, gps := range gpsRows {
+
+		//gpsId := string(gps[0].([]byte))
+		gpsName := string(gps[1].([]byte))
+		deviceId := string(gps[3].([]byte))
+		isStolen := gps[4].([]byte)
+
+		// Create GpsDevice struct and append to list of devices
+		list = append(list, device.GPSDevice{device.Device{deviceId, gpsName, isStolen[0]}})
 	}
 
 	disconnect(db)

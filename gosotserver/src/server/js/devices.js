@@ -13,7 +13,7 @@ $(function() {
 			return true;
 		  }
 		}
- 
+ 		
 		$( "#dialog-form" ).dialog({
 		  autoOpen: false,
 		  height: 430,
@@ -55,15 +55,10 @@ $(function() {
 		$("input:radio[name=deviceType]").click(function() {
     		deviceType = $(this);
 		});
-		$( "#deviceOne" )
-		  .click(function() {
-			$("#deviceOneBox").toggle();
-		});
-		$( "#deviceTwo" )
-		  .click(function() {
-			$("#deviceTwoBox").toggle();
-		});
-
+		/*$( "#deviceMenu li" ).click(function() {
+			alert($("#" + $(this).attr("id")));
+			$("#" + $(this).attr("id")).toggle();
+		});*/
 		function deviceInfo() {
 			$.ajax({
 				url: "/getDeviceInfo",
@@ -71,16 +66,31 @@ $(function() {
 				
 			}).done(function(response) {
 				alert(JSON.stringify(response));
-				//$("#deviceOne").text(response[0]['Name']);
-				//$("#deviceOneHeader").text(response[0]['Name']);
-				//$("#deviceTwo").text(response[1]['Name']);
-				for(i = 0; i < response.length; i++) {
-					$("#deviceBoxRow").append(createDeviceBox(JSON.stringify(response[i]['Name']), JSON.stringify(response[i]['IsStolen'])));
-				}
-				
+				var deviceBoxes = [];
+				if(response != null) {
+					for(i = 0; i < response.length; i++) {
+						deviceBoxes.push(createDeviceBox(response[i]['Name'], response[i]['IsStolen']));
+						$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
+						var deviceButton = $("<li>", {id: response[i]['Name'], style: "padding: 9px;", value:i});
+						deviceButton.text(response[i]['Name']);
+						deviceButton.click(function() {
+							deviceBoxes[$(this).val()].toggle();
+						});
+						$("#deviceBoxRow").append(deviceBoxes[i]);
+						$("#deviceMenu").append(deviceButton);
+					}
+				} 
+				$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
+				var addDeviceButton = $("<li>", {id: "newDeviceButton", style: "padding: 9px;"});
+				addDeviceButton.text("Add Device");
+				addDeviceButton.click(function() {
+					$( "#dialog-form" ).dialog( "open" );
+				});
+				$("#deviceMenu").append(addDeviceButton);
 				$("#deviceBoxRow").append($("<div>", {class: "col-md-1"}));
 				//alert(JSON.stringify(response[0]['Name']));
 			});
+			
 		}
 		
 		function createDeviceBox(deviceNameIn, deviceStatusIn) {

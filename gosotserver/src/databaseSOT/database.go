@@ -182,6 +182,16 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 		req.Response <- res
 	case CustomProtocol.GetDevice:
+		res := make([]byte, 5)
+
+		if payload[0] == "gps" {
+			res = getGpsDevices(payload[1])
+		} else if payload[0] == "laptop" {
+			res = getLaptopDevices(payload[1])
+		} else {
+			fmt.Println("CustomProtocol.GetDevice payload[0] must be either gps or laptop")
+		}
+		req.Response <- res
 	case CustomProtocol.SetDevice:
 	case CustomProtocol.GetDeviceList:
 		res := []byte{}

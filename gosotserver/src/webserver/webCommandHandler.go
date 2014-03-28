@@ -78,7 +78,7 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		toServer <- req
 	default:
 	}
-
+	fmt.Println("Response: ", <-resCh)
 }
 
 func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {

@@ -113,7 +113,15 @@ func processRequest(req *CustomProtocol.Request) {
 	}*/
 	switch req.OpCode {
 	case CustomProtocol.ActivateGPS:
+		flagStolen("gps", payload[0])
+		res := make([]byte, 2)
+		res[0] = 1
+		req.Response <- res
 	case CustomProtocol.FlagStolen:
+		flagStolen("laptop", payload[0])
+		res := make([]byte, 2)
+		res[0] = 1
+		req.Response <- res
 	case CustomProtocol.NewAccount:
 		SignUp(payload[0], payload[1], payload[2], payload[3], payload[4])
 		res := make([]byte, 2)
@@ -289,6 +297,7 @@ func registerNewDevice(deviceType string, deviceName string, deviceId string, us
 	if deviceType != "gps" && deviceType != "laptop" {
 		print("invalid device type")
 	} else {
+		// query does not work on VARCHAR with length of 50
 		if deviceType == "gps" {
 			db.Query("INSERT INTO gpsDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
 		} else if deviceType == "laptop" {
@@ -446,7 +455,7 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 
 	db := connect()
 
-	rows, res, err := db.Query("UPDATE gpsDevice SET latitude = '" + latitude + "', longitude = '" + longitude + "' WHERE id = '" + deviceId + "'")
+	rows, res, err := db.Query("UPDATE gpsDevice SET latitude = '" + latitude + "', longitude = '" + longitude + "' WHERE deviceId = '" + deviceId + "'")
 	rows = rows
 	res = res
 
@@ -461,8 +470,10 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 
 func flagStolen(deviceType string, deviceId string) {
 
-	/*db := connect()
-	queryStr*/
+	db := connect()
+	queryStr := "UPDATE " + deviceType + "Device " + "SET isStolen = 1, WHERE deviceId='" + deviceId + "'"
+	db.Query(queryStr)
+	disconnect(db)
 }
 
 /*

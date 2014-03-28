@@ -107,6 +107,7 @@ func chanHandler() {
 }
 
 func processRequest(req *CustomProtocol.Request) {
+
 	payload := CustomProtocol.ParsePayload(req.Payload)
 	/*for index, element := range payload {
 		fmt.Println("Payload element", index, ": ", element)
@@ -147,6 +148,7 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 		req.Response <- res
 	case CustomProtocol.VerifyLoginCredentials:
+
 		/*str := []string{}
 		pos := 1
 		for index, element := range req.Payload {
@@ -182,6 +184,16 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 		req.Response <- res
 	case CustomProtocol.GetDevice:
+		res := make([]byte, 5)
+
+		if payload[0] == "gps" {
+			res = getGpsDevices(payload[1])
+		} else if payload[0] == "laptop" {
+			res = getLaptopDevices(payload[1])
+		} else {
+			fmt.Println("CustomProtocol.GetDevice payload[0] must be either gps or laptop")
+		}
+		req.Response <- res
 	case CustomProtocol.SetDevice:
 	case CustomProtocol.GetDeviceList:
 		res := []byte{}
@@ -288,6 +300,43 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 	return
 }
 
+func getGpsDevices(email string) []byte {
+
+	var list []device.GPSDevice
+
+	db := connect()
+
+	//finding customerId to be used for selecting devices
+	rows, _, err := db.Query("select customerId from account where userName = '" + email + "'")
+	if err != nil {
+		panic(err)
+	}
+
+	customerId := string(rows[0][0].([]byte))
+
+	//adding gpsDevices to the the devices list
+	gpsRows, _, gpsErr := db.Query("select * from gpsDevice where customerId = '" + customerId + "'")
+	if gpsErr != nil {
+		panic(gpsErr)
+	}
+
+	for _, gps := range gpsRows {
+
+		//gpsId := string(gps[0].([]byte))
+		gpsName := string(gps[1].([]byte))
+		deviceId := string(gps[3].([]byte))
+		isStolen := gps[4].([]byte)
+
+		// Create GpsDevice struct and append to list of devices
+		list = append(list, device.GPSDevice{device.Device{deviceId, gpsName, isStolen[0]}})
+	}
+
+	disconnect(db)
+	deviceListJson, _ := json.Marshal(list)
+
+	return deviceListJson
+}
+
 /*
 *
 *
@@ -308,7 +357,7 @@ func registerNewDevice(deviceType string, deviceId string, deviceName string, us
 		} else if deviceType == "laptop" {
 			fmt.Println("checkmark")
 			db.Query("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
-			db.Query("INSERT INTO keyLogs (deviceId, data) VALUES ('" + deviceId + "', ' ')")
+
 		}
 	}
 
@@ -434,7 +483,9 @@ func UpdateKeylog(deviceId string, keylog string) bool {
 
 	db := connect()
 
-	rows, res, err := db.Query("UPDATE keylogs SET data = concat(data, '" + keylog + "') WHERE deviceId = '" + deviceId + "'")
+	fmt.Println("check1")
+	rows, res, err := db.Query("INSERT INTO keyLogs (data, deviceId) SELECT '" + keylog + "', " + "id FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
+
 	rows = rows
 	res = res
 

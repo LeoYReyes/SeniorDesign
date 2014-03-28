@@ -101,6 +101,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Response: ", res[0], res[1])
 	if (res[0] == 1) && (res[1] == 1) {
 		serveSession(w, r)
+
 	} else {
 		http.Error(w, "Invalid Login", 80085)
 		return
@@ -124,11 +125,11 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//TODO: move hashing to database SignUp function
 	h := sha1.New()
-	h.Write([]byte(strings.Join([]string{r.PostForm.Get("email"), r.PostForm.Get("password")}, "")))
+	h.Write([]byte(strings.Join([]string{r.PostForm.Get("loginName"), r.PostForm.Get("password")}, "")))
 
 	fmt.Println(r.PostForm.Get("firstName"))
 	fmt.Println(r.PostForm.Get("lastName"))
-	fmt.Println(r.PostForm.Get("email"))
+	fmt.Println(r.PostForm.Get("loginName"))
 	fmt.Println(r.PostForm.Get("phoneNumber"))
 	fmt.Println(r.PostForm.Get("password"))
 	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
@@ -139,7 +140,7 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(r.PostForm.Get("lastName"))...)
 	buf = append(buf, 0x1B)
-	buf = append(buf, []byte(r.PostForm.Get("email"))...)
+	buf = append(buf, []byte(r.PostForm.Get("loginName"))...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(r.PostForm.Get("phoneNumber"))...)
 	buf = append(buf, 0x1B)

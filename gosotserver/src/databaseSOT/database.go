@@ -295,7 +295,7 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 * Steven Whaley Mar, 18 - created
  */
 
-func registerNewDevice(deviceType string, deviceName string, deviceId string, userId string) {
+func registerNewDevice(deviceType string, deviceId string, deviceName string, userId string) {
 	db := connect()
 	//print(deviceType)
 

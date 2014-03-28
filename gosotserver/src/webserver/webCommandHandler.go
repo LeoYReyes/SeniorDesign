@@ -58,6 +58,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 // Toggles the device's stolen status
 func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
+	//TODO: user input for geogram PIN
 	buf := []byte{}
 	resCh := make(chan []byte)
 	// Check for device type
@@ -69,9 +70,19 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch deviceType {
 	case "gps":
-		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+		reqToDB := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 			OpCode: CustomProtocol.ActivateGPS, Payload: buf, Response: resCh}
-		toServer <- req
+		toServer <- reqToDB
+		// Default PIN-NUMBER for Geogram One
+		buf = append(buf, []byte("1234")...)
+		buf = append(buf, 0x1B)
+		// Default interval 60 seconds
+		buf = append(buf, []byte("60")...)
+		buf = append(buf, 0x1B)
+		reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
+			OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}
+		toServer <- reqToDevice
+
 	case "laptop":
 		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 			OpCode: CustomProtocol.FlagStolen, Payload: buf, Response: resCh}

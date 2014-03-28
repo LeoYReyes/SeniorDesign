@@ -13,7 +13,7 @@ $(function() {
 			return true;
 		  }
 		}
- 
+ 		
 		$( "#dialog-form" ).dialog({
 		  autoOpen: false,
 		  height: 430,

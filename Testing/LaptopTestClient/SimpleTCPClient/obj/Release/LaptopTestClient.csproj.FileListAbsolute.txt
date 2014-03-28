@@ -1,0 +1,5 @@
+C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\bin\Release\SimpleTCPClient.exe.config
+C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\obj\Release\SimpleTCPClient.exe
+C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\obj\Release\SimpleTCPClient.pdb
+C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\bin\Release\SimpleTCPClient.exe
+C:\Users\Nathan\SkyDrive\Documents\GitHub\SeniorDesign\Testing\LaptopTestClient\SimpleTCPClient\bin\Release\SimpleTCPClient.pdb

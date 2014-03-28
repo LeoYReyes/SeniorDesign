@@ -85,11 +85,22 @@ namespace SimpleTCPClient
             Console.WriteLine("Sent IP traceroute data");
         }
 
+        static void test4()
+        {
+            Thread tempThread;
+            for (int i = 0; i < 10; i++)
+            {
+                tempThread = new Thread(test1);
+                tempThread.Start();
+            }
+        }
+
         static void Main(string[] args)
         {
-            test1();
+            //test1();
             //test2();
-            test3();
+            //test3();
+            test4();
             //byte[] msg2 = Encoding.ASCII.GetBytes("2192.168.0.1~127.0.0.1~72.54.10.100\n");
             //byte[] msg2 = Encoding.ASCII.GetBytes("3test keylogger data\n");
             //int bytesSent2 = sender.Send(msg2);

@@ -66,18 +66,26 @@ func GPSCommunicate(conn net.Conn) {
 		case m := <-smsCh:
 			fmt.Println("smsCh: " + m)
 			conn.Write([]byte(m))
+			break
 		default:
 			//fmt.Println("Waiting to read from smsdevice")
 			bytesRead, _ := conn.Read(buffer)
 			if bytesRead > 0 {
 				if bytesRead > 10 {
 					received := string(buffer[0:bytesRead])
+					fmt.Println("Received msg: ", received)
 					number := parsePhoneNumber(received)
 					msg = googleMapLinkParser(received)
-					fmt.Println("Received msg: ", msg)
-					msg = strings.Replace(msg, ",", string(0x1B), -1)
-					msg = number + string(0x1B) + msg + string(0x1B)
-					go UpdateMapCoords(msg)
+					if msg != "" {
+						fmt.Println("parsed msg: ", msg)
+						msg = strings.Replace(msg, ",", string(0x1B), -1)
+						msg = number + string(0x1B) + msg + string(0x1B)
+						go UpdateMapCoords(msg)
+					} else if strings.Contains(received, MOTION_ALERT) {
+						//todo add functionality for motion alerts
+					} else if strings.Contains(received, GEOFENCE_ALERT) {
+						//todo add functionality for geofence alerts
+					}
 				} else if buffer[0] == '|' {
 					//fmt.Println("Heartbeat <3")
 					conn.Write([]byte("|")) //heartbeat response to ensure connection is alive
@@ -119,9 +127,15 @@ func googleMapLinkParser(input string) string {
 		return ""
 	}
 	str = str[index+1:]
+	if len(str) < 23 {
+		return ""
+	}
 	latDecimal, err1 := strconv.ParseFloat(str[3:10], 16)
+	if err1 != nil {
+		return ""
+	}
 	longDecimal, err2 := strconv.ParseFloat(str[16:23], 16)
-	if err1 != nil || err2 != nil {
+	if err2 != nil {
 		return ""
 	}
 	latDecimal = latDecimal / 60

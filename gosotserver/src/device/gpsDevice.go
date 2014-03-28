@@ -12,6 +12,14 @@ import (
 	"time"
 )
 
+const (
+	HYPERLINK_1    = "http://maps.google.com/maps?q="
+	HYPERLINK_2    = "+("
+	HYPERLINK_3    = ")&z=19"
+	MOTION_ALERT   = "motion alert!"
+	GEOFENCE_ALERT = "left geofence!"
+)
+
 type GPSDevice struct {
 	Device
 }

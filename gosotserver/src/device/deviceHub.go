@@ -169,7 +169,40 @@ func processRequest(req *CustomProtocol.Request) {
 			req.Response <- []byte{0}
 		}
 	//todo find where this is in memory. found it, at 200
-	case CustomProtocol.SetAwakenMsg:
+	//params: phone number, PIN
+	case CustomProtocol.GeogramSetup:
+		fmt.Println("processing geogram setup")
+		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
+		if len(payload) >= 2 {
+			//motion alert
+			motMsg := "[" + payload[0] + "]" + payload[1] + ".6.200." + MOTION_ALERT + ".|"
+			smsCh <- motMsg
+			fmt.Println("Message Sent: ", motMsg)
+
+			//hyperlink1
+			hyp1Msg := "[" + payload[0] + "]" + payload[1] + ".6.450." + HYPERLINK_1 + ".|"
+			smsCh <- hyp1Msg
+			fmt.Println("Message Sent: ", hyp1Msg)
+
+			//hyperlink2
+			hyp2Msg := "[" + payload[0] + "]" + payload[1] + ".6.500." + HYPERLINK_2 + ".|"
+			smsCh <- hyp2Msg
+			fmt.Println("Message Sent: ", hyp2Msg)
+
+			//hyperlink3
+			hyp3Msg := "[" + payload[0] + "]" + payload[1] + ".6.550." + HYPERLINK_3 + ".|"
+			smsCh <- hyp3Msg
+			fmt.Println("Message Sent: ", hyp3Msg)
+
+			//geofence alert
+			geoMsg := "[" + payload[0] + "]" + payload[1] + ".6.250." + GEOFENCE_ALERT + ".|"
+			smsCh <- geoMsg
+			fmt.Println("Message Sent: ", geoMsg)
+
+			req.Response <- []byte{1}
+		} else {
+			req.Response <- []byte{0}
+		}
 	//params: phone number, message
 	case CustomProtocol.FreestyleMsg:
 		fmt.Println("processing freestyle msg")

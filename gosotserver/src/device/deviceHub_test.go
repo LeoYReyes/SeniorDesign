@@ -208,3 +208,30 @@ func TestSetGeofence(t *testing.T) {
 		t.Error("No response on activate set geofence request")
 	}
 }
+
+func TestGeogramSetup(t *testing.T) {
+
+	resCh := make(chan []byte)
+
+	buf := []byte{}
+	buf = append(buf, []byte(phoneNumber)...)
+	buf = append(buf, 0x1B)
+	buf = append(buf, []byte(pin)...)
+	buf = append(buf, 0x1B)
+
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
+		OpCode: CustomProtocol.GeogramSetup, Payload: buf, Response: resCh}
+
+	toDeviceCh <- req
+
+	time.Sleep(30000 * time.Millisecond)
+
+	select {
+	case m := <-resCh:
+		if m[0] == 0 {
+			t.Error("Response to requests indicate it was not fullfilled")
+		}
+	default:
+		t.Error("No response on activate set geofence request")
+	}
+}

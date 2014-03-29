@@ -122,14 +122,14 @@ $(function() {
 					deviceType = "laptop";	
 				}
 				alert(deviceType);
-				/*$.ajax({
+				$.ajax({
 					url: "/toggleDevice",
 					type: "POST",
 					data: {
 						deviceId: $(this).attr("id"),
 						deviceType: deviceType
 					}
-				});*/
+				});
 				// send ajax to server, flag device stolen
 			});
 			li2.append(deviceStatus);

@@ -10,7 +10,7 @@
 package device
 
 import (
-	//"CustomProtocol"
+	"CustomProtocol"
 	//"container/list"
 	"fmt"
 	"net"
@@ -82,7 +82,30 @@ func GPSCommunicate(conn net.Conn) {
 						msg = number + string(0x1B) + msg + string(0x1B)
 						go UpdateMapCoords(msg)
 					} else if strings.Contains(received, MOTION_ALERT) {
-						//todo add functionality for motion alerts
+						//todo add functionality for motion alerts. probably put this in its own func
+						//report stolen
+						payload := append([]byte(number), 0x1B)
+						response := make(chan []byte)
+						req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
+							Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateGPS, Payload: payload,
+							Response: response}
+						toServer <- req
+						//add response check later
+						//interval gps request
+						pin := "1234" //un-hardcode
+						interval := "60"
+						payload2 := []byte(number)
+						payload2 = append(payload2, 0x1B)
+						payload2 = append(payload2, []byte(pin)...)
+						payload2 = append(payload2, 0x1B)
+						payload2 = append(payload2, []byte(interval)...)
+						payload2 = append(payload2, 0x1B)
+						response2 := make(chan []byte)
+						req2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
+							Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateIntervalGps, Payload: payload2,
+							Response: response2}
+						toServer <- req2
+						//add response check later
 					} else if strings.Contains(received, GEOFENCE_ALERT) {
 						//todo add functionality for geofence alerts
 					}

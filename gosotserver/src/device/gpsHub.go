@@ -150,14 +150,38 @@ func googleMapLinkParser(input string) string {
 		return ""
 	}
 	str = str[index+1:]
-	if len(str) < 23 {
+	// latitude
+	indexComma := strings.Index(str, ",")
+	if indexComma == -1 {
 		return ""
 	}
-	latDecimal, err1 := strconv.ParseFloat(str[3:10], 16)
+	lat := str[0:indexComma]
+
+	indexPlus := strings.Index(lat, "+")
+	if indexPlus == -1 || indexPlus > indexComma {
+		return ""
+	}
+	latWhole := lat[0:indexPlus]
+
+	latDecimal, err1 := strconv.ParseFloat(lat[indexPlus+1:indexComma], 16)
 	if err1 != nil {
 		return ""
 	}
-	longDecimal, err2 := strconv.ParseFloat(str[16:23], 16)
+
+	//longitude
+	long := str[indexComma+1:] //indexComma is strill from the lat calculationsabove
+
+	indexEnd := strings.Index(long, "+(")
+	if indexEnd == -1 {
+		return ""
+	}
+	lat = str[0:indexEnd]
+	indexPlus = strings.Index(long, "+")
+	if indexPlus == -1 || indexPlus > indexEnd {
+		return ""
+	}
+	longWhole := long[0:indexPlus]
+	longDecimal, err2 := strconv.ParseFloat(long[indexPlus+1:indexEnd], 16)
 	if err2 != nil {
 		return ""
 	}
@@ -167,6 +191,6 @@ func googleMapLinkParser(input string) string {
 	longStr := []byte{}
 	latStr = strconv.AppendFloat(latStr, latDecimal, 'g', 4, 32)
 	longStr = strconv.AppendFloat(longStr, longDecimal, 'g', 4, 32)
-	result = strings.Join([]string{result, str[0:2], ".", string(latStr[2:]), str[10:15], ".", string(longStr[2:])}, "")
+	result = strings.Join([]string{latWhole, ".", string(latStr[2:]), ",", longWhole, ".", string(longStr[2:])}, "")
 	return result
 }

@@ -67,6 +67,8 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 	buf = append(buf, []byte(r.PostForm.Get("deviceId"))...)
 	buf = append(buf, 0x1B)
+	fmt.Println("Device type: ", deviceType)
+	fmt.Println(string(buf))
 
 	switch deviceType {
 	case "gps":

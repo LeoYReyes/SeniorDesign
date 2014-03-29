@@ -69,7 +69,8 @@ $(function() {
 				alert(JSON.stringify(response));
 				if(response != null) {
 					for(i = 0; i < response.length; i++) {
-						deviceBoxes.push(createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen']));
+						var box = createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen']);
+						deviceBoxes.push(box);
 						$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
 						var deviceButton = $("<li>", {id: response[i]['Name'], style: "padding: 9px;", value:i});
 						deviceButton.text(response[i]['Name']);
@@ -88,6 +89,30 @@ $(function() {
 				});
 				$("#deviceMenu").append(addDeviceButton);
 				$("#deviceBoxRow").append($("<div>", {class: "col-md-1"}));
+				/*$(".activateButton").each(function() {
+					alert(this);
+					this.click(function() {
+						//alert($(this).attr("id"));
+						var deviceType;
+						if($(this).attr("id").length < 12) {
+							deviceType = "gps";
+							} else {
+								deviceType = "laptop";	
+							}
+						alert(deviceType + " " + $(this).attr("id"));
+						$.ajax({
+							url: "/toggleDevice",
+							type: "POST",
+							data: {
+								deviceId: $(this).attr("id"),
+								deviceType: deviceType
+							}
+						}).done(function(e) {
+							//alert(e);
+						});
+						// send ajax to server, flag device stolen
+					});	
+				});*/
 				//alert(JSON.stringify(response[0]['Name']));
 			});
 			
@@ -108,30 +133,39 @@ $(function() {
 			deviceName.text(deviceNameIn);
 			var li2 = $("<li>");
 			var deviceStatus = $("<h5>");
-			deviceStatus.text(deviceStatusIn);
+			if(deviceStatusIn == "49") {
+				deviceStatus.text("Stolen");
+			} else {
+				deviceStatus.text("Not Stolen");	
+			}
 			//alert(deviceId);
-			var activateDeviceButton = $("<div>", {id: deviceId});
-			activateDeviceButton.text(deviceNameIn);
-
-			activateDeviceButton.click(function(e) {
-				//alert($(this).attr("id"));
-				var deviceType;
-				if($(this).attr("id").length < 12) {
-					deviceType = "gps";
-				} else {
-					deviceType = "laptop";	
-				}
-				alert(deviceType);
-				$.ajax({
-					url: "/toggleDevice",
-					type: "POST",
-					data: {
-						deviceId: $(this).attr("id"),
-						deviceType: deviceType
-					}
-				});
-				// send ajax to server, flag device stolen
-			});
+			var activateDeviceButton = $("<div>", {id: deviceId, class: "activateButton"});
+			activateDeviceButton.text("Activate");
+			activateDeviceButton.click(function() {
+					//alert($(this).attr("id"));
+					var deviceType;
+					if($(this).attr("id").length < 12) {
+						deviceType = "gps";
+						} else {
+							deviceType = "laptop";	
+						}
+					//alert(deviceType + " " + $(this).attr("id"));
+					$.ajax({
+						url: "/toggleDevice",
+						type: "POST",
+						data: {
+							/*//FOR TESTING
+							deviceId: "2567978990",
+							deviceType: "gps"*/
+							deviceId: $(this).attr("id"),
+							deviceType: deviceType
+						}
+					}).done(function(e) {
+						//alert(e);
+					});
+					// send ajax to server, flag device stolen
+				});	
+			
 			li2.append(deviceStatus);
 			li.append(deviceName);
 			colmd10.append(li);

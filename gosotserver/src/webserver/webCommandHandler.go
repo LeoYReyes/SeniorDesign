@@ -58,6 +58,14 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 // Toggles the device's stolen status
 func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
+
+	err := r.ParseForm()
+	if err != nil {
+		// Handle error
+		fmt.Println("ParseForm error: ", err)
+	}
+
+	fmt.Println("Form: ", r.PostForm)
 	//TODO: user input for geogram PIN
 	buf := []byte{}
 	resCh := make(chan []byte)
@@ -68,7 +76,6 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	buf = append(buf, []byte(r.PostForm.Get("deviceId"))...)
 	buf = append(buf, 0x1B)
 	fmt.Println("Device type: ", deviceType)
-	fmt.Println(string(buf))
 
 	switch deviceType {
 	case "gps":
@@ -91,7 +98,8 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		toServer <- req
 	default:
 	}
-	fmt.Println("Response: ", <-resCh)
+	res := <-resCh
+	fmt.Println("Response: ", res)
 }
 
 func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {

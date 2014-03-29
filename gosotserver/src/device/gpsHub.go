@@ -50,6 +50,8 @@ func GPSListen(listener net.Listener) {
 			fmt.Println("Error connecting", err)
 		}
 		fmt.Println("Connection established with SMS client")
+		// make this a go routine and it likely already
+		// has the functionality to suppport multiple phones
 		GPSCommunicate(smsConn)
 	}
 }

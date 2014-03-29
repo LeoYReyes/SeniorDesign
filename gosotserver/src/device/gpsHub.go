@@ -71,47 +71,25 @@ func GPSCommunicate(conn net.Conn) {
 			//fmt.Println("Waiting to read from smsdevice")
 			bytesRead, _ := conn.Read(buffer)
 			if bytesRead > 0 {
-				if bytesRead > 10 {
+				if buffer[0] == '|' {
+					//fmt.Println("Heartbeat <3")
+					conn.Write([]byte("|")) //heartbeat response to ensure connection is alive
+				} else {
 					received := string(buffer[0:bytesRead])
 					fmt.Println("Received msg: ", received)
 					number := parsePhoneNumber(received)
 					msg = googleMapLinkParser(received)
-					if msg != "" {
+					//react based on message
+					if msg != "" { //try to parse it to coords first, if it fails it is another type of message
 						fmt.Println("parsed msg: ", msg)
 						msg = strings.Replace(msg, ",", string(0x1B), -1)
 						msg = number + string(0x1B) + msg + string(0x1B)
 						go UpdateMapCoords(msg)
 					} else if strings.Contains(received, MOTION_ALERT) {
-						//todo add functionality for motion alerts. probably put this in its own func
-						//report stolen
-						payload := append([]byte(number), 0x1B)
-						response := make(chan []byte)
-						req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
-							Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateGPS, Payload: payload,
-							Response: response}
-						toServer <- req
-						//add response check later
-						//interval gps request
-						pin := "1234" //un-hardcode
-						interval := "60"
-						payload2 := []byte(number)
-						payload2 = append(payload2, 0x1B)
-						payload2 = append(payload2, []byte(pin)...)
-						payload2 = append(payload2, 0x1B)
-						payload2 = append(payload2, []byte(interval)...)
-						payload2 = append(payload2, 0x1B)
-						response2 := make(chan []byte)
-						req2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
-							Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateIntervalGps, Payload: payload2,
-							Response: response2}
-						toServer <- req2
-						//add response check later
+						motionAlert(number)
 					} else if strings.Contains(received, GEOFENCE_ALERT) {
 						//todo add functionality for geofence alerts
 					}
-				} else if buffer[0] == '|' {
-					//fmt.Println("Heartbeat <3")
-					conn.Write([]byte("|")) //heartbeat response to ensure connection is alive
 				}
 			}
 		}
@@ -125,6 +103,33 @@ func parsePhoneNumber(msg string) string {
 		return msg[indexStart+1 : indexEnd]
 	}
 	return ""
+}
+
+func motionAlert(phoneNumber string) {
+	fmt.Println(phineNumber + " " + MOTION_ALERT)
+	//report stolen
+	payload := append([]byte(phoneNumber), 0x1B)
+	response := make(chan []byte)
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
+		Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateGPS, Payload: payload,
+		Response: response}
+	toServer <- req
+	//add response check later
+	//interval gps request
+	pin := "1234" //un-hardcode
+	interval := "60"
+	payload2 := []byte(phoneNumber)
+	payload2 = append(payload2, 0x1B)
+	payload2 = append(payload2, []byte(pin)...)
+	payload2 = append(payload2, 0x1B)
+	payload2 = append(payload2, []byte(interval)...)
+	payload2 = append(payload2, 0x1B)
+	response2 := make(chan []byte)
+	req2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
+		Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateIntervalGps, Payload: payload2,
+		Response: response2}
+	toServer <- req2
+	//add response check later
 }
 
 /*
@@ -150,14 +155,38 @@ func googleMapLinkParser(input string) string {
 		return ""
 	}
 	str = str[index+1:]
-	if len(str) < 23 {
+	// latitude
+	indexComma := strings.Index(str, ",")
+	if indexComma == -1 {
 		return ""
 	}
-	latDecimal, err1 := strconv.ParseFloat(str[3:10], 16)
+	lat := str[0:indexComma]
+
+	indexPlus := strings.Index(lat, "+")
+	if indexPlus == -1 || indexPlus > indexComma {
+		return ""
+	}
+	latWhole := lat[0:indexPlus]
+
+	latDecimal, err1 := strconv.ParseFloat(lat[indexPlus+1:indexComma], 16)
 	if err1 != nil {
 		return ""
 	}
-	longDecimal, err2 := strconv.ParseFloat(str[16:23], 16)
+
+	//longitude
+	long := str[indexComma+1:] //indexComma is strill from the lat calculationsabove
+
+	indexEnd := strings.Index(long, "+(")
+	if indexEnd == -1 {
+		return ""
+	}
+	lat = str[0:indexEnd]
+	indexPlus = strings.Index(long, "+")
+	if indexPlus == -1 || indexPlus > indexEnd {
+		return ""
+	}
+	longWhole := long[0:indexPlus]
+	longDecimal, err2 := strconv.ParseFloat(long[indexPlus+1:indexEnd], 16)
 	if err2 != nil {
 		return ""
 	}
@@ -167,6 +196,9 @@ func googleMapLinkParser(input string) string {
 	longStr := []byte{}
 	latStr = strconv.AppendFloat(latStr, latDecimal, 'g', 4, 32)
 	longStr = strconv.AppendFloat(longStr, longDecimal, 'g', 4, 32)
-	result = strings.Join([]string{result, str[0:2], ".", string(latStr[2:]), str[10:15], ".", string(longStr[2:])}, "")
+	if len(latStr) < 3 || len(longStr) < 3 {
+		return ""
+	}
+	result = strings.Join([]string{latWhole, ".", string(latStr[2:]), ",", longWhole, ".", string(longStr[2:])}, "")
 	return result
 }

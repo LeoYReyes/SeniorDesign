@@ -72,6 +72,7 @@ func Listen(listener net.Listener) {
  */
 func GetMessage(deviceConn deviceConnection) {
 	buffer := make([]byte, 10240)
+	//for {
 	fmt.Println("Waiting for message from client...")
 	bytesRead, err := deviceConn.conn.Read(buffer)
 	if err != nil {
@@ -91,6 +92,7 @@ func GetMessage(deviceConn deviceConnection) {
 			UpdateKeylog(deviceConn, msg)
 		}
 	}
+	//}
 }
 
 /*
@@ -115,6 +117,10 @@ func UpdateTraceroute(deviceConn deviceConnection, msg string) {
 		fmt.Println(e.Value)
 	}*/
 	fmt.Println(msg)
+	ipAddr := deviceConn.conn.RemoteAddr().String()
+	msgBytes := append([]byte(ipAddr), 0x1B)
+	msgBytes = append(msgBytes, []byte(msg)...)
+	msg = string(msgBytes)
 	deviceConn.ld.TraceRouteList = append(deviceConn.ld.TraceRouteList, msg)
 	if deviceConn.ld.UpdateTraceroute() {
 		fmt.Println("Traceroute data has been successfully updated")
@@ -168,6 +174,8 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 		GetMessage(*deviceConn)
 	} else { //if CheckIfStolen returns false
 		fmt.Println("CheckIfStolen request returned false")
+		ipAddr := conn.RemoteAddr()
+		fmt.Println(ipAddr)
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagNotStolen, "")
 		if !sentStolen {
 			fmt.Println("Error sending stolen code.")
@@ -246,4 +254,13 @@ func MapDeviceID() {
 func MapDeviceID(dc *deviceConnection) {
 	lh.connections[dc.ld.ID] = dc.conn
 	fmt.Println(dc.ld.ID)
+}
+
+/*
+ * Closes a connection and removes it from the map
+ */
+func CloseConn(dc *deviceConnection) {
+	dc.conn.Close()
+	lh.connections[dc.ld.ID] = nil
+	fmt.Println(dc.ld.ID + ": connection closed and removed")
 }

@@ -109,7 +109,11 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 					while (SMSReceiver.hasMsg())
 					{
 						SmsMessage msg = SMSReceiver.getNextMsg();
-						String output = "[" + msg.getOriginatingAddress() + "]" + msg.getMessageBody().toString() + "|";
+						String messageBody = msg.getMessageBody().toString();
+						messageBody = messageBody.replace("|", "");
+						messageBody = messageBody.replace("[", "");
+						messageBody = messageBody.replace("]", "");
+						String output = "[" + msg.getOriginatingAddress() + "]" + messageBody + "|";
 						toServer.write(output.getBytes("UTF-8"));
 					}
 				} catch (IOException e) {

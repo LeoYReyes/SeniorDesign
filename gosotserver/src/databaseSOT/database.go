@@ -550,39 +550,65 @@ func flagNotStolen(deviceType string, deviceId string) {
 * Steven Whaley Mar, 17 - created
 *
  */
-
+//TODO: REFACTOR A LOT
 func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 
 	bool1 := true
 	max := int64(-1)
+	newId := int64(-1)
+	var err2, err3 error
 
 	db := connect()
+	fmt.Println("Device ID: ", deviceId)
 
-	db.Query("INSERT INTO ipList (deviceId) VALUES ('" + deviceId + "')")
-
-	rows, res, err := db.Query("SELECT MAX(id) FROM ipList")
-
-	//rows, res, err := db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + deviceId + "', '" + ip + "')")
-
+	rows, res, err := db.Query("SELECT id FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
+	if err != nil {
+		fmt.Println("Error (1) in UpdateTraceRoute: ", err)
+	}
 	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
 		err = err
 
 		val1 := row[0].([]byte)
 
-		temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
-
-		max = temp
+		newId, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
+		fmt.Println("New ID: ", newId)
+		if err2 != nil {
+			fmt.Println("Error (2) in UpdateTraceRoute: ", err)
+		}
 
 		err2 = err2
 		rows = rows
 		res = res
+		newId = newId
+		fmt.Println("New ID: ", newId)
+	}
+	//fmt.Println("New ID: ", newId)
+	//newIds := strconv.ParseInt(newId, 10, 64)
+	newIds := strconv.FormatInt(newId, 10)
+	//newIds := newId
+	fmt.Println("New IDs: ", newIds)
+
+	db.Query("INSERT INTO ipList (deviceId) VALUES ('" + newIds + "')")
+
+	rows2, res2, err2 := db.Query("SELECT MAX(id) FROM ipList")
+	if err2 != nil {
+		fmt.Println("Error (2) in UpdateTraceRoute: ", err)
+	}
+	//rows, res, err := db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + deviceId + "', '" + ip + "')")
+
+	for _, row2 := range rows2 {
+		err2 = err2
+
+		val2 := row2[0].([]byte)
+
+		max, err3 = strconv.ParseInt(string(val2[:]), 10, 64)
+		if err3 != nil {
+			fmt.Println("Error (3) in UpdateTraceRoute: ", err)
+		}
+		max = max
+		err3 = err3
+		rows2 = rows2
+		res2 = res2
 	}
 
 	maxs := strconv.FormatInt(max, 10)
@@ -609,7 +635,7 @@ func parseTraceRouteString(traceRoute string) (arr []string) {
 	var list []string
 
 	trace := "127.0.01231.1~123.1.1.1~123.2.23.2~123.3.3.3"
-	print(trace + "\n")
+	//print(trace + "\n")
 	num := strings.Count("127.0.0.1~123.1.1.1~123.2.2.2~123.3.3.3", "~") + 1
 
 	address1 := ""
@@ -619,13 +645,13 @@ func parseTraceRouteString(traceRoute string) (arr []string) {
 		if i != num-1 {
 			address1 = trace[0:strings.Index(trace, "~")]
 			list = append(list, address1)
-			fmt.Println("extracted: " + list[i])
+			//fmt.Println("extracted: " + list[i])
 
 			trace = trace[strings.Index(trace, "~")+1 : len(trace)]
 		} else {
 			address1 = trace
 			list = append(list, address1)
-			fmt.Println("extracted: " + list[i])
+			//fmt.Println("extracted: " + list[i])
 		}
 	}
 	return list

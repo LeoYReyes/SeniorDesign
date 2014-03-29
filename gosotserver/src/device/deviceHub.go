@@ -215,7 +215,7 @@ func processRequest(req *CustomProtocol.Request) {
 		} else {
 			req.Response <- []byte{0}
 		}
-	case CustomProtocol.UpdateUserKeylogData:
+	case CustomProtocol.UpdateUserKeylogData: //todo idk if it is listening for a response. also do the NO_OP messages interefere with getmessage?
 		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
 	case CustomProtocol.UpdateUserIPTraceData: //todo include IP of connection in the trace route, currently starts at first node from router
 		go ProcessLapReq(req)

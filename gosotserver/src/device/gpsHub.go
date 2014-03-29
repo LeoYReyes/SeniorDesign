@@ -191,6 +191,9 @@ func googleMapLinkParser(input string) string {
 	longStr := []byte{}
 	latStr = strconv.AppendFloat(latStr, latDecimal, 'g', 4, 32)
 	longStr = strconv.AppendFloat(longStr, longDecimal, 'g', 4, 32)
+	if len(latStr) < 3 || len(longStr) < 3 {
+		return ""
+	}
 	result = strings.Join([]string{latWhole, ".", string(latStr[2:]), ",", longWhole, ".", string(longStr[2:])}, "")
 	return result
 }

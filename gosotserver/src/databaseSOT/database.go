@@ -552,34 +552,44 @@ func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 
 	bool1 := true
 	max := int64(-1)
+	newId := int64(-1)
 
 	db := connect()
 
-	db.Query("INSERT INTO ipList (deviceId) VALUES ('" + deviceId + "')")
-
-	rows, res, err := db.Query("SELECT MAX(id) FROM ipList")
-
-	//rows, res, err := db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + deviceId + "', '" + ip + "')")
+	rows, res, err := db.Query("SELECT id FROM laptopDevice WHERE deviceId = '" + deviceId + "')")
 
 	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
 		err = err
 
 		val1 := row[0].([]byte)
 
-		temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
-
-		max = temp
+		newId, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
 
 		err2 = err2
 		rows = rows
 		res = res
+		newId = newId
+	}
+
+	newIds := strconv.FormatInt(newId, 10)
+
+	db.Query("INSERT INTO ipList (deviceId) VALUES ('" + newIds + "')")
+
+	rows2, res2, err2 := db.Query("SELECT MAX(id) FROM ipList")
+
+	//rows, res, err := db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + deviceId + "', '" + ip + "')")
+
+	for _, row2 := range rows2 {
+		err2 = err2
+
+		val2 := row2[0].([]byte)
+
+		max, err3 := strconv.ParseInt(string(val2[:]), 10, 64)
+
+		max = max
+		err3 = err3
+		rows2 = rows2
+		res2 = res2
 	}
 
 	maxs := strconv.FormatInt(max, 10)

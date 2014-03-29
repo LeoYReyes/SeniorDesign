@@ -18,6 +18,8 @@
 *        -also what other functionality is needed?
  */
 
+// TODO: handle apostrophe
+
 package databaseSOT
 
 import (
@@ -353,9 +355,10 @@ func registerNewDevice(deviceType string, deviceId string, deviceName string, us
 	} else {
 		// query does not work on VARCHAR with length of 50
 		if deviceType == "gps" {
+			fmt.Println("Writing to gpsDevice...")
 			db.Query("INSERT INTO gpsDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
 		} else if deviceType == "laptop" {
-			fmt.Println("checkmark")
+			fmt.Println("Writing to laptopDevice...")
 			db.Query("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
 
 		}
@@ -527,7 +530,7 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 func flagStolen(deviceType string, deviceId string) {
 
 	db := connect()
-	queryStr := "UPDATE " + deviceType + "Device " + "SET isStolen = 1, WHERE deviceId='" + deviceId + "'"
+	queryStr := "UPDATE " + deviceType + "Device " + "SET isStolen = 1 WHERE deviceId='" + deviceId + "'"
 	db.Query(queryStr)
 	disconnect(db)
 }
@@ -535,7 +538,7 @@ func flagStolen(deviceType string, deviceId string) {
 func flagNotStolen(deviceType string, deviceId string) {
 
 	db := connect()
-	queryStr := "UPDATE " + deviceType + "Device " + "SET isStolen = 0, WHERE deviceId='" + deviceId + "'"
+	queryStr := "UPDATE " + deviceType + "Device " + "SET isStolen = 0 WHERE deviceId='" + deviceId + "'"
 	db.Query(queryStr)
 	disconnect(db)
 }

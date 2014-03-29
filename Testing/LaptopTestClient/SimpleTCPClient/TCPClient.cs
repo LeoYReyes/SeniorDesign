@@ -12,7 +12,8 @@ namespace SimpleTCPClient
     class TCPClient
     {
         static IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-        static IPAddress ipAddress = new IPAddress(0x0100007F);
+        //static IPAddress ipAddress = new IPAddress(0x0100007F);
+        static IPAddress ipAddress = IPAddress.Parse("71.91.88.205");
         static IPEndPoint remoteEP = new IPEndPoint(ipAddress, 10015);
         static byte[] bytes = new byte[1024];
 
@@ -90,6 +91,7 @@ namespace SimpleTCPClient
             Thread tempThread;
             for (int i = 0; i < 10; i++)
             {
+                Thread.Sleep(50);
                 tempThread = new Thread(test1);
                 tempThread.Start();
             }
@@ -99,8 +101,8 @@ namespace SimpleTCPClient
         {
             //test1();
             //test2();
-            //test3();
-            test4();
+            test3();
+            //test4();
             //byte[] msg2 = Encoding.ASCII.GetBytes("2192.168.0.1~127.0.0.1~72.54.10.100\n");
             //byte[] msg2 = Encoding.ASCII.GetBytes("3test keylogger data\n");
             //int bytesSent2 = sender.Send(msg2);

@@ -247,3 +247,12 @@ func MapDeviceID(dc *deviceConnection) {
 	lh.connections[dc.ld.ID] = dc.conn
 	fmt.Println(dc.ld.ID)
 }
+
+/*
+ * Closes a connection and removes it from the map
+ */
+func CloseConn(dc *deviceConnection) {
+	dc.conn.Close()
+	lh.connections[dc.ld.ID] = nil
+	fmt.Println(dc.ld.ID + ": connection closed and removed")
+}

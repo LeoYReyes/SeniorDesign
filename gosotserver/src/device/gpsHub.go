@@ -106,7 +106,7 @@ func parsePhoneNumber(msg string) string {
 }
 
 func motionAlert(phoneNumber string) {
-	fmt.Println(phineNumber + " " + MOTION_ALERT)
+	fmt.Println(phoneNumber + " " + MOTION_ALERT)
 	//report stolen
 	payload := append([]byte(phoneNumber), 0x1B)
 	response := make(chan []byte)

@@ -1,5 +1,6 @@
 $(function() {
 	deviceInfo();
+	var deviceBoxes = [];
 	var deviceType = $( "#deviceType" ),
 		deviceName = $( "#deviceName" ),
       	deviceId = $( "#deviceId" );
@@ -66,10 +67,9 @@ $(function() {
 				
 			}).done(function(response) {
 				alert(JSON.stringify(response));
-				var deviceBoxes = [];
 				if(response != null) {
 					for(i = 0; i < response.length; i++) {
-						deviceBoxes.push(createDeviceBox(response[i]['Name'], response[i]['IsStolen']));
+						deviceBoxes.push(createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen']));
 						$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
 						var deviceButton = $("<li>", {id: response[i]['Name'], style: "padding: 9px;", value:i});
 						deviceButton.text(response[i]['Name']);
@@ -93,7 +93,7 @@ $(function() {
 			
 		}
 		
-		function createDeviceBox(deviceNameIn, deviceStatusIn) {
+		function createDeviceBox(deviceNameIn, deviceId, deviceStatusIn) {
 			var deviceDiv = $("<div>", {id: deviceNameIn, class: "col-md-3 deviceInfo"});
 			var row = $("<div>", {class: "row"});
 			var colmd12 = $("<div>", {class: "col-md-12"});
@@ -109,11 +109,34 @@ $(function() {
 			var li2 = $("<li>");
 			var deviceStatus = $("<h5>");
 			deviceStatus.text(deviceStatusIn);
-			
+			//alert(deviceId);
+			var activateDeviceButton = $("<div>", {id: deviceId});
+			activateDeviceButton.text(deviceNameIn);
+
+			activateDeviceButton.click(function(e) {
+				//alert($(this).attr("id"));
+				var deviceType;
+				if($(this).attr("id").length < 12) {
+					deviceType = "gps";
+				} else {
+					deviceType = "laptop";	
+				}
+				alert(deviceType);
+				$.ajax({
+					url: "/toggleDevice",
+					type: "POST",
+					data: {
+						deviceId: $(this).attr("id"),
+						deviceType: deviceType
+					}
+				});
+				// send ajax to server, flag device stolen
+			});
 			li2.append(deviceStatus);
 			li.append(deviceName);
 			colmd10.append(li);
 			colmd10.append(li2);
+			colmd10.append(activateDeviceButton);
 			row2.append(colmd1);
 			row2.append(colmd10);
 			ul.append(row2);

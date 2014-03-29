@@ -16,6 +16,7 @@ import (
 	"net"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var smsConn net.Conn
@@ -61,7 +62,9 @@ func GPSListen(listener net.Listener) {
 func GPSCommunicate(conn net.Conn) {
 	buffer := make([]byte, 512)
 	msg := ""
+	lastPing := (time.Now()).Unix()
 	for {
+		remaining := ""
 		select {
 		case m := <-smsCh:
 			fmt.Println("smsCh: " + m)
@@ -74,8 +77,17 @@ func GPSCommunicate(conn net.Conn) {
 				if buffer[0] == '|' {
 					//fmt.Println("Heartbeat <3")
 					conn.Write([]byte("|")) //heartbeat response to ensure connection is alive
+					lastPing = (time.Now()).Unix()
 				} else {
-					received := string(buffer[0:bytesRead])
+					received := remaining + string(buffer[0:bytesRead])
+					index := strings.Index(received, "|")
+					if index == -1 {
+						remaining = received
+					} else if index+1 < len(received) {
+						remaining = received[index:]
+					} else {
+						remaining = ""
+					}
 					fmt.Println("Received msg: ", received)
 					number := parsePhoneNumber(received)
 					msg = googleMapLinkParser(received)
@@ -92,6 +104,11 @@ func GPSCommunicate(conn net.Conn) {
 					}
 				}
 			}
+		}
+		if (time.Now()).Unix()-lastPing > 30 {
+			fmt.Println("Lost connection with SMS client")
+			conn.Close()
+			break
 		}
 	}
 }

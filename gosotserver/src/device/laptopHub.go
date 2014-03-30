@@ -80,6 +80,7 @@ func GetMessage(deviceConn deviceConnection) {
 		bytesRead, err := deviceConn.conn.Read(buffer)
 		if err != nil {
 			fmt.Println("Error reading", err)
+			break
 		}
 		msg := string(buffer)
 		index := strings.Index(msg, "\n")

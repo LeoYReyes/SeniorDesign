@@ -11,5 +11,9 @@
     <string name="connection_connecting">Connecting...</string>
     <string name="connection_connected">Connected</string>
     <string name="connection_disconnecting">Disconnecting...</string>
+    <string name="sent_counter">Sent: </string>
+    <string name="received_counter">Received: </string>
+    <string name="sent_num">0</string>
+    <string name="received_num">0</string>
 
 </resources>

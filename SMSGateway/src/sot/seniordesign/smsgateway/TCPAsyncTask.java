@@ -26,6 +26,8 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 {
 	public static final int NO_CONNECTION = 0;
 	public static final int CONNECTION = 1;
+	public static final int SMS_PROCESSED = 2;
+	public static final int SMS_SENT = 3;
 	public static final int TIMEOUT = 10000;
 	
 	private SMSActivity parentActivity;
@@ -115,6 +117,7 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 						messageBody = messageBody.replace("]", "");
 						String output = "[" + msg.getOriginatingAddress() + "]" + messageBody + "|";
 						toServer.write(output.getBytes("UTF-8"));
+						publishProgress(SMS_PROCESSED);
 					}
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -224,6 +227,7 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 		number = serverMsg.substring(serverMsg.indexOf('[') + 1, serverMsg.indexOf(']'));
 		message = serverMsg.substring(serverMsg.indexOf(']') + 1, serverMsg.indexOf('|'));
 		sendSMS(number, message);
+		publishProgress(SMS_SENT);
 		} catch (Exception e)
 		{
 		}
@@ -242,6 +246,12 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 			break;
 		case CONNECTION:
 			parentActivity.connected();
+			break;
+		case SMS_PROCESSED:
+			parentActivity.incSMSProcessed();
+			break;
+		case SMS_SENT:
+			parentActivity.incSMSSent();
 			break;
 		default:
 			break;

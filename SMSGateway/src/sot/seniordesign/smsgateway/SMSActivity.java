@@ -31,6 +31,8 @@ public class SMSActivity extends Activity
 	// true when the application is connecting or connected to a server
 	private boolean connection = false;
 	private TCPAsyncTask tcp;
+	private int smsSent = 0;
+	private int smsReceived = 0;
 
 	/**
 	 * auto-generated
@@ -147,6 +149,26 @@ public class SMSActivity extends Activity
 	{
 		TextView connectionText = (TextView) findViewById(R.id.connectionStatus);
 		connectionText.setText(getResources().getString(R.string.connection_connected));
+	}
+	
+	/**
+	 * Increment the counter of processed SMS messages
+	 */
+	protected void incSMSProcessed()
+	{
+		smsReceived++;
+		TextView counter = (TextView) findViewById(R.id.textView_receivedCounter);
+		counter.setText("" + smsReceived);
+	}
+	
+	/**
+	 * Increment the counter of sent SMS messages
+	 */
+	protected void incSMSSent()
+	{
+		smsSent++;
+		TextView counter = (TextView) findViewById(R.id.textView_sentCounter);
+		counter.setText("" + smsSent);
 	}
 
 }

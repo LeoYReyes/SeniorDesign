@@ -81,11 +81,10 @@ func GetMessage(deviceConn deviceConnection) {
 		if err != nil {
 			fmt.Println("Error reading", err)
 		}
-		index := 
 		msg := string(buffer)
 		index := strings.Index(msg, "\n")
 		if index != -1 {
-			msg = msg[1: index]
+			msg = msg[1:index]
 		} else {
 			fmt.Println("LaptopDevice.GetDeviceID: deviceId Parse Error")
 		}
@@ -104,11 +103,6 @@ func GetMessage(deviceConn deviceConnection) {
 			}
 		}
 	}
-<<<<<<< HEAD
-=======
-	CloseConn(deviceConn)
-	//}
->>>>>>> FETCH_HEAD
 }
 
 /*

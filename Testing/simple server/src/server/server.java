@@ -1,5 +1,6 @@
 package server;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,9 +19,10 @@ public class server {
 	
 	private static ServerSocket ss;
 	private static Socket connection;
-	private static BufferedReader fromClient;
+	//private static BufferedReader fromClient;
+	private static BufferedInputStream fromClient;
 	private static DataOutputStream toClient;
-	private static char single[] = new char[1];
+	private static byte single[] = new byte[1];
 	
 	/**
 	 * remove next char, useful for leftover newlines
@@ -41,9 +43,9 @@ public class server {
 	private static void connect()
 	{
 		try {
-			ss = new ServerSocket(10011);
+			ss = new ServerSocket(10015);
 			connection = ss.accept();
-			fromClient = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+			fromClient = new BufferedInputStream(connection.getInputStream());
 			toClient = new DataOutputStream(connection.getOutputStream());
 			System.out.println("Connected");
 		} catch (Exception e)
@@ -83,8 +85,16 @@ public class server {
 		System.out.println("Testing connection and MAC address sending...");
 		connect();
 		try {
-			System.out.println(fromClient.readLine());
-			fromClient.readLine(); //remove left over newline
+			int message[] = new int[2048];
+			int next = 0;
+			int i = 0;
+			while (next != '\n') {
+				next = fromClient.read();
+				message[i] = next;
+				i++;
+			}
+			String rec = new String(message, 0, i - 1);
+			System.out.println("MAC address: " + rec);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -99,29 +109,36 @@ public class server {
 		connect();
 		try 
 		{
-			fromClient.readLine(); // get rid of MAC address
-			fromClient.readLine(); //remove left over newline
+			toClient.writeByte(135);
+			int next = 0;
+			while (next != '\n') {
+				next = fromClient.read(); // get rid of MAC address
+			}
 			System.out.print("Type here (off): ");
 			Thread.sleep(10000);
 			System.out.println("\nTurning keylogger on");
+			toClient.writeByte(134);
 			System.out.print("Type here (on): ");
-			toClient.writeByte(0);
 			Thread.sleep(10000);
 			System.out.println("\nTurning keylogger off");
-			toClient.writeByte(1);
+			toClient.writeByte(135);
 			System.out.print("Type here (off): ");
 			Thread.sleep(10000);
 			System.out.println("\nRequesting keylog...");
-			toClient.writeByte(3);
+			toClient.writeByte(130);
 			Thread.sleep(1000);
-			while (fromClient.ready()) {
-				char single[] = new char[1];
-				fromClient.read(single);
-				System.out.println("op code: " + (byte)single[0]);
-				System.out.println("Keylog: " + fromClient.readLine());
-				fromClient.readLine(); //remove left over newline
-				Thread.sleep(100);
+			fromClient.read(single, 0, 1);
+			System.out.println("op code: " + (0xFF & single[0]));
+			int message[] = new int[2048];
+			next = 0;
+			int i = 0;
+			while (next != '\n') {
+				next = fromClient.read();
+				message[i] = next;
+				i++;
 			}
+			String rec = new String(message, 0, i - 1);
+			System.out.println("Keylog: " + rec);
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -132,23 +149,30 @@ public class server {
 	private static void testIPTrace()
 	{
 		separator();
-		System.out.println("IP trace route...");
+		System.out.println("Testing IP trace route...");
 		connect();
 		try 
 		{
-			fromClient.readLine(); // get rid of MAC address
-			fromClient.readLine(); //remove left over newline
-			System.out.println("Requesting trace route...");
-			toClient.writeByte(2);
-			Thread.sleep(1000);
-			while (fromClient.ready()) {
-				char single[] = new char[1];
-				fromClient.read(single);
-				System.out.println("op code: " + (byte)single[0]);
-				System.out.println("IP trace route: " + fromClient.readLine());
-				fromClient.readLine(); //remove left over newline
-				Thread.sleep(100);
+			int next = 0;
+			while (next != '\n') {
+				next = fromClient.read(); // get rid of MAC address
 			}
+			//fromClient.readLine(); //remove left over newline
+			System.out.println("Requesting trace route...");
+			toClient.writeByte(131);
+			Thread.sleep(1000);
+			fromClient.read(single, 0, 1);
+			System.out.println("op code: " + (0xFF & single[0]));
+			int message[] = new int[2048];
+			next = 0;
+			int i = 0;
+			while (next != '\n') {
+				next = fromClient.read();
+				message[i] = next;
+				i++;
+			}
+			String rec = new String(message, 0, i - 1);
+			System.out.println("IP trace route: " + rec);
 		} catch (Exception e)
 		{
 			e.printStackTrace();
@@ -170,14 +194,14 @@ public class server {
 			System.out.println("Reconnect time (ms): " + (con - dis));
 			
 			System.out.println("\nReporting stolen");
-			toClient.writeByte(5);
+			toClient.writeByte(132);
 			disconnect();
 			dis = System.currentTimeMillis();
 			connect();
 			con = System.currentTimeMillis();
 			System.out.println("Reconnect time (ms): " + (con - dis));
 			System.out.println("\nReporting not stolen");
-			toClient.writeByte(4);
+			toClient.writeByte(133);
 			disconnect();
 			dis = System.currentTimeMillis();
 			connect();

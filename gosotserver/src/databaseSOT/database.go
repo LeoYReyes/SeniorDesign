@@ -200,7 +200,7 @@ func processRequest(req *CustomProtocol.Request) {
 	case CustomProtocol.GetDeviceList:
 		res := []byte{}
 		res = append(res, getLaptopDevices(payload[0])...)
-		res = append(res, getGpsDevices(payload[0])...)
+		//res = append(res, getGpsDevices(payload[0])...)
 		req.Response <- res
 	case CustomProtocol.CheckDeviceStolen: //
 		isStolen := IsDeviceStolen(payload[0])

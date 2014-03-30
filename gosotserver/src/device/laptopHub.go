@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"net"
 	//"strconv"
-	//"strings"
+	"strings"
 	//"time"
 )
 
@@ -71,28 +71,39 @@ func Listen(listener net.Listener) {
  * handling is the handed to the correct handling function.
  */
 func GetMessage(deviceConn deviceConnection) {
+	defer func() {
+		CloseConn(deviceConn)
+	}()
 	buffer := make([]byte, 10240)
-	//for {
-	fmt.Println("Waiting for message from client...")
-	bytesRead, err := deviceConn.conn.Read(buffer)
-	if err != nil {
-		fmt.Println("Error reading", err)
-	}
-	msg := string(buffer[1:bytesRead])
-	//opCode, err := strconv.Atoi(msg[0:1])
-	opCode := buffer[0]
-	fmt.Println("Message received with OP Code: ", opCode)
-	if err != nil {
-		fmt.Println("Invalid OP code", err)
-	} else {
-		switch opCode {
-		case CustomProtocol.UpdateUserIPTraceData:
-			UpdateTraceroute(deviceConn, msg)
-		case CustomProtocol.UpdateUserKeylogData:
-			UpdateKeylog(deviceConn, msg)
+	for {
+		fmt.Println("Waiting for message from client...")
+		bytesRead, err := deviceConn.conn.Read(buffer)
+		if err != nil {
+			fmt.Println("Error reading", err)
+		}
+		index := 
+		msg := string(buffer)
+		index := strings.Index(msg, "\n")
+		if index != -1 {
+			msg = msg[1: index]
+		} else {
+			fmt.Println("LaptopDevice.GetDeviceID: deviceId Parse Error")
+		}
+		//opCode, err := strconv.Atoi(msg[0:1])
+		opCode := buffer[0]
+		fmt.Println("Message byte format: ", buffer[1:bytesRead])
+		fmt.Println("Message received with OP Code: ", opCode)
+		if err != nil {
+			fmt.Println("Invalid OP code", err)
+		} else {
+			switch opCode {
+			case CustomProtocol.UpdateUserIPTraceData:
+				UpdateTraceroute(deviceConn, msg)
+			case CustomProtocol.UpdateUserKeylogData:
+				UpdateKeylog(deviceConn, msg)
+			}
 		}
 	}
-	//}
 }
 
 /*
@@ -155,23 +166,35 @@ func UpdateKeylog(deviceConn deviceConnection, msg string) {
 func GetDeviceID(conn net.Conn) { //(string, error) {
 	buffer := make([]byte, 10240)
 	//ld := new(LaptopDevice)
-	bytesRead, err := conn.Read(buffer)
+	_, err := conn.Read(buffer)
 	if err != nil {
 		fmt.Println("Error reading device ID", err)
 	}
 	//ld.ID = string(buffer[0:bytesRead])
 	deviceConn := new(deviceConnection)
-	deviceConn.ld.ID = string(buffer[0:bytesRead])
+	deviceId := string(buffer)
+	index := strings.Index(deviceId, "\n")
+	if index != -1 {
+		deviceConn.ld.ID = deviceId[:index]
+	} else {
+		fmt.Println("LaptopDevice.GetDeviceID: deviceId Parse Error")
+		deviceConn.ld.ID = ""
+	}
+
 	deviceConn.conn = conn
 	MapDeviceID(deviceConn)
 	var sentStolen bool
 	if deviceConn.ld.CheckIfStolen() {
 		fmt.Println("CheckIfStolen request returned true")
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagStolen, "")
+		requestTraceRoute := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserIPTraceData, "")
 		if !sentStolen {
 			fmt.Println("Error sending stolen code.")
 		}
-		GetMessage(*deviceConn)
+		if !requestTraceRoute {
+			fmt.Println("laptopHub.GetDeviceID: Error sending request traceroute")
+		}
+		go GetMessage(*deviceConn)
 	} else { //if CheckIfStolen returns false
 		fmt.Println("CheckIfStolen request returned false")
 		ipAddr := conn.RemoteAddr()
@@ -259,7 +282,7 @@ func MapDeviceID(dc *deviceConnection) {
 /*
  * Closes a connection and removes it from the map
  */
-func CloseConn(dc *deviceConnection) {
+func CloseConn(dc deviceConnection) {
 	dc.conn.Close()
 	lh.connections[dc.ld.ID] = nil
 	fmt.Println(dc.ld.ID + ": connection closed and removed")

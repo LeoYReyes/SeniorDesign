@@ -380,7 +380,9 @@ func IsDeviceStolen(deviceId string) bool {
 	bool1 := false
 
 	db := connect()
-	if len(deviceId) != 12 {
+	fmt.Println("DeviceId len: ", len(deviceId))
+	//TODO: < 12 temp fix
+	if len(deviceId) < 12 {
 		rows, res, err := db.Query("select isStolen from gpsDevice where phoneNumber = '" + deviceId + "'")
 		if err != nil {
 			panic(err)
@@ -571,7 +573,7 @@ func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 		val1 := row[0].([]byte)
 
 		newId, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		fmt.Println("New ID: ", newId)
+		//fmt.Println("New ID: ", newId)
 		if err2 != nil {
 			fmt.Println("Error (2) in UpdateTraceRoute: ", err)
 		}
@@ -580,13 +582,13 @@ func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 		rows = rows
 		res = res
 		newId = newId
-		fmt.Println("New ID: ", newId)
+		//fmt.Println("New ID: ", newId)
 	}
 	//fmt.Println("New ID: ", newId)
 	//newIds := strconv.ParseInt(newId, 10, 64)
 	newIds := strconv.FormatInt(newId, 10)
 	//newIds := newId
-	fmt.Println("New IDs: ", newIds)
+	//fmt.Println("New IDs: ", newIds)
 
 	db.Query("INSERT INTO ipList (deviceId) VALUES ('" + newIds + "')")
 
@@ -763,7 +765,7 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 * of all the devices owned by the user.
 *
 *
-* Steven Whaley Feb, 26 - created
+* Leo Reyes
  */
 func getLaptopDevices(email string) []byte {
 

@@ -139,6 +139,9 @@ $(function() {
 				deviceStatus.text("Not Stolen");	
 			}
 			//alert(deviceId);
+			var showIPListButton = $("<li>", {"data-toggle": "modal", "data-target": "modalIPList"});
+			var showIPListLink = $("<a>").text("Show IPs");
+			showIPListButton.append(showIPListLink);
 			var activateDeviceButton = $("<div>", {id: deviceId, class: "activateButton"});
 			activateDeviceButton.text("Activate");
 			activateDeviceButton.click(function() {
@@ -170,6 +173,7 @@ $(function() {
 			li.append(deviceName);
 			colmd10.append(li);
 			colmd10.append(li2);
+			colmd10.append(showIPListButton);
 			colmd10.append(activateDeviceButton);
 			row2.append(colmd1);
 			row2.append(colmd10);

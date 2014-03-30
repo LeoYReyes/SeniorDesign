@@ -58,3 +58,9 @@ func TestGetLaptopDevices(t *testing.T) {
 	fmt.Println("GetLaptopDevice TEST")
 	fmt.Println(string(jsonList))
 }
+
+func TestParseTraceRoute(t *testing.T) {
+	traceroute := parseTraceRouteString("127.0.0.1:4096~123.1.1.1~123.2.23.2~123.3.3.3")
+	fmt.Println("PARSE TRACEROUTE")
+	fmt.Println(len(traceroute))
+}

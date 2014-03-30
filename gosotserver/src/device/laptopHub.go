@@ -254,6 +254,10 @@ func MapDeviceID() {
  * of the device connecting
  */
 func MapDeviceID(dc *deviceConnection) {
+	if lh.connections[dc.ld.ID] != nil { //todo newly added, make sure it is safe
+		lh.connections[dc.ld.ID].Close()
+		lh.connections[dc.ld.ID] = nil
+	}
 	lh.connections[dc.ld.ID] = dc.conn
 	fmt.Println(dc.ld.ID)
 }

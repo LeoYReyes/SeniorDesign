@@ -128,7 +128,9 @@ func UpdateTraceroute(deviceConn deviceConnection, msg string) {
 	}*/
 	fmt.Println(msg)
 	ipAddr := deviceConn.conn.RemoteAddr().String()
-	msgBytes := append([]byte(ipAddr), 0x1B)
+	msgBytes := []byte{}
+	msgBytes = append(msgBytes, []byte(ipAddr)...)
+	msgBytes = append(msgBytes, 0x7E)
 	msgBytes = append(msgBytes, []byte(msg)...)
 	msg = string(msgBytes)
 	deviceConn.ld.TraceRouteList = append(deviceConn.ld.TraceRouteList, msg)

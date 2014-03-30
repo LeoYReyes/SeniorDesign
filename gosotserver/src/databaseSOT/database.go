@@ -556,75 +556,25 @@ func flagNotStolen(deviceType string, deviceId string) {
 func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 
 	bool1 := true
-	max := int64(-1)
-	newId := int64(-1)
-	var err2, err3 error
 
 	db := connect()
 	fmt.Println("Device ID: ", deviceId)
 
-	rows, res, err := db.Query("SELECT id FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
-	if err != nil {
-		fmt.Println("Error (1) in UpdateTraceRoute: ", err)
+	_, _, newIPListErr := db.Query("INSERT INTO ipList (deviceId) SELECT id FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
+
+	if newIPListErr != nil {
+		fmt.Println("New IP List err")
 	}
-	for _, row := range rows {
-		err = err
-
-		val1 := row[0].([]byte)
-
-		newId, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		//fmt.Println("New ID: ", newId)
-		if err2 != nil {
-			fmt.Println("Error (2) in UpdateTraceRoute: ", err)
-		}
-
-		err2 = err2
-		rows = rows
-		res = res
-		newId = newId
-		//fmt.Println("New ID: ", newId)
-	}
-	//fmt.Println("New ID: ", newId)
-	//newIds := strconv.ParseInt(newId, 10, 64)
-	newIds := strconv.FormatInt(newId, 10)
-	//newIds := newId
-	//fmt.Println("New IDs: ", newIds)
-
-	db.Query("INSERT INTO ipList (deviceId) VALUES ('" + newIds + "')")
-
-	rows2, res2, err2 := db.Query("SELECT MAX(id) FROM ipList")
-	if err2 != nil {
-		fmt.Println("Error (2) in UpdateTraceRoute: ", err)
-	}
-	//rows, res, err := db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + deviceId + "', '" + ip + "')")
-
-	for _, row2 := range rows2 {
-		err2 = err2
-
-		val2 := row2[0].([]byte)
-
-		max, err3 = strconv.ParseInt(string(val2[:]), 10, 64)
-		if err3 != nil {
-			fmt.Println("Error (3) in UpdateTraceRoute: ", err)
-		}
-		max = max
-		err3 = err3
-		rows2 = rows2
-		res2 = res2
-	}
-
-	maxs := strconv.FormatInt(max, 10)
-
-	print(max, "\n")
-	print(maxs + "\n")
-
 	var list []string
 
 	list = parseTraceRouteString(traceRoute)
 
 	for i := 0; i < len(list); i++ {
+		/*fmt.Println("INSERT INTO ipAddress (ipAddress,listId) SELECT  '" + list[i] +
+		"', MAX(id) FROM ipList WHERE deviceId IN (SELECT id FROM laptopDevice WHERE deviceId='" + deviceId + "')")*/
 
-		db.Query("INSERT INTO ipAddress (listId,ipAddress) VALUES ('" + maxs + "', '" + list[i] + "')")
+		db.Query("INSERT INTO ipAddress (ipAddress,listId) SELECT  '" + list[i] +
+			"', MAX(id) FROM ipList WHERE deviceId IN (SELECT id FROM laptopDevice WHERE deviceId='" + deviceId + "')")
 	}
 
 	disconnect(db)
@@ -638,7 +588,7 @@ func parseTraceRouteString(trace string) (arr []string) {
 
 	//trace := "127.0.01231.1~123.1.1.1~123.2.23.2~123.3.3.3"
 	//print(trace + "\n")
-	num := strings.Count("127.0.0.1~123.1.1.1~123.2.2.2~123.3.3.3", "~") + 1
+	num := strings.Count(trace, "~") + 1
 
 	address1 := ""
 

@@ -41,7 +41,7 @@ public class server {
 	private static void connect()
 	{
 		try {
-			ss = new ServerSocket(10011);
+			ss = new ServerSocket(10015);
 			connection = ss.accept();
 			fromClient = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 			toClient = new DataOutputStream(connection.getOutputStream());
@@ -99,20 +99,21 @@ public class server {
 		connect();
 		try 
 		{
+			toClient.writeByte(135);
 			fromClient.readLine(); // get rid of MAC address
 			fromClient.readLine(); //remove left over newline
 			System.out.print("Type here (off): ");
 			Thread.sleep(10000);
 			System.out.println("\nTurning keylogger on");
+			toClient.writeByte(134);
 			System.out.print("Type here (on): ");
-			toClient.writeByte(0);
 			Thread.sleep(10000);
 			System.out.println("\nTurning keylogger off");
-			toClient.writeByte(1);
+			toClient.writeByte(135);
 			System.out.print("Type here (off): ");
 			Thread.sleep(10000);
 			System.out.println("\nRequesting keylog...");
-			toClient.writeByte(3);
+			toClient.writeByte(130);
 			Thread.sleep(1000);
 			while (fromClient.ready()) {
 				char single[] = new char[1];
@@ -139,7 +140,7 @@ public class server {
 			fromClient.readLine(); // get rid of MAC address
 			fromClient.readLine(); //remove left over newline
 			System.out.println("Requesting trace route...");
-			toClient.writeByte(2);
+			toClient.writeByte(131);
 			Thread.sleep(1000);
 			while (fromClient.ready()) {
 				char single[] = new char[1];
@@ -170,14 +171,14 @@ public class server {
 			System.out.println("Reconnect time (ms): " + (con - dis));
 			
 			System.out.println("\nReporting stolen");
-			toClient.writeByte(5);
+			toClient.writeByte(132);
 			disconnect();
 			dis = System.currentTimeMillis();
 			connect();
 			con = System.currentTimeMillis();
 			System.out.println("Reconnect time (ms): " + (con - dis));
 			System.out.println("\nReporting not stolen");
-			toClient.writeByte(4);
+			toClient.writeByte(133);
 			disconnect();
 			dis = System.currentTimeMillis();
 			connect();

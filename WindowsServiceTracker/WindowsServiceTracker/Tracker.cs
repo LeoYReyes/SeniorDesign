@@ -492,7 +492,7 @@ namespace WindowsServiceTracker
             }
             else
             {
-                byteMsg = Encoding.UTF8.GetBytes(msg + "\n");
+                byteMsg = Encoding.UTF8.GetBytes(msg);
                 return SendStdMsg(false, NO_OP, byteMsg, newLine);
             }
         }
@@ -509,7 +509,7 @@ namespace WindowsServiceTracker
             }
             else
             {
-                byteMsg = Encoding.UTF8.GetBytes(msg + "\n");
+                byteMsg = Encoding.UTF8.GetBytes(msg);
                 return SendStdMsg(opcode, byteMsg, newLine);
             }
         }

@@ -83,15 +83,21 @@ public class SMSActivity extends Activity
 		Button button = (Button) findViewById(R.id.connectionButton);
 		TextView connectionText = (TextView) findViewById(R.id.connectionStatus);
 		
-		connection = true;
-		ipText.setEnabled(false);
-		portText.setEnabled(false);
-		button.setEnabled(true);
-		button.setText(getResources().getString(R.string.button_disconnect));
-		connectionText.setText(getResources().getString(R.string.connection_connecting));
+		String ip = ipText.getText().toString();
+		String port = portText.getText().toString();
 		
-		tcp = new TCPAsyncTask(this);
-		tcp.execute(ipText.getText().toString(), portText.getText().toString());
+		if (ip.length() > 0 && port.length() > 0)
+		{
+			connection = true;
+			ipText.setEnabled(false);
+			portText.setEnabled(false);
+			button.setEnabled(true);
+			button.setText(getResources().getString(R.string.button_disconnect));
+			connectionText.setText(getResources().getString(R.string.connection_connecting));
+			
+			tcp = new TCPAsyncTask(this);
+			tcp.execute(ip, port);
+		}
 	}
 	
 	/**

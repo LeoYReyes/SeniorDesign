@@ -632,11 +632,11 @@ func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 	return bool1
 }
 
-func parseTraceRouteString(traceRoute string) (arr []string) {
+func parseTraceRouteString(trace string) (arr []string) {
 
 	var list []string
 
-	trace := "127.0.01231.1~123.1.1.1~123.2.23.2~123.3.3.3"
+	//trace := "127.0.01231.1~123.1.1.1~123.2.23.2~123.3.3.3"
 	//print(trace + "\n")
 	num := strings.Count("127.0.0.1~123.1.1.1~123.2.2.2~123.3.3.3", "~") + 1
 

@@ -1,4 +1,4 @@
-/*
+/*f
  * @author Nathan Plotts (nwp0002@auburn.edu)
  * This file is where the the laptopHub struct is defined and
  * also where general laptop connection handling functions will
@@ -104,6 +104,11 @@ func GetMessage(deviceConn deviceConnection) {
 			}
 		}
 	}
+<<<<<<< HEAD
+=======
+	CloseConn(deviceConn)
+	//}
+>>>>>>> FETCH_HEAD
 }
 
 /*
@@ -203,10 +208,11 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 		if !sentStolen {
 			fmt.Println("Error sending stolen code.")
 		}
-		err := conn.Close()
+		CloseConn(*deviceConn)
+		/*err := conn.Close()
 		if err != nil {
 			fmt.Println("Error closing laptop connection.", err)
-		}
+		}*/
 		fmt.Println("Connection sucks-s-foli closed")
 		//todo close connection and laptop goes into sleep mode
 	}
@@ -275,6 +281,10 @@ func MapDeviceID() {
  * of the device connecting
  */
 func MapDeviceID(dc *deviceConnection) {
+	if lh.connections[dc.ld.ID] != nil { //todo newly added, make sure it is safe
+		lh.connections[dc.ld.ID].Close()
+		lh.connections[dc.ld.ID] = nil
+	}
 	lh.connections[dc.ld.ID] = dc.conn
 	fmt.Println(dc.ld.ID)
 }

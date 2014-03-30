@@ -200,6 +200,7 @@ func processRequest(req *CustomProtocol.Request) {
 	case CustomProtocol.GetDeviceList:
 		res := []byte{}
 		res = append(res, getLaptopDevices(payload[0])...)
+		res = append(res, getGpsDevices(payload[0])...)
 		req.Response <- res
 	case CustomProtocol.CheckDeviceStolen: //
 		isStolen := IsDeviceStolen(payload[0])
@@ -552,7 +553,7 @@ func flagNotStolen(deviceType string, deviceId string) {
 * Steven Whaley Mar, 17 - created
 *
  */
-//TODO: REFACTOR A LOT
+
 func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 
 	bool1 := true

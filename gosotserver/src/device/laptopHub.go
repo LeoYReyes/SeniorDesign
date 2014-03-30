@@ -92,6 +92,7 @@ func GetMessage(deviceConn deviceConnection) {
 			UpdateKeylog(deviceConn, msg)
 		}
 	}
+	CloseConn(deviceConn)
 	//}
 }
 
@@ -180,10 +181,11 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 		if !sentStolen {
 			fmt.Println("Error sending stolen code.")
 		}
-		err := conn.Close()
+		CloseConn(*deviceConn)
+		/*err := conn.Close()
 		if err != nil {
 			fmt.Println("Error closing laptop connection.", err)
-		}
+		}*/
 		fmt.Println("Connection sucks-s-foli closed")
 		//todo close connection and laptop goes into sleep mode
 	}
@@ -259,7 +261,7 @@ func MapDeviceID(dc *deviceConnection) {
 /*
  * Closes a connection and removes it from the map
  */
-func CloseConn(dc *deviceConnection) {
+func CloseConn(dc deviceConnection) {
 	dc.conn.Close()
 	lh.connections[dc.ld.ID] = nil
 	fmt.Println(dc.ld.ID + ": connection closed and removed")

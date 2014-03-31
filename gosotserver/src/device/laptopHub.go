@@ -77,7 +77,7 @@ func GetMessage(deviceConn deviceConnection) {
 	buffer := make([]byte, 10240)
 	for {
 		fmt.Println("Waiting for message from client...")
-		bytesRead, err := deviceConn.conn.Read(buffer)
+		_, err := deviceConn.conn.Read(buffer)
 		if err != nil {
 			fmt.Println("Error reading", err)
 			break
@@ -91,7 +91,7 @@ func GetMessage(deviceConn deviceConnection) {
 		}
 		//opCode, err := strconv.Atoi(msg[0:1])
 		opCode := buffer[0]
-		fmt.Println("Message byte format: ", buffer[1:bytesRead])
+		//fmt.Println("Message byte format: ", buffer[1:bytesRead])
 		fmt.Println("Message received with OP Code: ", opCode)
 		if err != nil {
 			fmt.Println("Invalid OP code", err)

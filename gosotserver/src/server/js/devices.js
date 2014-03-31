@@ -140,39 +140,15 @@ $(function() {
 					$("#modalKeylogger").find(".modal-footer").text("");
 					for(i = 0; i < keylogIn.length; i++) {
 						//alert(ipIn[i]);
-						$("#modalKeylogger").find(".modal-footer").append($("<h4>").text(keylogIn[i].substring(0, keylogIn[i].indexOf("&"))));
 						//var ipList = ipIn[i].substring(ipIn[i].indexOf("&") + 1).split("~");
-						for(j = 0; j < keylogIn.length; j++) {
-							$("#modalKeylogger").find(".modal-footer").append(keylogIn[i].substring(keylogIn[i].indexOf("&") + 1));
+						for(j = 0; j < keylogIn[i].length; j++) {
+							$("#modalKeylogger").find(".modal-footer").append($("<h4>").text(keylogIn[j].substring(0, keylogIn[j].indexOf("&"))));
+							$("#modalKeylogger").find(".modal-footer").append(keylogIn[j].substring(keylogIn[j].indexOf("&") + 1));
 							$("#modalKeylogger").find(".modal-footer").append("<br>");
 						}
 						$("#modalKeylogger").find(".modal-footer").append("<br>");
 					}
-					/*var keyDiv = $("<div>", {class: "modal fade", id: "modalKeylogger", "tabindex": "-1", role: "dialog", "aria-labelledby":"myModalLabel", "aria-hidden":"true"});
-					var keyDiv2 = $("<div>", {class: "modal-lg", style: "margin: 30px auto", style: "margin-top: 80px"});
-					var keyDiv3 = $("<div>", {class: "modal-content"});
-					var keyDiv4 = $("<div>", {class: "modal-body"});
-					var keyH3 = $("<h3>", {class: "modal-title", id: "myModalLabel"});
-					keyH3.text(deviceNameIn + "Keylog: ");
-					var keyH5 = $("<h5>", {class: "modal-title"});
-					keyH5.text(keylogIn);
-					var keyDiv5 = $("<div>", {class: "modal-footer"});
 					
-					var keyButtonClose = $("<button>", {type:"button", class:"btn btn-default", "data-dismiss":"modal"});
-					keyButtonClose.text("Close");
-					var keyButtonDownload = $("<button>", {type:"button", class:"btn btn-primary"});
-					keyButtonDownload.text("Download");
-					
-					showKeylogButton.append(keyDiv);
-					keyDiv.append(keyDiv2);
-					keyDiv2.append(keyDiv3);
-					keyDiv3.append(keyDiv4);
-					keyDiv3.append(keyDiv5);
-					keyDiv4.append(keyH3);
-					keyDiv4.append(keyH5);
-					keyDiv5.append(keyButtonClose);
-					keyDiv5.append(keyButtonDownload);
-					}*/
 				});
 				
 				showKeylogButton.append(showKeylogLink);

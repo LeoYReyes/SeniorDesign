@@ -23,6 +23,28 @@
 	height: 1000px;
 }
 
+.activateButton {
+	cursor: pointer;
+	width:          100px;
+	text-align:center;
+	margin: auto;
+	border-radius:      7px;
+	background-image:-webkit-linear-gradient(top,#FFF 0%,#91BDD6 100%);
+	background-image:       -moz-linear-gradient(top, #FFFFFF 0%, #91BDD6 100%);
+	background-image:-ms-linear-gradient(top,#FFF,#91BDD6);
+	background-image:-o-linear-gradient(top,#FFF,#91BDD6);
+	background-image:linear-gradient(top,#FFF,#91BDD6);
+	border:         solid #91BDD6 5px;
+	box-shadow: 0px 0px 0px 3px #fff, 5px 3px 12px #000000;
+}
+
+.deviceInfo li {
+	text-align: center;	
+}
+.deviceInfo .col-md-10 {
+	padding: 0 0 10px 0;	
+	margin-left: 25px;
+}
 button {
 	margin-left: 30px;
 }

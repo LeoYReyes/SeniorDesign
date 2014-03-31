@@ -141,14 +141,14 @@ $(function() {
 					for(i = 0; i < keylogIn.length; i++) {
 						//alert(ipIn[i]);
 						//var ipList = ipIn[i].substring(ipIn[i].indexOf("&") + 1).split("~");
-						for(j = 0; j < keylogIn[i].length; j++) {
-							$("#modalKeylogger").find(".modal-footer").append($("<h4>").text(keylogIn[j].substring(0, keylogIn[j].indexOf("&"))));
-							$("#modalKeylogger").find(".modal-footer").append(keylogIn[j].substring(keylogIn[j].indexOf("&") + 1));
+						//for(j = 0; j < keylogIn[i].length; j++) {
+							$("#modalKeylogger").find(".modal-footer").append($("<h4>").text(keylogIn[i].substring(0, keylogIn[i].indexOf("&"))));
+							$("#modalKeylogger").find(".modal-footer").append(keylogIn[i].substring(keylogIn[i].indexOf("&") + 1));
 							$("#modalKeylogger").find(".modal-footer").append("<br>");
-						}
-						$("#modalKeylogger").find(".modal-footer").append("<br>");
+						//}
+						
 					}
-					
+					$("#modalKeylogger").find(".modal-footer").append("<br>");
 				});
 				
 				showKeylogButton.append(showKeylogLink);

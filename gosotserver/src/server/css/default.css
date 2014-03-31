@@ -54,3 +54,7 @@
 button {
 	margin-left: 30px;
 }
+
+.modal-content {
+	overflow-wrap: break-word;	
+}

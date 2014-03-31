@@ -114,73 +114,91 @@ $(function() {
 			var deviceName = $("<h3>");
 			deviceName.text(deviceNameIn);
 			var li2 = $("<li>");
+					
+			var deviceType;
+			if(deviceId.length < 12) {
+				deviceType = "gps";
+			} else {
+				deviceType = "laptop";	
+			}
+			
+			if(deviceType == "laptop") {
+			
+				var showKeylogButton = $("<li>", {"data-toggle": "modal", "data-target": "#modalKeylogger"});
+				var showKeylogLink = $("<a>").text("Show Keylog");
+				
+				
+				showKeylogButton.click(function(){
+					var keyDiv = $("<div>", {class: "modal fade", id: "modalKeylogger", "tabindex": "-1", role: "dialog", "aria-labelledby":"myModalLabel", "aria-hidden":"true"});
+					var keyDiv2 = $("<div>", {class: "modal-lg", style: "margin: 30px auto", style: "margin-top: 80px"});
+					var keyDiv3 = $("<div>", {class: "modal-content"});
+					var keyDiv4 = $("<div>", {class: "modal-body"});
+					var keyH3 = $("<h3>", {class: "modal-title", id: "myModalLabel"});
+					keyH3.text(deviceNameIn + "Keylog: ");
+					var keyH5 = $("<h5>", {class: "modal-title"});
+					keyH5.text(keylogIn);
+					var keyDiv5 = $("<div>", {class: "modal-footer"});
+					
+					var keyButtonClose = $("<button>", {type:"button", class:"btn btn-default", "data-dismiss":"modal"});
+					keyButtonClose.text("Close");
+					var keyButtonDownload = $("<button>", {type:"button", class:"btn btn-primary"});
+					keyButtonDownload.text("Download");
+					
+					showKeylogButton.append(keyDiv);
+					keyDiv.append(keyDiv2);
+					keyDiv2.append(keyDiv3);
+					keyDiv3.append(keyDiv4);
+					keyDiv3.append(keyDiv5);
+					keyDiv4.append(keyH3);
+					keyDiv4.append(keyH5);
+					keyDiv5.append(keyButtonClose);
+					keyDiv5.append(keyButtonDownload);
+					}
+				);
+				
+				showKeylogButton.append(showKeylogLink);
+				// Parse ipIn into timestamp and multiple ip addresses
+				
+				var showIPListButton = $("<li>", {"data-toggle": "modal", "data-target": "#modalIPList"});
+				var showIPListLink = $("<a>").text("Show IPs");
+				
+				/* NOTE: possible usage of ipinfo.io to get ip geolocation
+				*		most likely handle it on server, because making requests each time on webview
+				*		is too costly	OR http://ipinfodb.com/ 	
+				*/
+				
+				showIPListLink.click(function() {
+					// Clear text
+					$("#modalIPList").find(".modal-footer").text("");
+					for(i = 0; i < ipIn.length; i++) {
+						//alert(ipIn[i]);
+						$("#modalIPList").find(".modal-footer").append($("<h4>").text(ipIn[i].substring(0, ipIn[i].indexOf("&"))));
+						var ipList = ipIn[i].substring(ipIn[i].indexOf("&") + 1).split("~");
+						for(j = 0; j < ipList.length; j++) {
+							$("#modalIPList").find(".modal-footer").append(ipList[j]);
+							$("#modalIPList").find(".modal-footer").append("<br>");
+						}
+						$("#modalIPList").find(".modal-footer").append("<br>");
+					}
+					
+				});
+				showIPListButton.append(showIPListLink);
+			}
+			var activateDeviceButton = $("<div>", {id: deviceId, class: "activateButton"});
 			var deviceStatus = $("<h5>");
+			var command;
 			if(deviceStatusIn == "49") {
 				deviceStatus.text("Stolen");
+				activateDeviceButton.text("Deactivate");
+				command = 0;
 			} else {
 				deviceStatus.text("Not Stolen");	
+				activateDeviceButton.text("Activate");
+				command = 1;
 			}
-			//alert(deviceId);
 			
-			
-			
-            var showKeylogButton = $("<li>", {"data-toggle": "modal", "data-target": "#modalKeylogger"});
-            var showKeylogLink = $("<a>").text("Show Keylog");
-            
-
-			showKeylogButton.click(function(){
-                var keyDiv = $("<div>", {class: "modal fade", id: "modalKeylogger", "tabindex": "-1", role: "dialog", "aria-labelledby":"myModalLabel", "aria-hidden":"true"});
-                var keyDiv2 = $("<div>", {class: "modal-lg", style: "margin: 30px auto", style: "margin-top: 80px"});
-                var keyDiv3 = $("<div>", {class: "modal-content"});
-                var keyDiv4 = $("<div>", {class: "modal-body"});
-                var keyH3 = $("<h3>", {class: "modal-title", id: "myModalLabel"});
-                    keyH3.text(deviceNameIn + "Keylog: ");
-                var keyH5 = $("<h5>", {class: "modal-title"});
-                    keyH5.text(keylogIn);
-                var keyDiv5 = $("<div>", {class: "modal-footer"});
-				
-                var keyButtonClose = $("<button>", {type:"button", class:"btn btn-default", "data-dismiss":"modal"});
-                    keyButtonClose.text("Close");
-                var keyButtonDownload = $("<button>", {type:"button", class:"btn btn-primary"});
-                    keyButtonDownload.text("Download");
-        
-                showKeylogButton.append(keyDiv);
-				keyDiv.append(keyDiv2);
-                keyDiv2.append(keyDiv3);
-                keyDiv3.append(keyDiv4);
-                keyDiv3.append(keyDiv5);
-                keyDiv4.append(keyH3);
-                keyDiv4.append(keyH5);
-                keyDiv5.append(keyButtonClose);
-                keyDiv5.append(keyButtonDownload);
-                }
-            )
-
-				showKeylogButton.append(showKeylogLink);
- 
-
-
-
-			
-			
-			var showIPListButton = $("<li>", {"data-toggle": "modal", "data-target": "#modalIPList"});
-			var showIPListLink = $("<a>").text("Show IPs");
-			showIPListLink.click(function() {
-				$("#modalIPList").find(".modal-footer").text(ipIn);
-			});
-			showIPListButton.append(showIPListLink);
-			
-			
-			var activateDeviceButton = $("<div>", {id: deviceId, class: "activateButton"});
-			activateDeviceButton.text("Activate");
 			activateDeviceButton.click(function() {
 					//alert($(this).attr("id"));
-					var deviceType;
-					if($(this).attr("id").length < 12) {
-						deviceType = "gps";
-						} else {
-							deviceType = "laptop";	
-						}
 					//alert(deviceType + " " + $(this).attr("id"));
 					$.ajax({
 						url: "/toggleDevice",
@@ -190,7 +208,8 @@ $(function() {
 							deviceId: "2567978990",
 							deviceType: "gps"*/
 							deviceId: $(this).attr("id"),
-							deviceType: deviceType
+							deviceType: deviceType,
+							deviceCommand: command
 						}
 					}).done(function(e) {
 						//alert(e);
@@ -204,9 +223,11 @@ $(function() {
 			li.append(deviceName);
 			colmd10.append(li);
 			colmd10.append(li2);
-			colmd10.append(showIPListButton);
+			if(deviceType == "laptop") {
+				colmd10.append(showIPListButton);
+				colmd10.append(showKeylogButton);
+			}
 			colmd10.append(activateDeviceButton);
-			colmd10.append(showKeylogButton);
 			row2.append(colmd1);
 			row2.append(colmd10);
 			ul.append(row2);

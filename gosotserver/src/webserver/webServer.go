@@ -205,11 +205,16 @@ func chanHandler() {
 	for {
 		select {
 		case req := <-fromServer:
-			fmt.Println("web server received: ", string(req.Payload))
+			fmt.Println("web server received: ", req.Payload)
 			//TODO: parse payload and send coordinates to correct ws session
 			//TODO: create process request
-			//msg := CustomProtocol.ParsePayload(req.Payload)
-			h.broadcast <- req.Payload
+			parsedPayload := CustomProtocol.ParsePayload(req.Payload)
+			msg := []byte{}
+			msg = append(msg, []byte(parsedPayload[1])...)
+			msg = append(msg, 0x1B)
+			msg = append(msg, []byte(parsedPayload[2])...)
+			fmt.Println(string(msg))
+			h.broadcast <- msg
 		}
 	}
 }

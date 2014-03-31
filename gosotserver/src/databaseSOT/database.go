@@ -126,7 +126,12 @@ func processRequest(req *CustomProtocol.Request) {
 		res[0] = 1
 		req.Response <- res
 	case CustomProtocol.FlagNotStolen:
-		flagNotStolen("laptop", payload[0])
+		//TODO: temp fix < 12
+		if len(payload[0]) < 12 {
+			flagNotStolen("gps", payload[0])
+		} else {
+			flagNotStolen("laptop", payload[0])
+		}
 		res := make([]byte, 2)
 		res[0] = 1
 		req.Response <- res
@@ -518,7 +523,7 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 
 	db := connect()
 
-	rows, res, err := db.Query("UPDATE gpsDevice SET latitude = '" + latitude + "', longitude = '" + longitude + "' WHERE deviceId = '" + deviceId + "'")
+	rows, res, err := db.Query("INSERT INTO coordinates(latitude, longitude, deviceId) SELECT '" + latitude + "', '" + longitude + "', id FROM gpsDevice WHERE deviceId = '" + deviceId + "'")
 	rows = rows
 	res = res
 

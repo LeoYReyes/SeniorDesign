@@ -73,6 +73,7 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	// Check for device type
 	deviceType := r.PostForm.Get("deviceType")
 	//deviceId := r.PostForm.Get("deviceId")
+	deviceCommand := r.PostForm.Get("deviceCommand")
 
 	buf = append(buf, []byte(r.PostForm.Get("deviceId"))...)
 	buf = append(buf, 0x1B)
@@ -80,23 +81,40 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch deviceType {
 	case "gps":
-		reqToDB := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
-			OpCode: CustomProtocol.ActivateGPS, Payload: buf, Response: resCh}
-		toServer <- reqToDB
 		// Default PIN-NUMBER for Geogram One
 		buf = append(buf, []byte("1234")...)
 		buf = append(buf, 0x1B)
-		// Default interval 60 seconds
-		buf = append(buf, []byte("60")...)
-		buf = append(buf, 0x1B)
-		reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
-			OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}
-		toServer <- reqToDevice
-
+		if deviceCommand == "1" {
+			reqToDB := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+				OpCode: CustomProtocol.ActivateGPS, Payload: buf, Response: resCh}
+			toServer <- reqToDB
+			// Default interval 60 seconds
+			buf = append(buf, []byte("60")...)
+			buf = append(buf, 0x1B)
+			reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
+				OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}
+			toServer <- reqToDevice
+		} else {
+			// send to database to flag not stolen
+			reqToDB := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+				OpCode: CustomProtocol.FlagNotStolen, Payload: buf, Response: resCh}
+			toServer <- reqToDB
+			// Deactivate command to device
+			reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
+				OpCode: CustomProtocol.SleepGeogram, Payload: buf, Response: nil}
+			toServer <- reqToDevice
+		}
 	case "laptop":
-		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
-			OpCode: CustomProtocol.FlagStolen, Payload: buf, Response: resCh}
-		toServer <- req
+		if deviceCommand == "1" {
+			req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+				OpCode: CustomProtocol.FlagStolen, Payload: buf, Response: resCh}
+			toServer <- req
+		} else {
+			// send to database to flag not stolen
+			reqToDB := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+				OpCode: CustomProtocol.FlagNotStolen, Payload: buf, Response: resCh}
+			toServer <- reqToDB
+		}
 	default:
 	}
 	res := <-resCh

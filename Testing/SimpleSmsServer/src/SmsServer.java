@@ -9,7 +9,7 @@ import java.net.Socket;
 public class SmsServer {
 	
 	public static void main(String args[]) throws Exception {
-		ServerSocket ss = new ServerSocket(11111);
+		ServerSocket ss = new ServerSocket(10016);
 		
 		while(true) {
 			System.out.println("Waiting for connection...");

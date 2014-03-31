@@ -64,56 +64,38 @@ $(function() {
 			$.ajax({
 				url: "/getDeviceInfo",
 				type: "GET",
-				
-			}).done(function(response) {
-				alert(JSON.stringify(response));
-				if(response != null) {
-					for(i = 0; i < response.length; i++) {
-						var box = createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen'], response[i]['TraceRouteList'], response[i]['KeylogData']);
-						deviceBoxes.push(box);
-						$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
-						var deviceButton = $("<li>", {id: response[i]['Name'], style: "padding: 9px;", value:i});
-						deviceButton.text(response[i]['Name']);
-						deviceButton.click(function() {
-							deviceBoxes[$(this).val()].toggle();
-						});
-						$("#deviceBoxRow").append(deviceBoxes[i]);
-						$("#deviceMenu").append(deviceButton);
-					}
-				} 
-				$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
-				var addDeviceButton = $("<li>", {id: "newDeviceButton", style: "padding: 9px;"});
-				addDeviceButton.text("Add Device");
-				addDeviceButton.click(function() {
-					$( "#dialog-form" ).dialog( "open" );
-				});
-				$("#deviceMenu").append(addDeviceButton);
-				$("#deviceBoxRow").append($("<div>", {class: "col-md-1"}));
-				/*$(".activateButton").each(function() {
-					alert(this);
-					this.click(function() {
-						//alert($(this).attr("id"));
-						var deviceType;
-						if($(this).attr("id").length < 12) {
-							deviceType = "gps";
-							} else {
-								deviceType = "laptop";	
-							}
-						alert(deviceType + " " + $(this).attr("id"));
-						$.ajax({
-							url: "/toggleDevice",
-							type: "POST",
-							data: {
-								deviceId: $(this).attr("id"),
-								deviceType: deviceType
-							}
-						}).done(function(e) {
-							//alert(e);
-						});
-						// send ajax to server, flag device stolen
-					});	
-				});*/
-				//alert(JSON.stringify(response[0]['Name']));
+				//dataType:"json",
+				success: function(response) {
+					//var response = $.parseJSON(data);
+					//alert(response.length);
+					//alert(JSON.stringify(response['responseText'][0]['Name']));
+					if(response != null) {
+						for(i = 0; i < response.length; i++) {
+							var box = createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen'], response[i]['TraceRouteList'], response[i]['KeylogData']);
+							deviceBoxes.push(box);
+							$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
+							var deviceButton = $("<li>", {id: response[i]['Name'], style: "padding: 9px;", value:i});
+							deviceButton.text(response[i]['Name']);
+							deviceButton.click(function() {
+								deviceBoxes[$(this).val()].toggle();
+							});
+							$("#deviceBoxRow").append(deviceBoxes[i]);
+							$("#deviceMenu").append(deviceButton);
+						}
+					} 
+					$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
+					var addDeviceButton = $("<li>", {id: "newDeviceButton", style: "padding: 9px;"});
+					addDeviceButton.text("Add Device");
+					addDeviceButton.click(function() {
+						$( "#dialog-form" ).dialog( "open" );
+					});
+					$("#deviceMenu").append(addDeviceButton);
+					$("#deviceBoxRow").append($("<div>", {class: "col-md-1"}));
+					//alert(JSON.stringify(response[0]['Name']));	
+				},
+				error: function(err) {
+					alert(JSON.stringify(err));
+				}
 			});
 			
 		}
@@ -142,7 +124,7 @@ $(function() {
 			
 			
 			
-            var showKeylogButton = $("<li>", {"data-toggle": "modal", "data-target": "modalKeylogger"});
+            var showKeylogButton = $("<li>", {"data-toggle": "modal", "data-target": "#modalKeylogger"});
             var showKeylogLink = $("<a>").text("Show Keylog");
             
 
@@ -181,8 +163,11 @@ $(function() {
 
 			
 			
-			var showIPListButton = $("<li>", {"data-toggle": "modal", "data-target": "modalIPList"});
+			var showIPListButton = $("<li>", {"data-toggle": "modal", "data-target": "#modalIPList"});
 			var showIPListLink = $("<a>").text("Show IPs");
+			showIPListLink.click(function() {
+				$("#modalIPList").find(".modal-footer").text(ipIn);
+			});
 			showIPListButton.append(showIPListLink);
 			
 			

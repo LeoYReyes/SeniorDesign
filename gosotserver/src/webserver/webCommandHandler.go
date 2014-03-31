@@ -4,6 +4,7 @@ import (
 	"CustomProtocol"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +123,18 @@ func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
 		OpCode: CustomProtocol.GetDeviceList, Payload: buf, Response: resCh}
 	toServer <- req
 	res := <-resCh
-	fmt.Println("Response: ", res[0])
+	str := string(res)
+	resLaptop := str[:strings.Index(str, string(0x1B))-1]
+	resGPS := str[strings.Index(str, string(0x1B))+2:]
+	//fmt.Println(resLaptop)
+	//fmt.Println(resGPS)
+	//fmt.Println([]byte(resLaptop))
+	finalRes := []byte{}
+	finalRes = append(finalRes, []byte(resLaptop)...)
+	finalRes = append(finalRes, 0x2C)
+	finalRes = append(finalRes, []byte(resGPS)...)
+	//fmt.Println("Response: ", res)
+	//fmt.Println("JSON: ", string(res))
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(res)
+	fmt.Println(w.Write(finalRes))
 }

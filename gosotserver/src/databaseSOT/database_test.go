@@ -29,17 +29,19 @@ func TestParsePayload(t *testing.T) {
 	t.Log("parsePayload([]byte) test passed.")
 }
 
-/*func TestIsDeviceStolen(t *testing.T) {
-	if IsDeviceStolen("3344449464") {
+func TestIsDeviceStolen(t *testing.T) {
+
+	//fmt.Println(IsDeviceStolen("1"))
+	if IsDeviceStolen("1") == true {
 		t.Log("IsDeviceStolen(string) test passed.")
 	} else {
 		t.Error("IsDeviceStolen(string) did not work as expected.")
 	}
-}*/
+}
 
 func TestVerifyAccountInfo(t *testing.T) {
-	userName := "Test@Test.com"
-	password := "test"
+	userName := "saw0019@auburn.edu"
+	password := "steven"
 	h := sha1.New()
 	h.Write([]byte(strings.Join([]string{userName, password}, "")))
 	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
@@ -53,9 +55,18 @@ func TestVerifyAccountInfo(t *testing.T) {
 }
 
 func TestGetLaptopDevices(t *testing.T) {
-	userName := "Test@Test.com"
+	//gps device must be present
+	userName := "saw0019@auburn.edu"
 	jsonList := getLaptopDevices(userName)
 	fmt.Println("GetLaptopDevice TEST")
+	fmt.Println(string(jsonList))
+}
+
+func TestGetGpsDevices(t *testing.T) {
+	//gps device must be present
+	userName := "saw0019@auburn.edu"
+	jsonList := getGpsDevices(userName)
+	fmt.Println("GetGpsDevice TEST")
 	fmt.Println(string(jsonList))
 }
 

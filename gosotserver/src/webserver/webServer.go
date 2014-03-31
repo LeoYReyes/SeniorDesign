@@ -213,7 +213,7 @@ func chanHandler() {
 			msg = append(msg, []byte(parsedPayload[1])...)
 			msg = append(msg, 0x1B)
 			msg = append(msg, []byte(parsedPayload[2])...)
-			fmt.Println(string(msg))
+			fmt.Println(msg)
 			h.broadcast <- msg
 		}
 	}

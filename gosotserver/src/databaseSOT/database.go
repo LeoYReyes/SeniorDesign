@@ -722,7 +722,6 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 * of all the devices owned by the user.
 *
 *
-* Leo Reyes
  */
 func getLaptopDevices(email string) []byte {
 

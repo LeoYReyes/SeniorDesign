@@ -142,17 +142,20 @@ func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
 	toServer <- req
 	res := <-resCh
 	str := string(res)
-	resLaptop := str[:strings.Index(str, string(0x1B))-1]
-	resGPS := str[strings.Index(str, string(0x1B))+2:]
-	//fmt.Println(resLaptop)
-	//fmt.Println(resGPS)
-	//fmt.Println([]byte(resLaptop))
 	finalRes := []byte{}
-	finalRes = append(finalRes, []byte(resLaptop)...)
-	finalRes = append(finalRes, 0x2C)
-	finalRes = append(finalRes, []byte(resGPS)...)
-	//fmt.Println("Response: ", res)
-	//fmt.Println("JSON: ", string(res))
-	w.Header().Set("Content-Type", "application/json")
+	//fmt.Println(len(str))
+	if len(str) > 10 {
+		resLaptop := str[:strings.Index(str, string(0x1B))-1]
+		resGPS := str[strings.Index(str, string(0x1B))+2:]
+		//fmt.Println(resLaptop)
+		//fmt.Println(resGPS)
+		//fmt.Println([]byte(resLaptop))
+		finalRes = append(finalRes, []byte(resLaptop)...)
+		finalRes = append(finalRes, 0x2C)
+		finalRes = append(finalRes, []byte(resGPS)...)
+		//fmt.Println("Response: ", res)
+		//fmt.Println("JSON: ", string(res))
+		w.Header().Set("Content-Type", "application/json")
+	}
 	fmt.Println(w.Write(finalRes))
 }

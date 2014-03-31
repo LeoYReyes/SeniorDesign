@@ -69,6 +69,7 @@ $(function() {
 					//var response = $.parseJSON(data);
 					//alert(response.length);
 					//alert(JSON.stringify(response['responseText'][0]['Name']));
+					//alert(response);
 					if(response != null) {
 						for(i = 0; i < response.length; i++) {
 							var box = createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen'], response[i]['TraceRouteList'], response[i]['KeylogData']);
@@ -77,6 +78,11 @@ $(function() {
 							var deviceButton = $("<li>", {id: response[i]['Name'], style: "padding: 9px;", value:i});
 							deviceButton.text(response[i]['Name']);
 							deviceButton.click(function() {
+								for(j = 0; j < deviceBoxes.length; j++) {
+									if(j != $(this).val()) {
+										deviceBoxes[j].hide();
+									}
+								}
 								deviceBoxes[$(this).val()].toggle();
 							});
 							$("#deviceBoxRow").append(deviceBoxes[i]);
@@ -94,7 +100,7 @@ $(function() {
 					//alert(JSON.stringify(response[0]['Name']));	
 				},
 				error: function(err) {
-					alert(JSON.stringify(err));
+					alert("ERROR:" + JSON.stringify(err));
 				}
 			});
 			

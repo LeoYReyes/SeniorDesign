@@ -69,7 +69,8 @@ $(function() {
 				alert(JSON.stringify(response));
 				if(response != null) {
 					for(i = 0; i < response.length; i++) {
-						deviceBoxes.push(createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen']));
+						var box = createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen'], response[i]['TraceRouteList'], response[i]['KeylogData']);
+						deviceBoxes.push(box);
 						$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
 						var deviceButton = $("<li>", {id: response[i]['Name'], style: "padding: 9px;", value:i});
 						deviceButton.text(response[i]['Name']);
@@ -88,12 +89,36 @@ $(function() {
 				});
 				$("#deviceMenu").append(addDeviceButton);
 				$("#deviceBoxRow").append($("<div>", {class: "col-md-1"}));
+				/*$(".activateButton").each(function() {
+					alert(this);
+					this.click(function() {
+						//alert($(this).attr("id"));
+						var deviceType;
+						if($(this).attr("id").length < 12) {
+							deviceType = "gps";
+							} else {
+								deviceType = "laptop";	
+							}
+						alert(deviceType + " " + $(this).attr("id"));
+						$.ajax({
+							url: "/toggleDevice",
+							type: "POST",
+							data: {
+								deviceId: $(this).attr("id"),
+								deviceType: deviceType
+							}
+						}).done(function(e) {
+							//alert(e);
+						});
+						// send ajax to server, flag device stolen
+					});	
+				});*/
 				//alert(JSON.stringify(response[0]['Name']));
 			});
 			
 		}
 		
-		function createDeviceBox(deviceNameIn, deviceId, deviceStatusIn) {
+		function createDeviceBox(deviceNameIn, deviceId, deviceStatusIn, ipIn, keylogIn) {
 			var deviceDiv = $("<div>", {id: deviceNameIn, class: "col-md-3 deviceInfo"});
 			var row = $("<div>", {class: "row"});
 			var colmd12 = $("<div>", {class: "col-md-12"});
@@ -108,35 +133,95 @@ $(function() {
 			deviceName.text(deviceNameIn);
 			var li2 = $("<li>");
 			var deviceStatus = $("<h5>");
-			deviceStatus.text(deviceStatusIn);
+			if(deviceStatusIn == "49") {
+				deviceStatus.text("Stolen");
+			} else {
+				deviceStatus.text("Not Stolen");	
+			}
 			//alert(deviceId);
-			var activateDeviceButton = $("<div>", {id: deviceId});
-			activateDeviceButton.text(deviceNameIn);
+			
+			
+			
+            var showKeylogButton = $("<li>", {"data-toggle": "modal", "data-target": "modalKeylogger"});
+            var showKeylogLink = $("<a>").text("Show Keylog");
+            
 
-			activateDeviceButton.click(function(e) {
-				//alert($(this).attr("id"));
-				var deviceType;
-				if($(this).attr("id").length < 12) {
-					deviceType = "gps";
-				} else {
-					deviceType = "laptop";	
-				}
-				alert(deviceType);
-				$.ajax({
-					url: "/toggleDevice",
-					type: "POST",
-					data: {
-						deviceId: $(this).attr("id"),
-						deviceType: deviceType
-					}
-				});
-				// send ajax to server, flag device stolen
-			});
+			showKeylogButton.click(function(){
+                var keyDiv = $("<div>", {class: "modal fade", id: "modalKeylogger", "tabindex": "-1", role: "dialog", "aria-labelledby":"myModalLabel", "aria-hidden":"true"});
+                var keyDiv2 = $("<div>", {class: "modal-lg", style: "margin: 30px auto", style: "margin-top: 80px"});
+                var keyDiv3 = $("<div>", {class: "modal-content"});
+                var keyDiv4 = $("<div>", {class: "modal-body"});
+                var keyH3 = $("<h3>", {class: "modal-title", id: "myModalLabel"});
+                    keyH3.text(deviceNameIn + "Keylog: ");
+                var keyH5 = $("<h5>", {class: "modal-title"});
+                    keyH5.text(keylogIn);
+                var keyDiv5 = $("<div>", {class: "modal-footer"});
+				
+                var keyButtonClose = $("<button>", {type:"button", class:"btn btn-default", "data-dismiss":"modal"});
+                    keyButtonClose.text("Close");
+                var keyButtonDownload = $("<button>", {type:"button", class:"btn btn-primary"});
+                    keyButtonDownload.text("Download");
+        
+                showKeylogButton.append(keyDiv);
+				keyDiv.append(keyDiv2);
+                keyDiv2.append(keyDiv3);
+                keyDiv3.append(keyDiv4);
+                keyDiv3.append(keyDiv5);
+                keyDiv4.append(keyH3);
+                keyDiv4.append(keyH5);
+                keyDiv5.append(keyButtonClose);
+                keyDiv5.append(keyButtonDownload);
+                }
+            )
+
+				showKeylogButton.append(showKeylogLink);
+ 
+
+
+
+			
+			
+			var showIPListButton = $("<li>", {"data-toggle": "modal", "data-target": "modalIPList"});
+			var showIPListLink = $("<a>").text("Show IPs");
+			showIPListButton.append(showIPListLink);
+			
+			
+			var activateDeviceButton = $("<div>", {id: deviceId, class: "activateButton"});
+			activateDeviceButton.text("Activate");
+			activateDeviceButton.click(function() {
+					//alert($(this).attr("id"));
+					var deviceType;
+					if($(this).attr("id").length < 12) {
+						deviceType = "gps";
+						} else {
+							deviceType = "laptop";	
+						}
+					//alert(deviceType + " " + $(this).attr("id"));
+					$.ajax({
+						url: "/toggleDevice",
+						type: "POST",
+						data: {
+							/*//FOR TESTING
+							deviceId: "2567978990",
+							deviceType: "gps"*/
+							deviceId: $(this).attr("id"),
+							deviceType: deviceType
+						}
+					}).done(function(e) {
+						//alert(e);
+					});
+					// send ajax to server, flag device stolen
+				});	
+			
+			
+			
 			li2.append(deviceStatus);
 			li.append(deviceName);
 			colmd10.append(li);
 			colmd10.append(li2);
+			colmd10.append(showIPListButton);
 			colmd10.append(activateDeviceButton);
+			colmd10.append(showKeylogButton);
 			row2.append(colmd1);
 			row2.append(colmd10);
 			ul.append(row2);
@@ -147,4 +232,38 @@ $(function() {
 			deviceDiv.append(row);
 			return deviceDiv;
 		}
+		
+		
+
+			
+		
+		
 });
+
+
+function showKeylog(){
+	
+	Downloadify.create('downloadify',{
+		
+		filename: function(){
+			return document.getElementById('filename').value;
+		},
+		
+		data: function(){ 
+			return document.getElementById('data').value;
+		},
+		
+		onComplete: function(){ alert('Your File Has Been Saved!'); },
+		onCancel: function(){ alert('You have cancelled the saving of this file.'); },
+		onError: function(){ alert('You must put something in the File Contents or there will be nothing to save!'); },
+		
+		swf: 'media/downloadify.swf',
+		downloadImage: 'images/download.png',
+		width: 100,
+		height: 30,
+		transparent: true,
+		append: false
+		
+	});
+	
+}

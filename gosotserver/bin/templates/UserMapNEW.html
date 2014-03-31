@@ -11,6 +11,8 @@
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/devices.js"></script>
     <link rel="stylesheet" type="text/css" href="css/default.css"></link>
+	<script type="text/javascript" src="js/swfobject.js"></script>
+	<script type="text/javascript" src="js/downloadify.min.js"></script>
 </head>
 <body>
 
@@ -95,6 +97,21 @@
 
 <!-- Modals: -->
 
+	<!-- IP LIST -->
+	<div class="modal fade" id="modalIPList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  		<div class="modal-lg" style="margin: 30px auto; margin-top: 80px">
+    		<div class="modal-content">
+      			<div class="modal-body">
+        			<h3 class="modal-title" id="myModalLabel"><!--{{.DeviceName}}--> IP List:</h3>
+        			<h5 class="modal-title"><!--{{.KeyloggerText}}--></h5>
+      			</div>
+      			<div class="modal-footer">
+        			
+      			</div>
+    		</div>
+  		</div>
+	</div> 
+
 	<!-- Rename Device PopOut -->
 	<div class="modal fade" id="modalRename" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-dialog" style="margin: 30px auto; margin-top: 80px">
@@ -147,7 +164,21 @@
         			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
         			<h4 class="modal-title" id="myModalLabel"><!--{{.DeviceName}}--></h4>
      			</div>
-      			<div class="modal-body">
+      			<div class="modal-body" onload="showKeylog();">
+					<form>
+						<p>
+							<input type="text" name="filename" id="filename" value="Keylogger" style="border: none" />
+						</p>
+						<p>
+							<label for="data">File Contents</label><br />
+							<input type="text" name="data" id="data" value="keylogger" disabled></input>
+						</p>
+			
+						<p id="downloadify">
+							Somethings not set up right...
+						</p>
+					</form>
+					<div class="modal-body">
         			<h4 class="modal-title" id="myModalLabel">Are you sure you want to delete device "<!--{{.DeviceName}}-->"?</h4>
       			</div>
       			<div class="modal-footer">
@@ -157,6 +188,7 @@
     		</div>
   		</div>
 	</div> 
+    </div>
 </div> <!-- END #wrapper -->
 	</body>
 </html>

@@ -15,7 +15,10 @@
 
 .deviceInfo {
 	display: none;
+	position: fixed;
 	margin-top: -900px;
+	margin-left: 55%;
+	width: 275px;
 }
 
 #google_map {
@@ -23,6 +26,9 @@
 	height: 1000px;
 }
 
+#deviceMenu li {
+	cursor: pointer;	
+}
 .activateButton {
 	cursor: pointer;
 	width:          100px;

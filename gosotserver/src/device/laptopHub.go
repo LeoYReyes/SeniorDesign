@@ -189,12 +189,17 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	if deviceConn.ld.CheckIfStolen() {
 		fmt.Println("CheckIfStolen request returned true")
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagStolen, "")
+		// SEND requests to laptop upon connection, if stolen
 		requestTraceRoute := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserIPTraceData, "")
+		requestKeyLog := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserKeylogData, "")
 		if !sentStolen {
 			fmt.Println("Error sending stolen code.")
 		}
 		if !requestTraceRoute {
 			fmt.Println("laptopHub.GetDeviceID: Error sending request traceroute")
+		}
+		if !requestKeyLog {
+			fmt.Println("laptopHub.GetDeviceID: Eror sending request keylog")
 		}
 		go GetMessage(*deviceConn)
 	} else { //if CheckIfStolen returns false

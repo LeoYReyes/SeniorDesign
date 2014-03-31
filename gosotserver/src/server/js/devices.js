@@ -135,7 +135,20 @@ $(function() {
 				
 				
 				showKeylogButton.click(function(){
-					var keyDiv = $("<div>", {class: "modal fade", id: "modalKeylogger", "tabindex": "-1", role: "dialog", "aria-labelledby":"myModalLabel", "aria-hidden":"true"});
+					//alert(keylogIn[0].substring(keylogIn[0].indexOf("&") + 1));
+					// Clear text
+					$("#modalKeylogger").find(".modal-footer").text("");
+					for(i = 0; i < keylogIn.length; i++) {
+						//alert(ipIn[i]);
+						$("#modalKeylogger").find(".modal-footer").append($("<h4>").text(keylogIn[i].substring(0, keylogIn[i].indexOf("&"))));
+						//var ipList = ipIn[i].substring(ipIn[i].indexOf("&") + 1).split("~");
+						for(j = 0; j < keylogIn.length; j++) {
+							$("#modalKeylogger").find(".modal-footer").append(keylogIn[i].substring(keylogIn[i].indexOf("&") + 1));
+							$("#modalKeylogger").find(".modal-footer").append("<br>");
+						}
+						$("#modalKeylogger").find(".modal-footer").append("<br>");
+					}
+					/*var keyDiv = $("<div>", {class: "modal fade", id: "modalKeylogger", "tabindex": "-1", role: "dialog", "aria-labelledby":"myModalLabel", "aria-hidden":"true"});
 					var keyDiv2 = $("<div>", {class: "modal-lg", style: "margin: 30px auto", style: "margin-top: 80px"});
 					var keyDiv3 = $("<div>", {class: "modal-content"});
 					var keyDiv4 = $("<div>", {class: "modal-body"});
@@ -159,8 +172,8 @@ $(function() {
 					keyDiv4.append(keyH5);
 					keyDiv5.append(keyButtonClose);
 					keyDiv5.append(keyButtonDownload);
-					}
-				);
+					}*/
+				});
 				
 				showKeylogButton.append(showKeylogLink);
 				// Parse ipIn into timestamp and multiple ip addresses

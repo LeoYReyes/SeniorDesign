@@ -385,7 +385,7 @@ func IsDeviceStolen(deviceId string) bool {
 	fmt.Println("DeviceId len: ", len(deviceId))
 	//TODO: < 12 temp fix
 	if len(deviceId) < 12 {
-		rows, res, err := db.Query("select isStolen from gpsDevice where phoneNumber = '" + deviceId + "'")
+		rows, res, err := db.Query("select isStolen from gpsDevice where deviceId = '" + deviceId + "'")
 		if err != nil {
 			panic(err)
 		}

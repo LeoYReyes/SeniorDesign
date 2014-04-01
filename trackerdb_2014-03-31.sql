@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.6.15)
 # Database: trackerdb
-# Generation Time: 2014-03-23 21:35:35 +0000
+# Generation Time: 2014-04-01 03:07:38 +0000
 # ************************************************************
 
 
@@ -47,7 +47,7 @@ CREATE TABLE `coordinates` (
   `deviceId` int(11) NOT NULL,
   `latitude` double DEFAULT NULL,
   `longitude` double DEFAULT NULL,
-  `timestamp` timestamp NULL DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   KEY `coordsToGpsDevice` (`deviceId`),
@@ -80,7 +80,7 @@ DROP TABLE IF EXISTS `gpsDevice`;
 
 CREATE TABLE `gpsDevice` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `deviceName` varchar(50) DEFAULT NULL,
+  `deviceName` varchar(30) DEFAULT NULL,
   `customerId` int(11) DEFAULT NULL,
   `deviceId` varchar(10) DEFAULT NULL COMMENT 'deviceId for gpsDevices are phone numbers',
   `isStolen` int(1) NOT NULL DEFAULT '0',
@@ -98,7 +98,7 @@ DROP TABLE IF EXISTS `ipAddress`;
 
 CREATE TABLE `ipAddress` (
   `listId` int(11) NOT NULL,
-  `ipAddress` varchar(15) DEFAULT NULL,
+  `ipAddress` varchar(20) DEFAULT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`),
   KEY `ipAddressToList` (`listId`),
@@ -115,7 +115,7 @@ DROP TABLE IF EXISTS `ipList`;
 CREATE TABLE `ipList` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `deviceId` int(11) DEFAULT NULL,
-  `timestamp` timestamp NULL DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `ipListToDevice` (`deviceId`),
   CONSTRAINT `ipListToDevice` FOREIGN KEY (`deviceId`) REFERENCES `laptopDevice` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
@@ -130,8 +130,10 @@ DROP TABLE IF EXISTS `keyLogs`;
 
 CREATE TABLE `keyLogs` (
   `deviceId` int(11) NOT NULL,
-  `timestamp` timestamp NULL DEFAULT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `data` text,
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`id`),
   KEY `keyLogToDevice` (`deviceId`),
   CONSTRAINT `keyLogToDevice` FOREIGN KEY (`deviceId`) REFERENCES `laptopDevice` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

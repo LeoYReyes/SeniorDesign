@@ -362,6 +362,7 @@ namespace WindowsServiceTracker
                         if (reportedStolen && keylogStopwatch.ElapsedMilliseconds > keylogFrequency)
                         {
                             sendKeylog();
+                            keylogStopwatch.Restart();
                         }
                     }
                 }

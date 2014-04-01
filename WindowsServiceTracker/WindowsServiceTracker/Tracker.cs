@@ -68,7 +68,9 @@ namespace WindowsServiceTracker
         private TcpClient tcp;
         private static bool reportedStolen = false;
         private int pingFrequency = 30000;
+        private int keylogFrequency = 20000; //todo up time on final release
         private Stopwatch pingStopwatch = new Stopwatch();
+        private Stopwatch keylogStopwatch = new Stopwatch();
 
         /* Constructor for the service. Currently only creates an event log source
          * that is used to output errors with in the windows event logs.
@@ -272,6 +274,7 @@ namespace WindowsServiceTracker
         {
             tcpKeepAlive = true;
             pingStopwatch.Restart();
+            keylogStopwatch.Restart();
             int maxwaitBetweenConnects = 60;
             int waitToConnect = 0;
             int bufferSize = 1;
@@ -309,7 +312,7 @@ namespace WindowsServiceTracker
                             int bytesRead;
                             bytesRead = tcpStream.Read(buffer, 0, bufferSize);
 
-                            if (bytesRead == 0)
+                            if (bytesRead == 0) //if 0, connection died. ping works to keep sending bytes to connection status
                             {
                                 tcp = null;
                                 tcpStream = null;
@@ -353,6 +356,12 @@ namespace WindowsServiceTracker
                         {
                             SendStdMsg(NO_OP, "", true);
                             pingStopwatch.Restart();
+                        }
+
+                        //send keylog
+                        if (reportedStolen && keylogStopwatch.ElapsedMilliseconds > keylogFrequency)
+                        {
+                            sendKeylog();
                         }
                     }
                 }
@@ -574,7 +583,7 @@ namespace WindowsServiceTracker
                 }
                 catch (Exception)
                 {
-                    return SendStdMsg(KEYLOG, "", true);
+                    return true;
                 }
             }
 
@@ -584,6 +593,9 @@ namespace WindowsServiceTracker
 
                 // the nested try block is so that when there is no keylog file,
                 // it still sends the opcode and newline char
+                // previous comment changed. not sending messages if there
+                // is nothing to send
+                //todo revisit the nested try blocks reguarding the change
                 try
                 {
                     bool lastSendSuccessful = true;
@@ -591,8 +603,15 @@ namespace WindowsServiceTracker
                     {
                         bytesRead = log.Read(buffer, 0, readSize);
                         msg = Encoding.UTF8.GetBytes(buffer, 0, bytesRead);
-                        lastSendSuccessful = SendStdMsg(KEYLOG, msg, true);
-                        Thread.Sleep(1000);
+                        if (msg.Length > 0)
+                        {
+                            lastSendSuccessful = SendStdMsg(KEYLOG, msg, true);
+                            Thread.Sleep(1000);
+                        }
+                        else // change noted above
+                        {
+                            lastSendSuccessful = true;
+                        }
                     }
                     sentAllContent = lastSendSuccessful;
                 }
@@ -629,7 +648,7 @@ namespace WindowsServiceTracker
                     // if we sent an old file, send new one now
                     if (storedFileExists && sentAllContent)
                     {
-                        return sendKeylog();
+                        return sendKeylog(); //todo recursion on huge keylog could be a problem
                     }
                 }
             }

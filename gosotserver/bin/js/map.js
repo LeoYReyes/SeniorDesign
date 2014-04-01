@@ -49,8 +49,8 @@ socket.onopen = function() {
 
 socket.onmessage = function(msg){
     //alert(msg.data); //Awesome!
-	var lat = parseFloat(msg.data.substring(0, msg.data.lastIndexOf(",")));
-	var longitude = parseFloat(msg.data.substring(msg.data.lastIndexOf(",") + 1,msg.data.length));
+	var lat = parseFloat(msg.data.substring(0, msg.data.indexOf(String.fromCharCode(27))));
+	var longitude = parseFloat(msg.data.substring(msg.data.indexOf(String.fromCharCode(27)) + 1, msg.data.length));
 	var markerPos = new google.maps.LatLng(lat, longitude);
 	if(currentPosition) {
 		currentPosition.setIcon(ghostMarkerImg);

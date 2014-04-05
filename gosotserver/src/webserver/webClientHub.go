@@ -1,11 +1,15 @@
 package webserver
 
+import (
+	"CustomProtocol"
+)
+
 // hub maintains the set of active connections and broadcasts messages to the
 // connections.
 
 type hub struct {
 	// Registered connections
-	connections map[*connection]bool
+	connections map[string]*connection
 
 	// Broadcast message
 	broadcast chan []byte
@@ -29,7 +33,7 @@ var h = hub{
 	outMessage:  make(chan []byte), // Receive only channel
 	register:    make(chan *connection),
 	unregister:  make(chan *connection),
-	connections: make(map[*connection]bool),
+	connections: make(map[string]*connection),
 }
 
 func updateClientMap() {
@@ -40,19 +44,35 @@ func (h *hub) run() {
 	for {
 		select {
 		case c := <-h.register:
-			h.connections[c] = true
+			for _, deviceId := range c.gpsDeviceList {
+				h.connections[deviceId] = c
+			}
 		case c := <-h.unregister:
-			delete(h.connections, c)
+			for _, deviceId := range c.gpsDeviceList {
+				delete(h.connections, deviceId)
+			}
 			close(c.send)
 		case m := <-h.broadcast:
-			for c := range h.connections {
+			// m is a []byte separated by 0x1B
+			parsedPayload := CustomProtocol.ParsePayload(m)
+			// NOTE: parsedPayload[0] == deviceId (Phone Number)
+
+			msg := []byte{}
+			// Latitude
+			msg = append(msg, []byte(parsedPayload[1])...)
+			msg = append(msg, 0x1B)
+			// Longitude
+			msg = append(msg, []byte(parsedPayload[2])...)
+			h.connections[parsedPayload[0]].send <- msg
+
+			/*for c := range h.connections {
 				select {
 				case c.send <- m:
 				default:
 					close(c.send)
 					delete(h.connections, c)
 				}
-			}
+			}*/
 		}
 	}
 }

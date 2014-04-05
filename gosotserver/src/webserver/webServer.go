@@ -208,13 +208,22 @@ func chanHandler() {
 			fmt.Println("web server received: ", req.Payload)
 			//TODO: parse payload and send coordinates to correct ws session
 			//TODO: create process request
-			parsedPayload := CustomProtocol.ParsePayload(req.Payload)
-			msg := []byte{}
+			//parsedPayload := CustomProtocol.ParsePayload(req.Payload)
+
+			/*msg := []byte{}
+			// DeviceId, Phone Number
+			msg = append(msg, []byte(parsedPayload[0])...)
+			msg = append(msg, 0x1B)
+			// Latitude
 			msg = append(msg, []byte(parsedPayload[1])...)
 			msg = append(msg, 0x1B)
+			// Longitude
 			msg = append(msg, []byte(parsedPayload[2])...)
-			fmt.Println(msg)
-			h.broadcast <- msg
+			msg = append(msg, 0x1B)
+
+			fmt.Println(msg)*/
+
+			h.broadcast <- req.Payload
 		}
 	}
 }

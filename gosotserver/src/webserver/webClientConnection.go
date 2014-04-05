@@ -37,8 +37,8 @@ type connection struct {
 	// The websocket connection
 	ws *websocket.Conn
 
-	// Devices associated with connection
-	//deviceList []device.Device
+	// GPS Device IDs associated with connection
+	gpsDeviceList []string
 
 	// Buffered channel of outbound messages
 	send chan []byte
@@ -126,8 +126,29 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	//TODO: see user info from r (*http.Request) get deviceID list from session
-	//req := CustomRequest.CustomRequest{}
-	c := &connection{send: make(chan []byte, 256), ws: ws}
+	_, cookieErr := r.Cookie("userSession")
+	sesh, _ := store.Get(r, "userSession")
+	if cookieErr != nil {
+		fmt.Println("Cookie Error: ", cookieErr)
+	} else {
+
+	}
+	userName := string(sesh.Values["userId"].(string))
+
+	resCh := make(chan []byte)
+	buf := []byte{}
+	buf = append(buf, []byte("gps")...)
+	buf = append(buf, 0x1B)
+	buf = append(buf, []byte(userName)...)
+	buf = append(buf, 0x1B)
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+		OpCode: CustomProtocol.GetDevice, Payload: buf, Response: resCh}
+
+	toServer <- req
+	res := <-resCh
+	list := CustomProtocol.ParsePayload(res)
+
+	c := &connection{send: make(chan []byte, 256), ws: ws, gpsDeviceList: list}
 	h.register <- c
 	go c.writePump()
 	c.readPump()

@@ -12,7 +12,9 @@
 	margin-top: -990px;
 	margin-left: 130px;
 }
-
+.navbar-default {
+	box-shadow: 10px 10px 10px #888888;	
+}
 .deviceInfo {
 	display: none;
 	position: fixed;

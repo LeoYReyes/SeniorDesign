@@ -1,3 +1,4 @@
+//TODO: comment this code!!
 $(function() {
 	deviceInfo();
 	var deviceBoxes = [];
@@ -64,12 +65,7 @@ $(function() {
 			$.ajax({
 				url: "/getDeviceInfo",
 				type: "GET",
-				//dataType:"json",
 				success: function(response) {
-					//var response = $.parseJSON(data);
-					//alert(response.length);
-					//alert(JSON.stringify(response['responseText'][0]['Name']));
-					//alert(response);
 					if(response != null) {
 						for(i = 0; i < response.length; i++) {
 							var box = createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen'], response[i]['TraceRouteList'], response[i]['KeylogData']);
@@ -189,8 +185,6 @@ $(function() {
 			}
 			
 			activateDeviceButton.click(function() {
-					//alert($(this).attr("id"));
-					//alert(deviceType + " " + $(this).attr("id"));
 					$.ajax({
 						url: "/toggleDevice",
 						type: "POST",
@@ -205,7 +199,6 @@ $(function() {
 					}).done(function(e) {
 						//alert(e);
 					});
-					// send ajax to server, flag device stolen
 				});	
 			
 			

@@ -57,10 +57,7 @@ $(function() {
 		$("input:radio[name=deviceType]").click(function() {
     		deviceType = $(this);
 		});
-		/*$( "#deviceMenu li" ).click(function() {
-			alert($("#" + $(this).attr("id")));
-			$("#" + $(this).attr("id")).toggle();
-		});*/
+
 		function deviceInfo() {
 			$.ajax({
 				url: "/getDeviceInfo",
@@ -68,7 +65,8 @@ $(function() {
 				success: function(response) {
 					if(response != null) {
 						for(i = 0; i < response.length; i++) {
-							var box = createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen'], response[i]['TraceRouteList'], response[i]['KeylogData']);
+							//alert(JSON.stringify(response[i]));
+							var box = createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen'], response[i]['TraceRouteList'], response[i]['KeylogData'], response[i]['Coordinates']);
 							deviceBoxes.push(box);
 							$("#deviceMenu").append($("<li>", {class: "divider", style: "margin:0px;"}));
 							var deviceButton = $("<li>", {id: response[i]['Name'], style: "padding: 9px;", value:i});
@@ -102,7 +100,7 @@ $(function() {
 			
 		}
 		
-		function createDeviceBox(deviceNameIn, deviceId, deviceStatusIn, ipIn, keylogIn) {
+		function createDeviceBox(deviceNameIn, deviceId, deviceStatusIn, ipIn, keylogIn, coordsIn) {
 			var deviceDiv = $("<div>", {id: deviceNameIn, class: "col-md-3 deviceInfo"});
 			var row = $("<div>", {class: "row"});
 			var colmd12 = $("<div>", {class: "col-md-12"});
@@ -170,6 +168,28 @@ $(function() {
 					
 				});
 				showIPListButton.append(showIPListLink);
+			} // END if(deviceType == "laptop")
+			if(deviceType == "gps") {
+				var showCoordListButton = $("<li>", {"data-toggle": "modal", "data-target": "#modalCoordList"});
+				var showCoordListLink = $("<a>").text("Show Coords");
+				
+				showCoordListLink.click(function() {
+					// Clear text
+					$("#modalCoordList").find(".modal-footer").text("");
+					for(i = 0; i < coordsIn.length; i++) {
+						//alert(ipIn[i]);
+						$("#modalCoordList").find(".modal-footer").append($("<h4>").text(coordsIn[i].substring(0, coordsIn[i].indexOf("&"))));
+						var coordList = coordsIn[i].substring(coordsIn[i].indexOf("&") + 1).split(String.fromCharCode(27));
+						$("#modalCoordList").find(".modal-footer").append("Latitude: ");
+						$("#modalCoordList").find(".modal-footer").append(coordList[0]);
+						$("#modalCoordList").find(".modal-footer").append("&nbsp;&nbsp;");
+						$("#modalCoordList").find(".modal-footer").append("Longitude: ");
+						$("#modalCoordList").find(".modal-footer").append(coordList[1]);
+						$("#modalCoordList").find(".modal-footer").append("<br>");
+					}
+					
+				});
+				showCoordListButton.append(showCoordListLink);
 			}
 			var activateDeviceButton = $("<div>", {id: deviceId, class: "activateButton"});
 			var deviceStatus = $("<h5>");
@@ -210,6 +230,9 @@ $(function() {
 			if(deviceType == "laptop") {
 				colmd10.append(showIPListButton);
 				colmd10.append(showKeylogButton);
+			}
+			if(deviceType == "gps") {
+				colmd10.append(showCoordListButton);	
 			}
 			colmd10.append(activateDeviceButton);
 			row2.append(colmd1);

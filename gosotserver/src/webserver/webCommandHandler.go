@@ -46,9 +46,9 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	if r.PostForm.Get("deviceType") == "gps" { //geogram setup
 		geogramBuf := []byte{}
 		geogramBuf = append(geogramBuf, []byte(r.PostForm.Get("deviceId"))...)
-		geogramBuf = append(buf, 0x1B)
-		geogramBuf = append(buf, []byte("1234")...) //todo hard-coded for now
-		geogramBuf = append(buf, 0x1B)
+		geogramBuf = append(geogramBuf, 0x1B)
+		geogramBuf = append(geogramBuf, []byte("1234")...) //todo hard-coded for now
+		geogramBuf = append(geogramBuf, 0x1B)
 		response := make(chan []byte)
 		geogramSetupReq := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 			OpCode: CustomProtocol.GeogramSetup, Payload: geogramBuf, Response: response}

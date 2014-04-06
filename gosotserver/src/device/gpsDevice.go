@@ -21,6 +21,7 @@ const (
 )
 
 type GPSDevice struct {
+	Coordinates []string
 	Device
 }
 

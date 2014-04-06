@@ -331,13 +331,23 @@ func getGpsDevices(email string) []byte {
 
 	for _, gps := range gpsRows {
 
-		//gpsId := string(gps[0].([]byte))
+		gpsId := string(gps[0].([]byte))
 		gpsName := string(gps[1].([]byte))
 		deviceId := string(gps[3].([]byte))
 		isStolen := gps[4].([]byte)
+		// Get all coordinates related to device
+		gpsCoordRows, _, _ := db.Query("SELECT * FROM coordinates WHERE deviceId='" + gpsId + "'")
 
+		// Create list of coordinates to add to GPSDevice struct
+		coordList := []string{}
+		for _, coordRow := range gpsCoordRows {
+			str := ""
+			// Create string of timestamp&latitudeESClongitude
+			str = string(coordRow[3].([]byte)) + "&" + string(coordRow[1].([]byte)) + string(0x1B) + string(coordRow[2].([]byte))
+			coordList = append(coordList, str)
+		}
 		// Create GpsDevice struct and append to list of devices
-		list = append(list, device.GPSDevice{device.Device{deviceId, gpsName, isStolen[0]}})
+		list = append(list, device.GPSDevice{coordList, device.Device{deviceId, gpsName, isStolen[0]}})
 	}
 
 	disconnect(db)
@@ -740,7 +750,7 @@ func getLaptopDevices(email string) []byte {
 	//adding laptopDevices to the the devices list
 	laptopRows, _, laptopErr := db.Query("select * from laptopDevice where customerId = '" + customerId + "'")
 	if laptopErr != nil {
-		panic(laptopErr)
+		fmt.Println(laptopErr)
 	}
 
 	for _, laptop := range laptopRows {
@@ -767,7 +777,7 @@ func getLaptopDevices(email string) []byte {
 			// Query for ip addresses related to the ip list
 			ipAddressRows, _, ipAddressErr := db.Query("SELECT * FROM ipAddress WHERE listId = '" + ipListId + "'")
 			if ipAddressErr != nil {
-				panic(ipAddressErr)
+				fmt.Println(ipAddressErr)
 			}
 			for _, ipAddress := range ipAddressRows {
 				traceRoute += string(ipAddress[1].([]byte)) + "~"
@@ -781,7 +791,7 @@ func getLaptopDevices(email string) []byte {
 		// Query for Key Logs related to laptop
 		keyLogsRows, _, keyLogsErr := db.Query("SELECT * FROM keyLogs WHERE deviceId = '" + laptopId + "'")
 		if keyLogsErr != nil {
-			panic(keyLogsErr)
+			fmt.Println(keyLogsErr)
 		}
 		for _, keyLogs := range keyLogsRows {
 			keyLog := string(keyLogs[1].([]byte)) + "&" + string(keyLogs[2].([]byte))

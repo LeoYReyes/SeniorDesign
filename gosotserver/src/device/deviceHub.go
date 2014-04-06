@@ -168,7 +168,6 @@ func processRequest(req *CustomProtocol.Request) {
 		} else {
 			req.Response <- []byte{0}
 		}
-	//todo find where this is in memory. found it, at 200
 	//params: phone number, PIN
 	case CustomProtocol.GeogramSetup:
 		fmt.Println("processing geogram setup")

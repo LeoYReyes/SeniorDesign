@@ -103,6 +103,8 @@ func GPSCommunicate(conn net.Conn) {
 						motionAlert(number)
 					} else if strings.Contains(received, GEOFENCE_ALERT) {
 						//todo add functionality for geofence alerts
+					} else {
+						fmt.Println("Message format not recognized")
 					}
 				}
 			}

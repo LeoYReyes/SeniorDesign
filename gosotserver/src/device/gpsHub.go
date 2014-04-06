@@ -19,6 +19,11 @@ import (
 	"time"
 )
 
+const (
+	INTERVAL_TIME     = "60"
+	MOTION_AWAKE_TIME = 300000 * time.Millisecond
+)
+
 var smsConn net.Conn
 var smsCh = make(chan string)
 
@@ -102,7 +107,7 @@ func GPSCommunicate(conn net.Conn) {
 					} else if strings.Contains(received, MOTION_ALERT) {
 						motionAlert(number)
 					} else if strings.Contains(received, GEOFENCE_ALERT) {
-						//todo add functionality for geofence alerts
+						//geofenceAlert(number) //todo uncomment when functional
 					} else {
 						fmt.Println("Message format not recognized")
 					}
@@ -128,6 +133,69 @@ func parsePhoneNumber(msg string) string {
 
 func motionAlert(phoneNumber string) {
 	fmt.Println(phoneNumber + " " + MOTION_ALERT)
+	go motionAlertTimer(phoneNumber)
+	/*
+		//report stolen
+		payload := append([]byte(phoneNumber), 0x1B)
+		response := make(chan []byte)
+		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
+			Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateGPS, Payload: payload,
+			Response: response}
+		toServer <- req
+		//add response check later
+		//interval gps request
+		pin := getPIN(phoneNumber)
+		interval := INTERVAL_TIME
+
+		payload2 := []byte(phoneNumber)
+		payload2 = append(payload2, 0x1B)
+		payload2 = append(payload2, []byte(pin)...)
+		payload2 = append(payload2, 0x1B)
+		payload2 = append(payload2, []byte(interval)...)
+		payload2 = append(payload2, 0x1B)
+		response2 := make(chan []byte)
+		req2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
+			Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateIntervalGps, Payload: payload2,
+			Response: response2}
+		toServer <- req2
+		//add response check later
+	*/
+}
+
+func motionAlertTimer(phoneNumber string) {
+	time.Sleep(MOTION_AWAKE_TIME)
+
+	//check if stolen
+	buf := []byte(phoneNumber)
+	buf = append(buf, 0x1B)
+
+	response := make(chan []byte)
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
+		Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.CheckDeviceStolen, Payload: buf,
+		Response: response}
+	toServer <- req
+	isStolen := <-response
+
+	if isStolen[0] != 1 {
+		//send sleep command
+		pin := getPIN(phoneNumber)
+
+		payload := []byte(phoneNumber)
+		payload = append(payload, 0x1B)
+		payload = append(payload, []byte(pin)...)
+		payload = append(payload, 0x1B)
+
+		response2 := make(chan []byte)
+		req2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
+			Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.SleepGeogram, Payload: payload,
+			Response: response2}
+		toServer <- req2
+		fmt.Println(phoneNumber + " has not left geofence. Sleeping")
+	}
+}
+
+func geofenceAlert(phoneNumber string) { //todo add functionality
+	fmt.Println(phoneNumber + " " + MOTION_ALERT)
 	//report stolen
 	payload := append([]byte(phoneNumber), 0x1B)
 	response := make(chan []byte)
@@ -137,8 +205,9 @@ func motionAlert(phoneNumber string) {
 	toServer <- req
 	//add response check later
 	//interval gps request
-	pin := "1234" //un-hardcode
-	interval := "60"
+	pin := getPIN(phoneNumber)
+	interval := INTERVAL_TIME
+
 	payload2 := []byte(phoneNumber)
 	payload2 = append(payload2, 0x1B)
 	payload2 = append(payload2, []byte(pin)...)
@@ -151,6 +220,10 @@ func motionAlert(phoneNumber string) {
 		Response: response2}
 	toServer <- req2
 	//add response check later
+}
+
+func getPIN(phoneNumber string) string {
+	return "1234"
 }
 
 /*

@@ -2,6 +2,7 @@ package webserver
 
 import (
 	"CustomProtocol"
+	"fmt"
 )
 
 // hub maintains the set of active connections and broadcasts messages to the
@@ -47,6 +48,7 @@ func (h *hub) run() {
 			for _, deviceId := range c.gpsDeviceList {
 				h.connections[deviceId] = c
 			}
+			fmt.Println(h.connections)
 		case c := <-h.unregister:
 			for _, deviceId := range c.gpsDeviceList {
 				delete(h.connections, deviceId)
@@ -56,7 +58,7 @@ func (h *hub) run() {
 			// m is a []byte separated by 0x1B
 			parsedPayload := CustomProtocol.ParsePayload(m)
 			// NOTE: parsedPayload[0] == deviceId (Phone Number)
-
+			fmt.Println(parsedPayload)
 			msg := []byte{}
 			// Latitude
 			msg = append(msg, []byte(parsedPayload[1])...)
@@ -64,7 +66,6 @@ func (h *hub) run() {
 			// Longitude
 			msg = append(msg, []byte(parsedPayload[2])...)
 			h.connections[parsedPayload[0]].send <- msg
-
 			/*for c := range h.connections {
 				select {
 				case c.send <- m:

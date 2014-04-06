@@ -3,6 +3,8 @@ package webserver
 import (
 	"CustomProtocol"
 	//"encoding/gob"
+	"device"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"sessions"
@@ -71,8 +73,6 @@ func (c *connection) readPump() {
 			Source: CustomProtocol.Web, OpCode: CustomProtocol.ActivateGPS, Payload: message, Response: response}
 		toServer <- req
 		fmt.Println("Response received: ", <-response)
-		//h.broadcast <- message
-		//h.inMessage <- Message{c, message}
 	}
 }
 
@@ -146,9 +146,21 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 
 	toServer <- req
 	res := <-resCh
-	list := CustomProtocol.ParsePayload(res)
+	// res comes in as JSON data
+	var deviceList []device.Device
+	err = json.Unmarshal(res, &deviceList)
+	if err != nil {
+		fmt.Println("deviceList unmarshal error")
+	}
+	//list := CustomProtocol.ParsePayload(res)
+	fmt.Println("serveWS list: ", deviceList)
+	list := []string{}
+	for _, device := range deviceList {
+		list = append(list, device.ID)
+	}
 
 	c := &connection{send: make(chan []byte, 256), ws: ws, gpsDeviceList: list}
+	fmt.Println("serveWS conn: ", c)
 	h.register <- c
 	go c.writePump()
 	c.readPump()

@@ -310,7 +310,7 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 }
 
 func getGpsDevices(email string) []byte {
-
+	//fmt.Println("Getting GPS devices of ", email)
 	var list []device.GPSDevice
 
 	db := connect()
@@ -342,7 +342,7 @@ func getGpsDevices(email string) []byte {
 
 	disconnect(db)
 	deviceListJson, _ := json.Marshal(list)
-
+	//fmt.Println(string(deviceListJson))
 	return deviceListJson
 }
 

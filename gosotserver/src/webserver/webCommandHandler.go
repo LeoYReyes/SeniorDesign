@@ -43,6 +43,14 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 		OpCode: CustomProtocol.NewDevice, Payload: buf, Response: resCh}
 	toServer <- req
+	if(r.PostForm.Get("deviceType") == "gps") {
+		geogramBuf := []byte{}
+		geogramBuf = append(geogramBuf, []byte(r.PostForm.Get("deviceId"))...)
+		//CONTINUE HERE
+		geogramSetupReq := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
+			OpCode: CustomProtcol.GeogramSetup, Payload: buf, Response: }
+		toServer <- geogramSetupReq
+	}
 	res := <-resCh
 	// response is true if successfully registered, false if there is an error
 	fmt.Println("Response: ", res[0])

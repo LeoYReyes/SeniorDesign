@@ -43,12 +43,15 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 		OpCode: CustomProtocol.NewDevice, Payload: buf, Response: resCh}
 	toServer <- req
-	if(r.PostForm.Get("deviceType") == "gps") {
+	if r.PostForm.Get("deviceType") == "gps" { //geogram setup
 		geogramBuf := []byte{}
 		geogramBuf = append(geogramBuf, []byte(r.PostForm.Get("deviceId"))...)
-		//CONTINUE HERE
-		geogramSetupReq := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
-			OpCode: CustomProtcol.GeogramSetup, Payload: buf, Response: }
+		geogramBuf = append(buf, 0x1B)
+		geogramBuf = append(buf, []byte("1234")...) //todo hard-coded for now
+		geogramBuf = append(buf, 0x1B)
+		response := make(chan []byte)
+		geogramSetupReq := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
+			OpCode: CustomProtocol.GeogramSetup, Payload: geogramBuf, Response: response}
 		toServer <- geogramSetupReq
 	}
 	res := <-resCh
@@ -89,7 +92,7 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch deviceType {
 	case "gps":
-		// Default PIN-NUMBER for Geogram One
+		//todo Default PIN-NUMBER for Geogram One
 		buf = append(buf, []byte("1234")...)
 		buf = append(buf, 0x1B)
 		if deviceCommand == "1" {

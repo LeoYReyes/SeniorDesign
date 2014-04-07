@@ -70,7 +70,7 @@ func chanHandler() {
 		select {
 		case req := <-fromServer:
 			fmt.Println("Device received request from server")
-			go processRequest(req)
+			go processRequest(req) //todo go routine here may not be necessary
 		}
 	}
 }

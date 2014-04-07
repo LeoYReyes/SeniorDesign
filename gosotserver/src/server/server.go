@@ -13,7 +13,7 @@ var toWebCh = make(chan *CustomProtocol.Request)
 var fromWebCh = make(chan *CustomProtocol.Request)
 var toDatabaseCh = make(chan *CustomProtocol.Request)
 var fromDatabaseCh = make(chan *CustomProtocol.Request)
-var toDeviceCh = make(chan *CustomProtocol.Request)
+var toDeviceCh = make(chan *CustomProtocol.Request, 100)
 var fromDeviceCh = make(chan *CustomProtocol.Request)
 
 var testDeviceCh = make(chan []byte)

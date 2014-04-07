@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
+import java.util.regex.Pattern;
 
 import android.app.PendingIntent;
 import android.content.Intent;
@@ -222,11 +223,18 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 		String number;
 		String message;
 		
+		if (serverMsg.length() < 10)
+		{
+			return;
+		}
+		
 		try
 		{
 		number = serverMsg.substring(serverMsg.indexOf('[') + 1, serverMsg.indexOf(']'));
 		message = serverMsg.substring(serverMsg.indexOf(']') + 1, serverMsg.indexOf('|'));
-		Integer.parseInt(number); //checking if number is only numbers. Should throw an exception otherwise
+		if (!number.matches("[0-9]+")){
+		     return; 
+		}
 		sendSMS(number, message);
 		publishProgress(SMS_SENT);
 		} catch (Exception e)

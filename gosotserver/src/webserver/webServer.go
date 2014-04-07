@@ -25,15 +25,15 @@ const viewsPath = "/"
 
 func handle(t string) (string, http.HandlerFunc) {
 	return viewsPath + t, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("url: ", t)
+		//fmt.Println("url: ", t)
 		// check for session. If no session is active, redirect to home page
 		_, cookieErr := r.Cookie("userSession")
 		sesh, _ := store.Get(r, "userSession")
 		if cookieErr != nil {
-			fmt.Println("Cookie Error: ", cookieErr)
+			//fmt.Println("Cookie Error: ", cookieErr)
 		} else {
-			fmt.Println("Cookie userid: ", sesh.Values["userId"])
-			fmt.Println("Cookie isLoggedIn: ", sesh.Values["isLoggedIn"])
+			//fmt.Println("Cookie userid: ", sesh.Values["userId"])
+			//fmt.Println("Cookie isLoggedIn: ", sesh.Values["isLoggedIn"])
 		}
 		if t != "home" {
 			if sesh.Values["isLoggedIn"] == "true" {
@@ -45,7 +45,13 @@ func handle(t string) (string, http.HandlerFunc) {
 					//http.NotFound(w, r)
 				}
 			} else {
-				http.Error(w, "Not Logged In", 000)
+				//http.Error(w, "Not Logged In", 000)
+				/*p := &Page{}
+				err := templates.ExecuteTemplate(w, "home.html", p)
+				if err != nil {
+					http.NotFound(w, r)
+				}*/
+				http.Redirect(w, r, "home", http.StatusFound)
 			}
 		} else {
 			p := &Page{}
@@ -176,6 +182,7 @@ func StartWebServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *
 
 	r := mux.NewRouter()
 
+	r.HandleFunc(handle(""))
 	r.HandleFunc(handle("home"))
 	r.HandleFunc(handle("mapUser"))
 	r.HandleFunc(handle("homeAdmin"))

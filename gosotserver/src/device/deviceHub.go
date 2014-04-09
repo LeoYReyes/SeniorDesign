@@ -130,7 +130,10 @@ func processRequest(req *CustomProtocol.Request) {
 		fmt.Println("processing sleep geogram")
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 2 {
-			msg := "[" + payload[0] + "]" + payload[1] + ".1.|"
+			//msg := "[" + payload[0] + "]" + payload[1] + ".1.|"
+			//new sleeping method, awake for 120 seconds, asleep for 86400 (24 hours)
+			//also wakes on SMS or motion
+			msg := "[" + payload[0] + "]" + payload[1] + ".5.120.86400.6.|"
 			smsCh <- msg
 			fmt.Println("Message Sent: ", msg)
 			req.Response <- []byte{1}

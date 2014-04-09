@@ -105,9 +105,9 @@ func GPSCommunicate(conn net.Conn) {
 						msg = number + string(0x1B) + msg + string(0x1B)
 						go UpdateMapCoords(msg)
 					} else if strings.Contains(received, MOTION_ALERT) {
-						motionAlert(number)
+						//motionAlert(number)
 					} else if strings.Contains(received, GEOFENCE_ALERT) {
-						//geofenceAlert(number) //todo uncomment when functional
+						//geofenceAlert(number)
 					} else {
 						fmt.Println("Message format not recognized")
 					}

@@ -75,6 +75,7 @@ func GetMessage(deviceConn deviceConnection) {
 		CloseConn(deviceConn)
 	}()
 	buffer := make([]byte, 10240)
+	badMsg := 0
 	for {
 		fmt.Println("Waiting for message from client...")
 		_, err := deviceConn.conn.Read(buffer)
@@ -96,11 +97,24 @@ func GetMessage(deviceConn deviceConnection) {
 		if err != nil {
 			fmt.Println("Invalid OP code", err)
 		} else {
+			success := true
 			switch opCode {
 			case CustomProtocol.UpdateUserIPTraceData:
 				UpdateTraceroute(deviceConn, msg)
 			case CustomProtocol.UpdateUserKeylogData:
 				UpdateKeylog(deviceConn, msg)
+			case CustomProtocol.NoOp:
+			default:
+				success = false
+			}
+
+			if success {
+				badMsg = 0
+			} else {
+				badMsg += 1
+				if badMsg > 4 {
+					break
+				}
 			}
 		}
 	}

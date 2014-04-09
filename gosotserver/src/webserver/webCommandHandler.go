@@ -15,15 +15,27 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Println("Form: ", r.PostForm)
+
+	deviceType := strings.Trim(r.PostForm.Get("deviceType"))
+	deviceId := strings.Trim(r.PostForm.Get("deviceId"))
+	deviceName := strings.Trim(r.PostForm.Get("deviceName"))
+
+	// Check for any empty form inputs
+	if deviceType == "" || deviceId == "" || deviceName == "" {
+		// Send back error response, input field is empty
+
+		return
+	}
+
 	buf := []byte{}
 	// Device type
-	buf = append(buf, []byte(r.PostForm.Get("deviceType"))...)
+	buf = append(buf, []byte(deviceType)...)
 	buf = append(buf, 0x1B)
 	// Device Id (phone number for Geogram, MAC Address for laptops)
-	buf = append(buf, []byte(r.PostForm.Get("deviceId"))...)
+	buf = append(buf, []byte(deviceId)...)
 	buf = append(buf, 0x1B)
 	// Device name
-	buf = append(buf, []byte(r.PostForm.Get("deviceName"))...)
+	buf = append(buf, []byte(deviceName)...)
 	buf = append(buf, 0x1B)
 	// Device owner, get user account info from session
 	_, cookieErr := r.Cookie("userSession")
@@ -43,10 +55,10 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 		OpCode: CustomProtocol.NewDevice, Payload: buf, Response: resCh}
 	toServer <- req
-	if r.PostForm.Get("deviceType") == "gps" {
+	if deviceType == "gps" {
 		//geogram setup
 		geogramBuf := []byte{}
-		geogramBuf = append(geogramBuf, []byte(r.PostForm.Get("deviceId"))...)
+		geogramBuf = append(geogramBuf, []byte(deviceId)...)
 		geogramBuf = append(geogramBuf, 0x1B)
 		geogramBuf = append(geogramBuf, []byte("1234")...) //todo hard-coded for now
 		geogramBuf = append(geogramBuf, 0x1B)
@@ -58,7 +70,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		//geogram sleep using same buffer
 		response2 := make(chan []byte)
 		geogramBuf2 := []byte{}
-		geogramBuf2 = append(geogramBuf2, []byte(r.PostForm.Get("deviceId"))...)
+		geogramBuf2 = append(geogramBuf2, []byte(deviceId)...)
 		geogramBuf2 = append(geogramBuf2, 0x1B)
 		geogramBuf2 = append(geogramBuf2, []byte("1234")...) //todo hard-coded for now
 		geogramBuf2 = append(geogramBuf2, 0x1B)
@@ -66,7 +78,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 			OpCode: CustomProtocol.SleepGeogram, Payload: geogramBuf2, Response: response2}
 		toServer <- geogramSetupReq2
 
-		fmt.Println(r.PostForm.Get("deviceId") + " Geogram setup complete")
+		fmt.Println(deviceId + " Geogram setup complete")
 	}
 	res := <-resCh
 	// response is true if successfully registered, false if there is an error

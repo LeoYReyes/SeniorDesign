@@ -6,7 +6,10 @@
       <Value Profile="(Default)">127.0.0.1</Value>
     </Setting>
     <Setting Name="ServerPort" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">10000</Value>
+      <Value Profile="(Default)">10015</Value>
+    </Setting>
+    <Setting Name="ServerDomain" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Domain Name Here</Value>
     </Setting>
   </Settings>
 </SettingsFile>

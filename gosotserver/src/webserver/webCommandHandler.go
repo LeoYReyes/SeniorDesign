@@ -16,9 +16,9 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Form: ", r.PostForm)
 
-	deviceType := strings.Trim(r.PostForm.Get("deviceType"))
-	deviceId := strings.Trim(r.PostForm.Get("deviceId"))
-	deviceName := strings.Trim(r.PostForm.Get("deviceName"))
+	deviceType := strings.Trim(r.PostForm.Get("deviceType"), " ")
+	deviceId := strings.Trim(r.PostForm.Get("deviceId"), " ")
+	deviceName := strings.Trim(r.PostForm.Get("deviceName"), " ")
 
 	// Check for any empty form inputs
 	if deviceType == "" || deviceId == "" || deviceName == "" {

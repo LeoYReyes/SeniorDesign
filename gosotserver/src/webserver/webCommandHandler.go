@@ -131,14 +131,21 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 			reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}
 			toServer <- reqToDevice
+			//sleep command
+			reqToDevice2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
+				OpCode: CustomProtocol.SleepGeogram, Payload: buf, Response: nil}
+			toServer <- reqToDevice2
 		} else {
 			// send to database to flag not stolen
 			reqToDB := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.FlagNotStolen, Payload: buf, Response: resCh}
 			toServer <- reqToDB
 			// Deactivate command to device
+			// end tracking
+			buf = append(buf, []byte("0")...)
+			buf = append(buf, 0x1B)
 			reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
-				OpCode: CustomProtocol.SleepGeogram, Payload: buf, Response: nil}
+				OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}
 			toServer <- reqToDevice
 		}
 	case "laptop":

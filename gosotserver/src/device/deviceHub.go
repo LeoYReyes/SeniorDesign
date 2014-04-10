@@ -99,6 +99,7 @@ func sanitizeGPSInput(params []string) []string { //todo
  * in any parameters
  */
 func processRequest(req *CustomProtocol.Request) {
+	success := false
 	switch req.OpCode {
 	//params: phone number, PIN
 	case CustomProtocol.ActivateGPS:
@@ -106,8 +107,10 @@ func processRequest(req *CustomProtocol.Request) {
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 2 {
 			msg := "[" + payload[0] + "]" + payload[1] + ".0.|"
-			smsCh <- msg
-			fmt.Println("Message Sent: ", msg)
+			success = sendMsgToGpsHub(msg)
+		}
+
+		if success {
 			req.Response <- []byte{1}
 		} else {
 			req.Response <- []byte{0}
@@ -119,8 +122,10 @@ func processRequest(req *CustomProtocol.Request) {
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 4 {
 			msg := "[" + payload[0] + "]" + payload[1] + ".2." + payload[2] + ".1.0." + payload[3] + ".|"
-			smsCh <- msg
-			fmt.Println("Message Sent: ", msg)
+			success = sendMsgToGpsHub(msg)
+		}
+
+		if success {
 			req.Response <- []byte{1}
 		} else {
 			req.Response <- []byte{0}
@@ -134,8 +139,10 @@ func processRequest(req *CustomProtocol.Request) {
 			//new sleeping method, awake for 120 seconds, asleep for 86400 (24 hours)
 			//also wakes on SMS or motion
 			msg := "[" + payload[0] + "]" + payload[1] + ".5.120.86400.6.|"
-			smsCh <- msg
-			fmt.Println("Message Sent: ", msg)
+			success = sendMsgToGpsHub(msg)
+		}
+
+		if success {
 			req.Response <- []byte{1}
 		} else {
 			req.Response <- []byte{0}
@@ -146,8 +153,10 @@ func processRequest(req *CustomProtocol.Request) {
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 3 {
 			msg := "[" + payload[0] + "]" + payload[1] + ".4." + payload[2] + ".|"
-			smsCh <- msg
-			fmt.Println("Message Sent: ", msg)
+			success = sendMsgToGpsHub(msg)
+		}
+
+		if success {
 			req.Response <- []byte{1}
 		} else {
 			req.Response <- []byte{0}
@@ -161,12 +170,14 @@ func processRequest(req *CustomProtocol.Request) {
 		if len(payload) >= 4 {
 			//lat
 			latMsg := "[" + payload[0] + "]" + payload[1] + ".6.128." + payload[2] + ".|"
-			smsCh <- latMsg
-			fmt.Println("Message Sent: ", latMsg)
+
 			//long
 			longMsg := "[" + payload[0] + "]" + payload[1] + ".6.132." + payload[3] + ".|"
-			smsCh <- longMsg
-			fmt.Println("Message Sent: ", longMsg)
+
+			success = sendMsgToGpsHub(latMsg) && sendMsgToGpsHub(longMsg)
+		}
+
+		if success {
 			req.Response <- []byte{1}
 		} else {
 			req.Response <- []byte{0}
@@ -178,29 +189,25 @@ func processRequest(req *CustomProtocol.Request) {
 		if len(payload) >= 2 {
 			//motion alert
 			motMsg := "[" + payload[0] + "]" + payload[1] + ".6.200." + MOTION_ALERT + ".|"
-			smsCh <- motMsg
-			fmt.Println("Message Sent: ", motMsg)
 
 			//hyperlink1
 			hyp1Msg := "[" + payload[0] + "]" + payload[1] + ".6.450." + HYPERLINK_1 + ".|"
-			smsCh <- hyp1Msg
-			fmt.Println("Message Sent: ", hyp1Msg)
 
 			//hyperlink2
 			hyp2Msg := "[" + payload[0] + "]" + payload[1] + ".6.500." + HYPERLINK_2 + ".|"
-			smsCh <- hyp2Msg
-			fmt.Println("Message Sent: ", hyp2Msg)
 
 			//hyperlink3
 			hyp3Msg := "[" + payload[0] + "]" + payload[1] + ".6.550." + HYPERLINK_3 + ".|"
-			smsCh <- hyp3Msg
-			fmt.Println("Message Sent: ", hyp3Msg)
 
 			//geofence alert
 			geoMsg := "[" + payload[0] + "]" + payload[1] + ".6.250." + GEOFENCE_ALERT + ".|"
-			smsCh <- geoMsg
-			fmt.Println("Message Sent: ", geoMsg)
 
+			success = sendMsgToGpsHub(motMsg) && sendMsgToGpsHub(hyp1Msg) &&
+				sendMsgToGpsHub(hyp2Msg) && sendMsgToGpsHub(hyp3Msg) &&
+				sendMsgToGpsHub(geoMsg)
+		}
+
+		if success {
 			req.Response <- []byte{1}
 		} else {
 			req.Response <- []byte{0}
@@ -211,15 +218,17 @@ func processRequest(req *CustomProtocol.Request) {
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 2 {
 			msg := "[" + payload[0] + "]" + payload[1] + "|"
-			smsCh <- msg
-			fmt.Println("Message Sent: ", msg)
+			success = sendMsgToGpsHub(msg)
+		}
+
+		if success {
 			req.Response <- []byte{1}
 		} else {
 			req.Response <- []byte{0}
 		}
-	case CustomProtocol.UpdateUserKeylogData: //todo idk if it is listening for a response. also do the NO_OP messages interefere with getmessage?
+	case CustomProtocol.UpdateUserKeylogData:
 		go ProcessLapReq(req) //todo is creating a thread for this a good idea?
-	case CustomProtocol.UpdateUserIPTraceData: //todo include IP of connection in the trace route, currently starts at first node from router
+	case CustomProtocol.UpdateUserIPTraceData:
 		go ProcessLapReq(req)
 	case CustomProtocol.FlagStolen:
 		go ProcessLapReq(req)
@@ -227,5 +236,20 @@ func processRequest(req *CustomProtocol.Request) {
 		go ProcessLapReq(req)
 	default:
 		req.Response <- []byte{0}
+	}
+
+}
+
+/*
+ * Send string to gpshub by a channel. Returns true on success
+ */
+func sendMsgToGpsHub(msg string) bool {
+	select {
+	case smsCh <- msg:
+		fmt.Println("Message processed: ", msg)
+		return true
+	default:
+		fmt.Println("Message failed to process: ", msg)
+		return false
 	}
 }

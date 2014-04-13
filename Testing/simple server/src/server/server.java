@@ -133,7 +133,7 @@ public class server {
 			next = 0;
 			int i = 0;
 			while (next != '\n') {
-				next = fromClient.read();
+				next = fromClient.read(); //todo this should probably be after i++
 				message[i] = next;
 				i++;
 			}
@@ -160,7 +160,7 @@ public class server {
 			//fromClient.readLine(); //remove left over newline
 			System.out.println("Requesting trace route...");
 			toClient.writeByte(131);
-			Thread.sleep(1000);
+			Thread.sleep(20000);
 			fromClient.read(single, 0, 1);
 			System.out.println("op code: " + (0xFF & single[0]));
 			int message[] = new int[2048];

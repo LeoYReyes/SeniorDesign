@@ -397,18 +397,23 @@ namespace WindowsServiceTracker
          */
         private bool tcpConnect()
         {
-            tcpIpPort = new IPEndPoint(ipList[currentIP], port);
-            tcp = new TcpClient();
-            try {
-                tcp.Connect(tcpIpPort);
-            }
-            catch{}
-            if (!tcp.Connected)
+            int ipAddressesTried = 0;
+            do
             {
-                currentIP++;
-                currentIP %= ipList.Length;
-                return false;
-            }
+                tcpIpPort = new IPEndPoint(ipList[currentIP], port);
+                tcp = new TcpClient();
+                try {
+                    tcp.Connect(tcpIpPort);
+                }
+                catch{}
+                if (!tcp.Connected)
+                {
+                    currentIP++;
+                    ipAddressesTried++;
+                    currentIP %= ipList.Length;
+                    return false;
+                }
+            } while (!tcp.Connected && ipAddressesTried < ipList.Length);
             return true;
         }
 

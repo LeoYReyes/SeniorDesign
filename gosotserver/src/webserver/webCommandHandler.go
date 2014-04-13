@@ -158,6 +158,13 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 			reqToDB := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.FlagNotStolen, Payload: buf, Response: resCh}
 			toServer <- reqToDB
+
+			//res := <-resCh
+			//fmt.Println("Response: ", res)
+
+			//reqToDeviceHub := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceLaptop, Source: CustomProtocol.Web,
+			//	OpCode: CustomProtocol.FlagNotStolen, Payload: buf, Response: resCh}
+			//toServer <- reqToDeviceHub
 		}
 	default:
 	}

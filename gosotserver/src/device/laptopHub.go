@@ -255,7 +255,6 @@ func SendMsg(id string, opcode byte, payload string) bool {
 		fmt.Println("SendMsg: Error sending message to device with ID " + id)
 		return false
 	}
-	//TODO idk how to make the opcode (byte) send as a decimal number
 	fmt.Printf("Message %d"+payload+" sent to device with ID "+id+"\n", opcode)
 	return true
 }
@@ -267,13 +266,11 @@ func SendMsg(id string, opcode byte, payload string) bool {
 func ProcessLapReq(req *CustomProtocol.Request) {
 	id := string(req.Payload)
 	sent := SendMsg(id, req.OpCode, "")
-	var sentByte []byte
 	if sent {
-		sentByte[0] = 1
+		req.Response <- []byte{1}
 	} else {
-		sentByte[0] = 0
+		req.Response <- []byte{0}
 	}
-	req.Response <- sentByte
 }
 
 /*

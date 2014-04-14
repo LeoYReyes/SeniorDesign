@@ -168,7 +168,7 @@ func UpdateKeylog(deviceConn deviceConnection, msg string) {
  * Address) and this is where it is read in. The connection object is then
  * hashed using the MAC Address.
  */
-func GetDeviceID(conn net.Conn) { //(string, error) {
+func GetDeviceID(conn net.Conn) {
 	buffer := make([]byte, 10240)
 	//ld := new(LaptopDevice)
 	_, err := conn.Read(buffer)
@@ -182,9 +182,9 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	if index != -1 {
 		deviceConn.ld.ID = deviceId[:index]
 	} else {
-		fmt.Println("LaptopDevice.GetDeviceID: deviceId Parse Error")
 		deviceConn.ld.ID = ""
-		//TODO: possibly close the connection here
+		fmt.Println("laptopHub.GetDeviceID: deviceId Parse Error")
+		CloseConn(*deviceConn)
 	}
 
 	deviceConn.conn = conn
@@ -193,19 +193,22 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	if deviceConn.ld.CheckIfStolen() {
 		fmt.Println("CheckIfStolen request returned true")
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagStolen, "")
+		if !sentStolen {
+			fmt.Println("Error sending stolen code. Closing connection...")
+			CloseConn(*deviceConn)
+		}
 		// SEND requests to laptop upon connection, if stolen
 		//TODO: keep connections open until devices are marked as not stolen
 		//TODO: add error handling for connections that are dropped (or closed by the laptop unexpectedly)
 		requestTraceRoute := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserIPTraceData, "")
-		requestKeyLog := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserKeylogData, "")
-		if !sentStolen {
-			fmt.Println("Error sending stolen code.")
-		}
 		if !requestTraceRoute {
-			fmt.Println("laptopHub.GetDeviceID: Error sending request traceroute")
+			fmt.Println("laptopHub.GetDeviceID: Error sending request traceroute. Closing connection...")
+			CloseConn(*deviceConn)
 		}
+		requestKeyLog := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserKeylogData, "")
 		if !requestKeyLog {
-			fmt.Println("laptopHub.GetDeviceID: Eror sending request keylog")
+			fmt.Println("laptopHub.GetDeviceID: Error sending request keylog. Closing connection...")
+			CloseConn(*deviceConn)
 		}
 		go GetMessage(*deviceConn)
 	} else { //if CheckIfStolen returns false
@@ -299,6 +302,8 @@ func MapDeviceID(dc *deviceConnection) {
  */
 func CloseConn(dc deviceConnection) {
 	dc.conn.Close()
-	lh.connections[dc.ld.ID] = nil
+	if dc.ld.ID != "" {
+		lh.connections[dc.ld.ID] = nil
+	}
 	fmt.Println(dc.ld.ID + ": connection closed and removed")
 }

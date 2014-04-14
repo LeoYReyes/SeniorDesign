@@ -1,4 +1,4 @@
-/*f
+/*
  * @author Nathan Plotts (nwp0002@auburn.edu)
  * This file is where the the laptopHub struct is defined and
  * also where general laptop connection handling functions will
@@ -58,7 +58,7 @@ func Listen(listener net.Listener) {
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			fmt.Println("Error connecting", err)
+			fmt.Println("Error connecting with client: ", err)
 		}
 		fmt.Println("Connection established with client")
 		go GetDeviceID(conn)
@@ -80,7 +80,7 @@ func GetMessage(deviceConn deviceConnection) {
 		fmt.Println("Waiting for message from client...")
 		_, err := deviceConn.conn.Read(buffer)
 		if err != nil {
-			fmt.Println("Error reading", err)
+			fmt.Println("Error reading message: ", err)
 			break
 		}
 		msg := string(buffer)
@@ -88,35 +88,39 @@ func GetMessage(deviceConn deviceConnection) {
 		if index != -1 {
 			msg = msg[1:index]
 		} else {
-			fmt.Println("LaptopDevice.GetDeviceID: deviceId Parse Error")
+			fmt.Println("laptopHub.GetMessage - Bad message received")
 		}
-		//opCode, err := strconv.Atoi(msg[0:1])
 		opCode := buffer[0]
 		//fmt.Println("Message byte format: ", buffer[1:bytesRead])
 		fmt.Println("Message received with OP Code: ", opCode)
-		if err != nil {
-			fmt.Println("Invalid OP code", err)
-		} else {
-			success := true
-			switch opCode {
-			case CustomProtocol.UpdateUserIPTraceData:
-				UpdateTraceroute(deviceConn, msg)
-			case CustomProtocol.UpdateUserKeylogData:
-				UpdateKeylog(deviceConn, msg)
-			case CustomProtocol.NoOp:
-			default:
-				success = false
-			}
+		/*if err != nil {
+			fmt.Println("laptopHub.GetMessage - Invalid OP code", err)
+		} else {*/
+		success := true
+		switch opCode {
+		case CustomProtocol.UpdateUserIPTraceData:
+			UpdateTraceroute(deviceConn, msg)
+		case CustomProtocol.UpdateUserKeylogData:
+			UpdateKeylog(deviceConn, msg)
+		case CustomProtocol.NoOp:
+		default:
+			success = false
+		}
 
-			if success {
-				badMsg = 0
-			} else {
-				badMsg += 1
-				if badMsg > 4 {
-					break
-				}
+		/*
+		 * Every time a "bad message" is received badMsg is incremented by 1. If
+		 * a valid message is received then badMsg is reset. Otherwise once badMsg
+		 * reaches 5 the GetMessage loop is broken out of.
+		 */
+		if success {
+			badMsg = 0
+		} else {
+			badMsg += 1
+			if badMsg > 4 {
+				break
 			}
 		}
+		// }
 	}
 }
 
@@ -128,19 +132,6 @@ func GetMessage(deviceConn deviceConnection) {
  * sync the new list there.
  */
 func UpdateTraceroute(deviceConn deviceConnection, msg string) {
-	/*newList := new(list.List)
-	start := 1
-	for i := 1; i < len(msg)-1; i++ {
-		if msg[i:i+1] == "~" {
-			newList.PushBack(msg[start:i])
-			start = i + 1
-		}
-	}
-	newList.PushBack(msg[start : len(msg)-1]) //to get the final IP address
-	deviceConn.ld.TraceRouteList.PushBack()
-	for e := newList.Front(); e != nil; e = e.Next() {
-		fmt.Println(e.Value)
-	}*/
 	fmt.Println(msg)
 	ipAddr := deviceConn.conn.RemoteAddr().String()
 	msgBytes := []byte{}
@@ -154,7 +145,6 @@ func UpdateTraceroute(deviceConn deviceConnection, msg string) {
 	} else {
 		fmt.Println("Traceroute data has NOT been successfully updated")
 	}
-	//TODO send request to the database to write the new IP list
 }
 
 /*
@@ -170,7 +160,6 @@ func UpdateKeylog(deviceConn deviceConnection, msg string) {
 	} else {
 		fmt.Println("Keylog data has NOT been successfully updated")
 	}
-	//TODO send request to database to add new keylog entry
 }
 
 /*
@@ -184,7 +173,7 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	//ld := new(LaptopDevice)
 	_, err := conn.Read(buffer)
 	if err != nil {
-		fmt.Println("Error reading device ID", err)
+		fmt.Println("laptopHub.GetDeviceID - Error receiving device ID: ", err)
 	}
 	//ld.ID = string(buffer[0:bytesRead])
 	deviceConn := new(deviceConnection)
@@ -195,6 +184,7 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 	} else {
 		fmt.Println("LaptopDevice.GetDeviceID: deviceId Parse Error")
 		deviceConn.ld.ID = ""
+		//TODO: possibly close the connection here
 	}
 
 	deviceConn.conn = conn
@@ -204,6 +194,8 @@ func GetDeviceID(conn net.Conn) { //(string, error) {
 		fmt.Println("CheckIfStolen request returned true")
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagStolen, "")
 		// SEND requests to laptop upon connection, if stolen
+		//TODO: keep connections open until devices are marked as not stolen
+		//TODO: add error handling for connections that are dropped (or closed by the laptop unexpectedly)
 		requestTraceRoute := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserIPTraceData, "")
 		requestKeyLog := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserKeylogData, "")
 		if !sentStolen {

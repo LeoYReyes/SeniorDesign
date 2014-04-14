@@ -133,7 +133,7 @@ func processRequest(req *CustomProtocol.Request) {
 			flagNotStolen("laptop", payload[0])
 		}
 		res := make([]byte, 2)
-		res[0] = 1
+		res[0] = 1 //TO DO CHANGE
 		req.Response <- res
 	case CustomProtocol.NewAccount:
 		SignUp(payload[0], payload[1], payload[2], payload[3], payload[4])
@@ -300,6 +300,14 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 
 	db := connect()
 
+	if strings.Contains(firstname, "'") || strings.Contains(lastname, "'") || strings.Contains(email, "'") || strings.Contains(phoneNumber, "'") || strings.Contains(password, "'") {
+		firstname = strings.Replace(firstname, "'", "\\'", -1)
+		lastname = strings.Replace(lastname, "'", "\\'", -1)
+		email = strings.Replace(email, "'", "\\'", -1)
+		phoneNumber = strings.Replace(phoneNumber, "'", "\\'", -1)
+		password = strings.Replace(password, "'", "\\'", -1)
+	}
+
 	db.Query("INSERT INTO customer (firstName, lastName, email, phoneNumber) VALUES ('" + firstname + "', '" + lastname + "', '" + email + "', '" + phoneNumber + "')")
 
 	db.Query("INSERT INTO account (userName, password, customerId) SELECT '" + email + "', '" + password + "', id FROM customer WHERE email='" + email + "'")
@@ -365,7 +373,13 @@ func getGpsDevices(email string) []byte {
 
 func registerNewDevice(deviceType string, deviceId string, deviceName string, userId string) {
 	db := connect()
-	//print(deviceType)
+
+	if strings.Contains(deviceType, "'") || strings.Contains(deviceId, "'") || strings.Contains(deviceName, "'") || strings.Contains(userId, "'") {
+		deviceType = strings.Replace(deviceType, "'", "\\'", -1)
+		deviceId = strings.Replace(deviceId, "'", "\\'", -1)
+		deviceName = strings.Replace(deviceName, "'", "\\'", -1)
+		userId = strings.Replace(userId, "'", "\\'", -1)
+	}
 
 	if deviceType != "gps" && deviceType != "laptop" {
 		print("invalid device type")
@@ -478,6 +492,11 @@ func updateAccountInfo(oldUsername string, newUsername string, newPassword strin
 
 	db := connect()
 
+	if strings.Contains(newUsername, "'") || strings.Contains(newPassword, "'") {
+		newUsername = strings.Replace(newUsername, "'", "\\'", -1)
+		newPassword = strings.Replace(newPassword, "'", "\\'", -1)
+	}
+
 	rows, res, err := db.Query("UPDATE account SET userName = '" + newUsername + "', password = '" + newPassword + "' WHERE userName = '" + oldUsername + "'")
 	rows = rows
 	res = res
@@ -504,6 +523,10 @@ func UpdateKeylog(deviceId string, keylog string) bool {
 	bool1 := true
 
 	db := connect()
+
+	if strings.Contains(keylog, "'") {
+		keylog = strings.Replace(keylog, "'", "\\'", -1)
+	}
 
 	fmt.Println("check1")
 	rows, res, err := db.Query("INSERT INTO keyLogs (data, deviceId) SELECT '" + keylog + "', " + "id FROM laptopDevice WHERE deviceId = '" + deviceId + "'")

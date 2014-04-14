@@ -8,6 +8,15 @@ import (
 	"testing"
 )
 
+func TestSignUp(t *testing.T) {
+	SignUp("steven's name", "whaley", "steven@steven.com", "2567836223", "password")
+}
+
+func TestRegisterNewDevice(t *testing.T) {
+	//deviceType string, deviceId string, deviceName string, userId string)
+	//registerNewDevice("laptop", "1", "stevens laptop", "61")
+}
+
 func TestParsePayload(t *testing.T) {
 	a := []byte("Param1")
 	b := []byte("Param2")

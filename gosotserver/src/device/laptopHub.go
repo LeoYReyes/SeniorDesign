@@ -195,7 +195,7 @@ func GetDeviceID(conn net.Conn) {
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagStolen, "")
 		if !sentStolen {
 			fmt.Println("Error sending stolen code. Closing connection...")
-			CloseConn(deviceConn)
+			CloseConn(*deviceConn)
 		}
 		// SEND requests to laptop upon connection, if stolen
 		//TODO: keep connections open until devices are marked as not stolen
@@ -203,12 +203,12 @@ func GetDeviceID(conn net.Conn) {
 		requestTraceRoute := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserIPTraceData, "")
 		if !requestTraceRoute {
 			fmt.Println("laptopHub.GetDeviceID: Error sending request traceroute. Closing connection...")
-			CloseConn(deviceConn)
+			CloseConn(*deviceConn)
 		}
 		requestKeyLog := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserKeylogData, "")
 		if !requestKeyLog {
 			fmt.Println("laptopHub.GetDeviceID: Error sending request keylog. Closing connection...")
-			CloseConn(deviceConn)
+			CloseConn(*deviceConn)
 		}
 		go GetMessage(*deviceConn)
 	} else { //if CheckIfStolen returns false

@@ -259,8 +259,12 @@ func SendMsg(id string, opcode byte, payload string) bool {
  * message is sent to the laptop
  */
 func ProcessLapReq(req *CustomProtocol.Request) {
-	id := string(req.Payload)
-	sent := SendMsg(id, req.OpCode, "")
+	payload := CustomProtocol.ParsePayload(req.Payload)
+	if len(payload) == 0 {
+		req.Response <- []byte{0}
+		return
+	}
+	sent := SendMsg(payload[0], req.OpCode, "")
 	if sent {
 		req.Response <- []byte{1}
 	} else {

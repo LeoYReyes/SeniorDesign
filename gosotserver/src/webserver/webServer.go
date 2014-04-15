@@ -84,16 +84,23 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		// Handle error
 		fmt.Println("ParseForm error: ", err)
 	}
+	loginName := strings.Trim(r.PostForm.Get("loginName"), " ")
+	loginPassword := strings.Trim(r.PostForm.Get("loginPassword"), " ")
+
+	if loginName == "" || loginPassword == "" {
+		// Send error message back
+		return
+	}
 	//TODO: move hashing to database VerifyAccountFunction
 	ha := sha1.New()
-	ha.Write([]byte(strings.Join([]string{r.PostForm.Get("loginName"), r.PostForm.Get("loginPassword")}, "")))
+	ha.Write([]byte(strings.Join([]string{loginName, loginPassword}, "")))
 
-	fmt.Println(r.PostForm.Get("loginName"))
-	fmt.Println(r.PostForm.Get("loginPassword"))
+	/*fmt.Println(loginName)
+	fmt.Println(loginPassword)*/
 	hashedPass := fmt.Sprintf("%x", ha.Sum(nil))
 
 	buf := []byte{}
-	buf = append(buf, []byte(r.PostForm.Get("loginName"))...)
+	buf = append(buf, []byte(loginName)...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(hashedPass)...)
 	buf = append(buf, 0x1B)
@@ -103,7 +110,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		OpCode: CustomProtocol.VerifyLoginCredentials, Payload: buf, Response: resCh}
 	toServer <- req
 	res := <-resCh
-	//accountValid, passwordValid := databaseSOT.VerifyAccountInfo(r.PostForm.Get("loginName"), hashedPass)
 	fmt.Println("Response: ", res[0], res[1])
 	if (res[0] == 1) && (res[1] == 1) {
 		serveSession(w, r)
@@ -124,6 +130,16 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	//TODO: check for blank inputs
+	firstName := strings.Trim(r.PostForm.Get("firstName"), " ")
+	lastName := strings.Trim(r.PostForm.Get("lastName"), " ")
+	loginName := strings.Trim(r.PostForm.Get("loginName"), " ")
+	phoneNumber := strings.Trim(r.PostForm.Get("phoneNumber"), " ")
+	password := strings.Trim(r.PostForm.Get("password"), " ")
+
+	if firsName == "" || lastName == "" || loginName == "" || phoneNumber == "" || password == "" {
+		// Send error message back to browser
+		return
+	}
 	err := r.ParseForm()
 	if err != nil {
 		// Handle error
@@ -131,24 +147,24 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	//TODO: move hashing to database SignUp function
 	h := sha1.New()
-	h.Write([]byte(strings.Join([]string{r.PostForm.Get("loginName"), r.PostForm.Get("password")}, "")))
+	h.Write([]byte(strings.Join([]string{loginName, password}, "")))
 
-	fmt.Println(r.PostForm.Get("firstName"))
-	fmt.Println(r.PostForm.Get("lastName"))
-	fmt.Println(r.PostForm.Get("loginName"))
-	fmt.Println(r.PostForm.Get("phoneNumber"))
-	fmt.Println(r.PostForm.Get("password"))
+	/*fmt.Println(firstName)
+	fmt.Println(lastName)
+	fmt.Println(loginName)
+	fmt.Println(phoneNumber)
+	fmt.Println(password)*/
 	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
-	fmt.Println(hashedPass)
+	//fmt.Println(hashedPass)
 
 	buf := []byte{}
-	buf = append(buf, []byte(r.PostForm.Get("firstName"))...)
+	buf = append(buf, []byte(firstName)...)
 	buf = append(buf, 0x1B)
-	buf = append(buf, []byte(r.PostForm.Get("lastName"))...)
+	buf = append(buf, []byte(lastName)...)
 	buf = append(buf, 0x1B)
-	buf = append(buf, []byte(r.PostForm.Get("loginName"))...)
+	buf = append(buf, []byte(loginName)...)
 	buf = append(buf, 0x1B)
-	buf = append(buf, []byte(r.PostForm.Get("phoneNumber"))...)
+	buf = append(buf, []byte(phoneNumber)...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(hashedPass)...)
 	buf = append(buf, 0x1B)

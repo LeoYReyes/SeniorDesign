@@ -105,14 +105,20 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("Form: ", r.PostForm)
 	//TODO: user input for geogram PIN
+	deviceType := strings.Trim(r.PostForm.Get("deviceType"), " ")
+	deviceId := strings.Trim(r.PostForm.Get("deviceId"), " ")
+	deviceCommand := strings.Trim(r.PostForm.Get("deviceCommand"), " ")
+
+	// Check for any empty form inputs
+	if deviceType == "" || deviceId == "" || deviceCommand == "" {
+		// Send back error response, input field is empty
+
+		return
+	}
 	buf := []byte{}
 	resCh := make(chan []byte)
-	// Check for device type
-	deviceType := r.PostForm.Get("deviceType")
-	//deviceId := r.PostForm.Get("deviceId")
-	deviceCommand := r.PostForm.Get("deviceCommand")
 
-	buf = append(buf, []byte(r.PostForm.Get("deviceId"))...)
+	buf = append(buf, []byte(deviceId)...)
 	buf = append(buf, 0x1B)
 	fmt.Println("Device type: ", deviceType)
 

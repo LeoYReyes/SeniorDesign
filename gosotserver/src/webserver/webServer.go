@@ -137,7 +137,8 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	password := strings.Trim(r.PostForm.Get("password"), " ")
 
 	if firstName == "" || lastName == "" || loginName == "" || phoneNumber == "" || password == "" {
-		// Send error message back to browser
+		// Redirect back to home if any fields are empty, someone is trying to play tricks
+		http.Redirect(w, r, "/home", http.StatusFound)
 		return
 	}
 	err := r.ParseForm()

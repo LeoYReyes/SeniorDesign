@@ -136,7 +136,7 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	phoneNumber := strings.Trim(r.PostForm.Get("phoneNumber"), " ")
 	password := strings.Trim(r.PostForm.Get("password"), " ")
 
-	if firsName == "" || lastName == "" || loginName == "" || phoneNumber == "" || password == "" {
+	if firstName == "" || lastName == "" || loginName == "" || phoneNumber == "" || password == "" {
 		// Send error message back to browser
 		return
 	}

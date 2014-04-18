@@ -5,7 +5,13 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-
+/**
+ * 
+ * @author Charles Baker
+ *
+ * Server used to initially test the SMS Gateway app.
+ * Prints out messages it receives and then sends them back to the phone.
+ */
 public class SmsServer {
 	
 	public static void main(String args[]) throws Exception {

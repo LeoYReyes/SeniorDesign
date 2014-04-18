@@ -187,7 +187,7 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
-	//buf := []byte{}
+	buf := []byte{}
 	// Device owner, get user account info from session
 	_, cookieErr := r.Cookie("userSession")
 	if cookieErr != nil {
@@ -196,7 +196,7 @@ func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
 		sesh, _ := store.Get(r, "userSession")
 		/*buf = append(buf, []byte(sesh.Values["userId"].(string))...)
 		buf = append(buf, 0x1B)*/
-		buf := CustomProtocol.CreatePayload(sesh.Values["userId"].(string))
+		buf = CustomProtocol.CreatePayload(sesh.Values["userId"].(string))
 		//fmt.Println("Cookie userid: ", sesh.Values["userId"])
 		//fmt.Println("Cookie isLoggedIn: ", sesh.Values["isLoggedIn"])
 	}

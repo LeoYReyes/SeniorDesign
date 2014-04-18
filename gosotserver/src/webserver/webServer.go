@@ -109,13 +109,18 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 		OpCode: CustomProtocol.VerifyLoginCredentials, Payload: buf, Response: resCh}
 	toServer <- req
-	res := <-resCh
-	fmt.Println("Response: ", res[0], res[1])
-	if (res[0] == 1) && (res[1] == 1) {
-		serveSession(w, r)
+	sucessful, res := CustomProtocol.GetResponse(resCh, 10)
+	//res := <-resCh
+	if sucessful {
+		fmt.Println("Response: ", res[0], res[1])
+		if (res[0] == 1) && (res[1] == 1) {
+			serveSession(w, r)
 
+		} else {
+			http.Error(w, "Invalid Login", 80085)
+			return
+		}
 	} else {
-		http.Error(w, "Invalid Login", 80085)
 		fmt.Println("No response on login")
 		http.Error(w, "Timeout on Login", 8008135)
 		return

@@ -1,24 +1,28 @@
 /*
-* Steven Whaley - created: February 18, 2014  - last updated: February 27, 2014
+*	DATABASE.GO
 *
-* OVERVIEW:
+* 	Created			- Steven Whaley: February 18, 2014
+*	Last updated	- Steven Whaley: April 17, 2014
 *
-*     This is the database portion of the server. It provides functionality for interacting with the database. Actions
-*     such as user sign up and login must use functions provided in this file to update and query the database.
-*     See the comments for each method for details.
+* 	OVERVIEW:
 *
-*   useful links:
-*       mysql driver for google go:
-*         https://github.com/ziutek/mymysql
-*     golang documentation:
-*         http://golang.org/doc/
+*   This is the database portion of the server. It provides functionality for interacting with the database. Actions
+*   such as user sign up and login must use functions provided in this file to update and query the database.
+*   See the comments for each method for details.
 *
-*   TO DO: Interface with other server components using requests, continue testing existing functions.
+*	user := "root"
+*	pass := "toor"
+*	dbname := "trackerdb"
+*	proto := "tcp"
+*	addr := "127.0.0.1:3306"
 *
-*        -also what other functionality is needed?
+*   Useful Links:
+*
+*   Mysql driver for google go:	https://github.com/ziutek/mymysql
+*
+*   Golang documentation:			http://golang.org/doc/
+*
  */
-
-// TODO: handle apostrophe
 
 package databaseSOT
 
@@ -28,11 +32,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ziutek/mymysql/mysql"
-	//"os"
 	"strconv"
 	"strings"
-	//_ "github.com/ziutek/mymysql/native" // Native engine
-	_ "github.com/ziutek/mymysql/thrsafe" // Thread safe engine
 )
 
 /*
@@ -111,9 +112,6 @@ func chanHandler() {
 func processRequest(req *CustomProtocol.Request) {
 
 	payload := CustomProtocol.ParsePayload(req.Payload)
-	/*for index, element := range payload {
-		fmt.Println("Payload element", index, ": ", element)
-	}*/
 	switch req.OpCode {
 	case CustomProtocol.ActivateGPS:
 		flagStolen("gps", payload[0])
@@ -155,16 +153,6 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 		req.Response <- res
 	case CustomProtocol.VerifyLoginCredentials:
-
-		/*str := []string{}
-		pos := 1
-		for index, element := range req.Payload {
-			if element == 0x1B {
-				str = append(str, string(req.Payload[pos:index-1]))
-				pos = index + 2
-			}
-		}
-		fmt.Println(str)*/
 		accountValid, passwordValid := VerifyAccountInfo(payload[0], payload[1])
 		res := make([]byte, 2)
 		if accountValid {
@@ -178,8 +166,6 @@ func processRequest(req *CustomProtocol.Request) {
 			res[0] = 0
 			res[1] = 0
 		}
-		//fmt.Println("Method Return: ", accountValid, passwordValid)
-		//fmt.Println("Byte form: ", res)
 		req.Response <- res
 	case CustomProtocol.SetAccount:
 		accSet := updateAccountInfo(payload[0], payload[1], payload[2])
@@ -208,7 +194,7 @@ func processRequest(req *CustomProtocol.Request) {
 		res = append(res, 0x1B)
 		res = append(res, getGpsDevices(payload[0])...)
 		req.Response <- res
-	case CustomProtocol.CheckDeviceStolen: //
+	case CustomProtocol.CheckDeviceStolen:
 		isStolen := IsDeviceStolen(payload[0])
 		res := make([]byte, 1)
 		if isStolen == true {
@@ -217,7 +203,7 @@ func processRequest(req *CustomProtocol.Request) {
 			res[0] = 0
 		}
 		req.Response <- res
-	case CustomProtocol.UpdateUserKeylogData: //
+	case CustomProtocol.UpdateUserKeylogData:
 		boolResult := UpdateKeylog(payload[0], payload[1])
 		res := make([]byte, 1)
 		if boolResult == true {
@@ -226,7 +212,7 @@ func processRequest(req *CustomProtocol.Request) {
 			res[0] = 0
 		}
 		req.Response <- res
-	case CustomProtocol.UpdateUserIPTraceData: //
+	case CustomProtocol.UpdateUserIPTraceData:
 		boolResult := UpdateTraceRoute(payload[0], payload[1])
 		res := make([]byte, 1)
 		if boolResult == true {
@@ -318,12 +304,10 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 }
 
 func getGpsDevices(email string) []byte {
-	//fmt.Println("Getting GPS devices of ", email)
 	var list []device.GPSDevice
 
 	db := connect()
 
-	//finding customerId to be used for selecting devices
 	rows, _, err := db.Query("select customerId from account where userName = '" + email + "'")
 	if err != nil {
 		fmt.Println("Database Query Error:", err)
@@ -331,7 +315,6 @@ func getGpsDevices(email string) []byte {
 
 	customerId := string(rows[0][0].([]byte))
 
-	//adding gpsDevices to the the devices list
 	gpsRows, _, gpsErr := db.Query("select * from gpsDevice where customerId = '" + customerId + "'")
 	if gpsErr != nil {
 		fmt.Println("Database Query Error:", gpsErr)
@@ -343,24 +326,20 @@ func getGpsDevices(email string) []byte {
 		gpsName := string(gps[1].([]byte))
 		deviceId := string(gps[3].([]byte))
 		isStolen := gps[4].([]byte)
-		// Get all coordinates related to device
+
 		gpsCoordRows, _, _ := db.Query("SELECT * FROM coordinates WHERE deviceId='" + gpsId + "'")
 
-		// Create list of coordinates to add to GPSDevice struct
 		coordList := []string{}
 		for _, coordRow := range gpsCoordRows {
 			str := ""
-			// Create string of timestamp&latitudeESClongitude
 			str = string(coordRow[3].([]byte)) + "&" + string(coordRow[1].([]byte)) + string(0x1B) + string(coordRow[2].([]byte))
 			coordList = append(coordList, str)
 		}
-		// Create GpsDevice struct and append to list of devices
 		list = append(list, device.GPSDevice{coordList, device.Device{deviceId, gpsName, isStolen[0]}})
 	}
 
 	disconnect(db)
 	deviceListJson, _ := json.Marshal(list)
-	//fmt.Println(string(deviceListJson))
 	return deviceListJson
 }
 
@@ -374,14 +353,19 @@ func getGpsDevices(email string) []byte {
 func registerNewDevice(deviceType string, deviceId string, deviceName string, email string) bool {
 	db := connect()
 	output := true
+	var res []mysql.Row
 	if strings.Contains(deviceType, "'") || strings.Contains(deviceId, "'") || strings.Contains(deviceName, "'") || strings.Contains(email, "'") {
 		deviceType = strings.Replace(deviceType, "'", "\\'", -1)
 		deviceId = strings.Replace(deviceId, "'", "\\'", -1)
 		deviceName = strings.Replace(deviceName, "'", "\\'", -1)
 		email = strings.Replace(email, "'", "\\'", -1)
 	}
+	if deviceType == "gps" {
+		res, _, _ = db.Query("SELECT * FROM gpsDevice WHERE deviceId = '" + deviceId + "'")
+	} else if deviceType == "laptop" {
+		res, _, _ = db.Query("SELECT * FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
+	}
 
-	res, _, _ := db.Query("SELECT * FROM '" + deviceType + "'Device WHERE deviceId = '" + deviceId + "'")
 	if len(res) != 0 {
 		output = false
 		fmt.Println("check")
@@ -389,7 +373,6 @@ func registerNewDevice(deviceType string, deviceId string, deviceName string, em
 		if deviceType != "gps" && deviceType != "laptop" {
 			print("invalid device type")
 		} else {
-			// query does not work on VARCHAR with length of 50
 			if deviceType == "gps" {
 				fmt.Println("Writing to gpsDevice...")
 				db.Query("INSERT INTO gpsDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + email + "'")
@@ -399,7 +382,6 @@ func registerNewDevice(deviceType string, deviceId string, deviceName string, em
 			}
 		}
 	}
-
 	disconnect(db)
 
 	return output
@@ -429,13 +411,6 @@ func IsDeviceStolen(deviceId string) bool {
 		res = res
 
 		for _, row := range rows {
-			for _, col := range row {
-				if col == nil {
-					// col has NULL value
-				} else {
-					// Do something with text in col (type []byte)
-				}
-			}
 
 			var err2 error
 
@@ -460,13 +435,6 @@ func IsDeviceStolen(deviceId string) bool {
 		res2 = res2
 
 		for _, row := range rows2 {
-			for _, col := range row {
-				if col == nil {
-					// col has NULL value
-				} else {
-					// Do something with text in col (type []byte)
-				}
-			}
 
 			val2 := row[0].([]byte)
 
@@ -521,8 +489,8 @@ func updateAccountInfo(oldUsername string, newUsername string, newPassword strin
 *
 *
 *
-* Steven Whaley Mar, 1 - created
-* Mar 17 - seems to be working
+* 	Steven Whaley Mar, 1 - created
+* 	Mar 17 - seems to be working
  */
 
 func UpdateKeylog(deviceId string, keylog string) bool {

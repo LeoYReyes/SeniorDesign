@@ -2,6 +2,9 @@
 //TODO: change marker fade based on previous position
 //TODO: different arrays to hold previous positions of different devices
 
+var gpsDevices = [];
+var gpsDevicePins = [];
+var gpsDevicePinsDirections = [];
 var map;
 var socket = new WebSocket("ws://" + window.location.href.substring(window.location.protocol.length, window.location.href.lastIndexOf('/')) + "/ws");
 

@@ -12,8 +12,8 @@ namespace SimpleTCPClient
     class TCPClient
     {
         static IPHostEntry ipHostInfo = Dns.GetHostEntry(Dns.GetHostName());
-        //static IPAddress ipAddress = new IPAddress(0x0100007F);
-        static IPAddress ipAddress = IPAddress.Parse("71.91.88.205");
+        static IPAddress ipAddress = new IPAddress(0x0100007F);
+        //static IPAddress ipAddress = IPAddress.Parse("71.91.88.205");
         static IPEndPoint remoteEP = new IPEndPoint(ipAddress, 10015);
         static byte[] bytes = new byte[1024];
 

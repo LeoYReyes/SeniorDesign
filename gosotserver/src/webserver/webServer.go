@@ -115,7 +115,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		serveSession(w, r)
 
 	} else {
+<<<<<<< HEAD
 		http.Error(w, "Invalid Login", 80085)
+=======
+		fmt.Println("No response on login")
+		http.Error(w, "Timeout on Login", 8008135)
+>>>>>>> FETCH_HEAD
 		return
 	}
 }

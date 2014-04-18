@@ -238,8 +238,8 @@ func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
 	finalRes := []byte{}
 	resLaptop := str[:strings.Index(str, string(0x1B))]
 	resGPS := str[strings.Index(str, string(0x1B))+1:]
-	fmt.Println(resLaptop)
-	fmt.Println(resGPS)
+	//fmt.Println(resLaptop)
+	//fmt.Println(resGPS)
 	if len(resLaptop) > 5 {
 		if len(resGPS) > 5 {
 			resLaptop = str[:strings.Index(str, string(0x1B))-1]

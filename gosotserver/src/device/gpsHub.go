@@ -25,7 +25,7 @@ const (
 )
 
 var smsConn net.Conn
-var smsCh = make(chan string, 100)
+var smsCh = make(chan string, 1000)
 
 /*
  * This method creates a connection which creates a new socket, opens the port

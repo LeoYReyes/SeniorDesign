@@ -9,12 +9,12 @@ import (
 	"webserver"
 )
 
-var toWebCh = make(chan *CustomProtocol.Request)
-var fromWebCh = make(chan *CustomProtocol.Request)
-var toDatabaseCh = make(chan *CustomProtocol.Request)
-var fromDatabaseCh = make(chan *CustomProtocol.Request)
-var toDeviceCh = make(chan *CustomProtocol.Request, 100)
-var fromDeviceCh = make(chan *CustomProtocol.Request)
+var toWebCh = make(chan *CustomProtocol.Request, 1000)
+var fromWebCh = make(chan *CustomProtocol.Request, 1000)
+var toDatabaseCh = make(chan *CustomProtocol.Request, 1000)
+var fromDatabaseCh = make(chan *CustomProtocol.Request, 1000)
+var toDeviceCh = make(chan *CustomProtocol.Request, 1000)
+var fromDeviceCh = make(chan *CustomProtocol.Request, 1000)
 
 var testDeviceCh = make(chan []byte)
 var testWebCh = make(chan []byte)

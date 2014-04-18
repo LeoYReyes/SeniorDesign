@@ -60,6 +60,9 @@ func (h *hub) run() {
 			// NOTE: parsedPayload[0] == deviceId (Phone Number)
 			fmt.Println(parsedPayload)
 			msg := []byte{}
+			// deviceId
+			msg = append(msg, []byte(parsedPayload[0])...)
+			msg = append(msg, 0x1B)
 			// Latitude
 			msg = append(msg, []byte(parsedPayload[1])...)
 			msg = append(msg, 0x1B)

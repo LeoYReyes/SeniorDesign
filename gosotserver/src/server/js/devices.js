@@ -184,7 +184,7 @@ $(function() {
 						var markerPos = new google.maps.LatLng(parseFloat(coordList[0]), parseFloat(coordList[1]));
 						var marker = new google.maps.Marker({
 	            			position: markerPos,
-							icon: markerImg,
+							icon: markerIcons[gpsDevices.length % 7],
 	            			map: map,
 	            			title: coordsIn[k].substring(0, coordsIn[k].indexOf("&"))
 	    				});

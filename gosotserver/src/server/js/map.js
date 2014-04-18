@@ -13,10 +13,19 @@ var mapOptions = {
     //mapTypeId: google.maps.MapTypeId.HYBRID
 }
 
-var previousLocations = new Array();
 var currentPosition;
 
 var markerImg = 'images/marker.png';
+var markerGreen = 'images/markerGreen.png';
+var markerBlue = 'images/markerBlue.png';
+var markerRed = 'images/markerRed.png';
+var markerPink = 'images/markerRed.png';
+var markerCyan = 'images/markerCyan.png';
+var markerOrange = 'images/markerOrange.png';
+var markerYellow = 'images/markerYellow.png';
+
+var markerIcons = [markerGreen, markerBlue, markerRed, markerPink, markerCyan, markerOrange, markerYellow];
+
 var ghostMarkerImg = ('images/ghostMarker.png');
 
 function initialize() {
@@ -50,28 +59,31 @@ socket.onopen = function() {
     //alert("Socket opened!");
 }
 
-socket.onmessage = function(msg){
+socket.onmessage = function(msg) {
     //alert(msg.data); //Awesome!
-	var lat = parseFloat(msg.data.substring(0, msg.data.indexOf(String.fromCharCode(27))));
-	var longitude = parseFloat(msg.data.substring(msg.data.indexOf(String.fromCharCode(27)) + 1, msg.data.length));
+	var deviceId = msg.data.substring(0, msg.data.indexOf(String.fromCharCode(27)));
+	var lat = parseFloat(msg.data.substring(msg.data.indexOf(String.fromCharCode(27)) + 1, msg.data.lastIndexOf(String.fromCharCode(27))));
+	var longitude = parseFloat(msg.data.substring(msg.data.lastIndexOf(String.fromCharCode(27)) + 1, msg.data.length));
 	var markerPos = new google.maps.LatLng(lat, longitude);
-	if(currentPosition) {
-		currentPosition.setIcon(ghostMarkerImg);
-		previousLocations.push(currentPosition);
-		//alert(currentPosition.icon);
-		currentPosition = new google.maps.Marker({
-	            position: markerPos,
-				icon: markerImg,
-	            map: map,
-	            title: 'New Location'
-	    });
-	} else {
-		currentPosition = new google.maps.Marker({
-            position: markerPos,
-			icon: markerImg,
-            map: map,
-            title: 'Default Location'
-        });
+	var deviceIndex = gpsDevices.indexOf(deviceId);
+	
+	var newPosition = new google.maps.Marker({
+			position: markerPos,
+			icon: markerIcons[deviceIndex % 7],
+			map: map,
+			title: 'New Location'
+		});
+	devicePins[deviceIndex].push(newPosition);
+	if(devicePins[deviceIndex].length > 1) {
+		var line = new google.maps.Polyline({
+			path: [devicePins[deviceIndex - 1].position, newPosition.position],
+			icons: [{
+				icon: lineSymbol,
+				offset: '100%'
+			}],
+			map: map
+		});
+		gpsDevicePinsDirections[deviceIndex].push(line);	
 	}
 }
 

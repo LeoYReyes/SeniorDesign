@@ -296,9 +296,11 @@ func disconnect(connection mysql.Conn) {
 * Steven Whaley Feb, 26 - created
  */
 
-func SignUp(firstname string, lastname string, email string, phoneNumber string, password string) {
+func SignUp(firstname string, lastname string, email string, phoneNumber string, password string) bool {
 
 	db := connect()
+
+	output := true
 
 	if strings.Contains(firstname, "'") || strings.Contains(lastname, "'") || strings.Contains(email, "'") || strings.Contains(phoneNumber, "'") || strings.Contains(password, "'") {
 		firstname = strings.Replace(firstname, "'", "\\'", -1)
@@ -308,13 +310,19 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 		password = strings.Replace(password, "'", "\\'", -1)
 	}
 
-	db.Query("INSERT INTO customer (firstName, lastName, email, phoneNumber) VALUES ('" + firstname + "', '" + lastname + "', '" + email + "', '" + phoneNumber + "')")
+	res, _, _ := db.Query("SELECT * FROM customer WHERE email = '" + email + "'")
 
-	db.Query("INSERT INTO account (userName, password, customerId) SELECT '" + email + "', '" + password + "', id FROM customer WHERE email='" + email + "'")
+	if len(res) != 0 {
+		output = false
+	} else {
+		db.Query("INSERT INTO customer (firstName, lastName, email, phoneNumber) VALUES ('" + firstname + "', '" + lastname + "', '" + email + "', '" + phoneNumber + "')")
+
+		db.Query("INSERT INTO account (userName, password, customerId) SELECT '" + email + "', '" + password + "', id FROM customer WHERE email='" + email + "'")
+	}
 
 	disconnect(db)
 
-	return
+	return output
 }
 
 func getGpsDevices(email string) []byte {
@@ -371,31 +379,38 @@ func getGpsDevices(email string) []byte {
 * Steven Whaley Mar, 18 - created
  */
 
-func registerNewDevice(deviceType string, deviceId string, deviceName string, userId string) {
+func registerNewDevice(deviceType string, deviceId string, deviceName string, email string) bool {
 	db := connect()
-
-	if strings.Contains(deviceType, "'") || strings.Contains(deviceId, "'") || strings.Contains(deviceName, "'") || strings.Contains(userId, "'") {
+	output := true
+	if strings.Contains(deviceType, "'") || strings.Contains(deviceId, "'") || strings.Contains(deviceName, "'") || strings.Contains(email, "'") {
 		deviceType = strings.Replace(deviceType, "'", "\\'", -1)
 		deviceId = strings.Replace(deviceId, "'", "\\'", -1)
 		deviceName = strings.Replace(deviceName, "'", "\\'", -1)
-		userId = strings.Replace(userId, "'", "\\'", -1)
+		email = strings.Replace(email, "'", "\\'", -1)
 	}
 
-	if deviceType != "gps" && deviceType != "laptop" {
-		print("invalid device type")
+	res, _, _ := db.Query("SELECT * FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
+	if len(res) != 0 {
+		output = false
+		fmt.Println("check")
 	} else {
-		// query does not work on VARCHAR with length of 50
-		if deviceType == "gps" {
-			fmt.Println("Writing to gpsDevice...")
-			db.Query("INSERT INTO gpsDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
-		} else if deviceType == "laptop" {
-			fmt.Println("Writing to laptopDevice...")
-			db.Query("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + userId + "'")
-
+		if deviceType != "gps" && deviceType != "laptop" {
+			print("invalid device type")
+		} else {
+			// query does not work on VARCHAR with length of 50
+			if deviceType == "gps" {
+				fmt.Println("Writing to gpsDevice...")
+				db.Query("INSERT INTO gpsDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + email + "'")
+			} else if deviceType == "laptop" {
+				fmt.Println("Writing to laptopDevice...")
+				db.Query("INSERT INTO laptopDevice (deviceName, deviceId, customerId) SELECT '" + deviceName + "', '" + deviceId + "', id FROM customer WHERE email='" + email + "'")
+			}
 		}
 	}
 
 	disconnect(db)
+
+	return output
 }
 
 /*

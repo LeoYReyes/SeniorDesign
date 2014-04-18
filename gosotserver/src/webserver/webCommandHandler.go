@@ -59,24 +59,26 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	toServer <- req
 	if deviceType == "gps" {
 		//geogram setup
-		geogramBuf := []byte{}
+		/*geogramBuf := []byte{}
 		geogramBuf = append(geogramBuf, []byte(deviceId)...)
 		geogramBuf = append(geogramBuf, 0x1B)
 		geogramBuf = append(geogramBuf, []byte("1234")...) //todo hard-coded for now
-		geogramBuf = append(geogramBuf, 0x1B)
+		geogramBuf = append(geogramBuf, 0x1B)*/
+		geogramBuf := CustomProtocol.CreatePayload(deviceId, "1234") //todo hard-coded for now
 		response := make(chan []byte)
 		geogramSetupReq := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 			OpCode: CustomProtocol.GeogramSetup, Payload: geogramBuf, Response: response}
 		toServer <- geogramSetupReq
 
-		//geogram sleep using same buffer
+		//geogram sleep
 		response2 := make(chan []byte)
-		geogramBuf2 := []byte{}
+		/*geogramBuf2 := []byte{}
 		geogramBuf2 = append(geogramBuf2, []byte(deviceId)...)
 		geogramBuf2 = append(geogramBuf2, 0x1B)
 		geogramBuf2 = append(geogramBuf2, []byte("1234")...) //todo hard-coded for now
-		geogramBuf2 = append(geogramBuf2, 0x1B)
-		geogramSetupReq2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
+		geogramBuf2 = append(geogramBuf2, 0x1B)*/
+		geogramBuf2 := CustomProtocol.CreatePayload(deviceId, "1234") //todo hard-coded for now
+		geogramSetupReq2 := &CustomProtocol.Request{Id:               CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 			OpCode: CustomProtocol.SleepGeogram, Payload: geogramBuf2, Response: response2}
 		toServer <- geogramSetupReq2
 
@@ -117,25 +119,28 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	buf := []byte{}
 	resCh := make(chan []byte)
+	/*buf := []byte{}
 
 	buf = append(buf, []byte(deviceId)...)
-	buf = append(buf, 0x1B)
+	buf = append(buf, 0x1B)*/
+	buf := CustomProtocol.CreatePayload(deviceId)
 	fmt.Println("Device type: ", deviceType)
 
 	switch deviceType {
 	case "gps":
 		//todo Default PIN-NUMBER for Geogram One
-		buf = append(buf, []byte("1234")...)
-		buf = append(buf, 0x1B)
+		/*buf = append(buf, []byte("1234")...)
+		buf = append(buf, 0x1B)*/
+		buf = append(buf, CustomProtocol.CreatePayload("1234")...)
 		if deviceCommand == "1" {
 			reqToDB := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.ActivateGPS, Payload: buf, Response: resCh}
 			toServer <- reqToDB
 			// Default interval 60 seconds
-			buf = append(buf, []byte("140")...)
-			buf = append(buf, 0x1B)
+			/*buf = append(buf, []byte("140")...)
+			buf = append(buf, 0x1B)*/
+			buf = append(buf, CustomProtocol.CreatePayload("140")...)
 			reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}
 			toServer <- reqToDevice
@@ -150,8 +155,9 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 			toServer <- reqToDB
 			// Deactivate command to device
 			// end tracking
-			buf = append(buf, []byte("0")...)
-			buf = append(buf, 0x1B)
+			/*buf = append(buf, []byte("0")...)
+			buf = append(buf, 0x1B)*/
+			buf = append(buf, CustomProtocol.CreatePayload("0")...)
 			reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}
 			toServer <- reqToDevice
@@ -181,15 +187,16 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
-	buf := []byte{}
+	//buf := []byte{}
 	// Device owner, get user account info from session
 	_, cookieErr := r.Cookie("userSession")
 	if cookieErr != nil {
 		fmt.Println("Cookie Error: ", cookieErr)
 	} else {
 		sesh, _ := store.Get(r, "userSession")
-		buf = append(buf, []byte(sesh.Values["userId"].(string))...)
-		buf = append(buf, 0x1B)
+		/*buf = append(buf, []byte(sesh.Values["userId"].(string))...)
+		buf = append(buf, 0x1B)*/
+		buf := CustomProtocol.CreatePayload(sesh.Values["userId"].(string))
 		//fmt.Println("Cookie userid: ", sesh.Values["userId"])
 		//fmt.Println("Cookie isLoggedIn: ", sesh.Values["isLoggedIn"])
 	}

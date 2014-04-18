@@ -123,6 +123,8 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	} else {
 		fmt.Println("No response on login")
+		http.Error(w, "Timeout on Login", 8008135)
+		return
 	}
 }
 

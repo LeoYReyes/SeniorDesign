@@ -122,6 +122,10 @@ func GPSCommunicate(conn net.Conn) {
 	}
 }
 
+/**
+ * Get the phone number from a text message. Returns an empty string if the argument
+ * was not in the expected format.
+ */
 func parsePhoneNumber(msg string) string {
 	indexStart := strings.Index(msg, "[")
 	indexEnd := strings.Index(msg, "]")
@@ -131,6 +135,10 @@ func parsePhoneNumber(msg string) string {
 	return ""
 }
 
+/**
+ * Starts a timer in another thread. See motionAlertTimer for more specific
+ * details.
+ */
 func motionAlert(phoneNumber string) {
 	fmt.Println(phoneNumber + " " + MOTION_ALERT)
 	go motionAlertTimer(phoneNumber)
@@ -162,6 +170,13 @@ func motionAlert(phoneNumber string) {
 	*/
 }
 
+/**
+ * This should be called as a go routine. Sleeps for an amount of time,
+ * then checks if the geogram is stolen (it will be marked solen if it leaves
+ * the geofence). If it is no stolen, it sleeps it again.
+ * No longer used. If need to reimplement, sleep geogram command no longer
+ * use the .1 command which sends a motion alert upon waking.
+ */
 func motionAlertTimer(phoneNumber string) {
 	time.Sleep(MOTION_AWAKE_TIME)
 
@@ -188,6 +203,9 @@ func motionAlertTimer(phoneNumber string) {
 		payload := CustomProtocol.CreatePayload(phoneNumber, pin)
 
 		response2 := make(chan []byte)
+		// This request (CustomProtocol.SleepGeogram) no longer uses the type of sleeping
+		// that sends a motion alert upon waking by motion. If this method needs to be used in the future
+		// a new opcode should be created that uses that command.
 		req2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
 			Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.SleepGeogram, Payload: payload,
 			Response: response2}
@@ -196,6 +214,10 @@ func motionAlertTimer(phoneNumber string) {
 	}
 }
 
+/**
+ * Marks GPS device as stolen and activates interval tracking.
+ * No longer used.
+ */
 func geofenceAlert(phoneNumber string) { //todo add functionality
 	fmt.Println(phoneNumber + " " + MOTION_ALERT)
 	//report stolen

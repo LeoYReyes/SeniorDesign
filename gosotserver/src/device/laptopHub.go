@@ -198,8 +198,6 @@ func GetDeviceID(conn net.Conn) {
 			CloseConn(*deviceConn)
 		}
 		// SEND requests to laptop upon connection, if stolen
-		//TODO: keep connections open until devices are marked as not stolen
-		//TODO: add error handling for connections that are dropped (or closed by the laptop unexpectedly)
 		requestTraceRoute := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserIPTraceData, "")
 		if !requestTraceRoute {
 			fmt.Println("laptopHub.GetDeviceID: Error sending request traceroute. Closing connection...")

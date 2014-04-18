@@ -1,6 +1,10 @@
 //TODO: Refactor: processRequest that all components can share
 package CustomProtocol
 
+import (
+	"time"
+)
+
 const (
 	// Op Code format	ddd fffff
 	//	ddd = destination
@@ -94,6 +98,22 @@ func ParsePayload(payload []byte) []string {
 		}
 	}
 	return str
+}
+
+/**
+ * Listen to a channel with a set timeout. If there is a response in that
+ * time, the function returns true, with the byte array that was sent
+ * to the channel. If it does not receive a response before the timeout,
+ * then it returns false with a nil value for the array. The timeout is in
+ * seconds.
+ */
+func GetResponse(respCh chan []byte, timeout time.Duration) (bool, []byte) {
+	select {
+	case response := <-respCh:
+		return true, response
+	case <-time.After(timeout * time.Second):
+		return false, nil
+	}
 }
 
 /*//tests if request is for the calling source

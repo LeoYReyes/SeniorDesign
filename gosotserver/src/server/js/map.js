@@ -19,7 +19,7 @@ var markerImg = 'images/marker.png';
 var markerGreen = 'images/markerGreen.png';
 var markerBlue = 'images/markerBlue.png';
 var markerRed = 'images/markerRed.png';
-var markerPink = 'images/markerRed.png';
+var markerPink = 'images/markerPink.png';
 var markerCyan = 'images/markerCyan.png';
 var markerOrange = 'images/markerOrange.png';
 var markerYellow = 'images/markerYellow.png';
@@ -73,10 +73,10 @@ socket.onmessage = function(msg) {
 			map: map,
 			title: 'New Location'
 		});
-	devicePins[deviceIndex].push(newPosition);
-	if(devicePins[deviceIndex].length > 1) {
+	gpsDevicePins[deviceIndex].push(newPosition);
+	if(gpsDevicePins[deviceIndex].length > 1) {
 		var line = new google.maps.Polyline({
-			path: [devicePins[deviceIndex - 1].position, newPosition.position],
+			path: [gpsDevicePins[deviceIndex][gpsDevicePins[deviceIndex].length - 2].position, newPosition.position],
 			icons: [{
 				icon: lineSymbol,
 				offset: '100%'

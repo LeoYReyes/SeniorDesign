@@ -99,11 +99,12 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(loginPassword)*/
 	hashedPass := fmt.Sprintf("%x", ha.Sum(nil))
 
-	buf := []byte{}
+	/*buf := []byte{}
 	buf = append(buf, []byte(loginName)...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(hashedPass)...)
-	buf = append(buf, 0x1B)
+	buf = append(buf, 0x1B)*/
+	buf := CustomProtocol.CreatePayload(loginName, hashedPass)
 
 	resCh := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
@@ -158,7 +159,7 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
 	//fmt.Println(hashedPass)
 
-	buf := []byte{}
+	/*buf := []byte{}
 	buf = append(buf, []byte(firstName)...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(lastName)...)
@@ -168,7 +169,8 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	buf = append(buf, []byte(phoneNumber)...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(hashedPass)...)
-	buf = append(buf, 0x1B)
+	buf = append(buf, 0x1B)*/
+	buf := CustomProtocol.CreatePayload(firstName, lastName, loginName, phoneNumber, hashedPass)
 
 	resCh := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,

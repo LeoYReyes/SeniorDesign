@@ -1,23 +1,24 @@
 package databaseSOT
 
 import (
-	"CustomProtocol"
-	"crypto/sha1"
-	"fmt"
-	"strings"
+	//"CustomProtocol"
+	//"crypto/sha1"
+	//"fmt"
+	//"strings"
 	"testing"
 )
 
-func TestSignUp(t *testing.T) {
+/*func TestSignUp(t *testing.T) {
 	SignUp("steven's name", "whaley", "steven@steven.com", "2567836223", "password")
-}
+
+}*/
 
 func TestRegisterNewDevice(t *testing.T) {
 	//deviceType string, deviceId string, deviceName string, userId string)
-	//registerNewDevice("laptop", "1", "stevens laptop", "61")
+	registerNewDevice("laptop", "1", "steven's laptop", "steven@steven.com")
 }
 
-func TestParsePayload(t *testing.T) {
+/*func TestParsePayload(t *testing.T) {
 	a := []byte("Param1")
 	b := []byte("Param2")
 	c := []byte("Param3")
@@ -83,4 +84,4 @@ func TestParseTraceRoute(t *testing.T) {
 	traceroute := parseTraceRouteString("127.0.0.1:4096~123.1.1.1~123.2.23.2~123.3.3.3")
 	fmt.Println("PARSE TRACEROUTE")
 	fmt.Println(len(traceroute))
-}
+}*/

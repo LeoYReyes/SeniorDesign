@@ -1,4 +1,8 @@
 //TODO: comment this code!!
+var lineSymbol = {
+    path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW
+};
+  
 $(function() {
 	deviceInfo();
 	var deviceBoxes = [];
@@ -64,6 +68,7 @@ $(function() {
 				type: "GET",
 				success: function(response) {
 					if(response != null) {
+						//alert(JSON.stringify(response[2]['Name']));
 						for(i = 0; i < response.length; i++) {
 							//alert(JSON.stringify(response[i]));
 							var box = createDeviceBox(response[i]['Name'], response[i]['ID'], response[i]['IsStolen'], response[i]['TraceRouteList'], response[i]['KeylogData'], response[i]['Coordinates']);
@@ -172,7 +177,51 @@ $(function() {
 			if(deviceType == "gps") {
 				var showCoordListButton = $("<li>", {"data-toggle": "modal", "data-target": "#modalCoordList"});
 				var showCoordListLink = $("<a>").text("Show Coords");
-				
+				var deviceCoords = [];
+				var deviceCoordDirections = [];
+				for(k = 0; k < coordsIn.length; k++) {
+						var coordList = coordsIn[k].substring(coordsIn[k].indexOf("&") + 1).split(String.fromCharCode(27));
+						var markerPos = new google.maps.LatLng(parseFloat(coordList[0]), parseFloat(coordList[1]));
+						var marker = new google.maps.Marker({
+	            			position: markerPos,
+							icon: markerImg,
+	            			map: map,
+	            			title: coordsIn[k].substring(0, coordsIn[k].indexOf("&"))
+	    				});
+						deviceCoords.push(marker);
+						if(k > 0) {
+							var line = new google.maps.Polyline({
+								path: [deviceCoords[k - 1].position, deviceCoords[k].position],
+								icons: [{
+									icon: lineSymbol,
+									offset: '100%'
+								}],
+								map: map
+							});
+							deviceCoordDirections.push(line);
+						}
+				}
+				gpsDevices.push(deviceId);
+				gpsDevicePins.push(deviceCoords);
+				gpsDevicePinsDirections.push(deviceCoordDirections);
+				var showPreviousLocationsButton = $("<div>", {id: deviceId, class: "showPrevLocButton"});
+				showPreviousLocationsButton.text("toggle locs");
+				showPreviousLocationsButton.click(function() {
+					var deviceIndex = gpsDevices.indexOf($(this).attr("id"));
+					for(i = 0; i < gpsDevicePins[deviceIndex].length; i++) {
+						//alert(gpsDevicePinsDirections[deviceIndex]);
+						if(i < (gpsDevicePins[deviceIndex].length - 1)) {
+							if(gpsDevicePins[deviceIndex][i].getVisible()) {
+								gpsDevicePinsDirections[deviceIndex][i].setMap(null);
+							} else {
+								gpsDevicePinsDirections[deviceIndex][i].setMap(map);
+							}
+						}
+						gpsDevicePins[deviceIndex][i].setVisible(!gpsDevicePins[deviceIndex][i].getVisible());
+						//alert(gpsDevicePins[deviceIndex].length);
+							
+					}
+				});
 				showCoordListLink.click(function() {
 					// Clear text
 					$("#modalCoordList").find(".modal-footer").text("");
@@ -233,6 +282,7 @@ $(function() {
 			}
 			if(deviceType == "gps") {
 				colmd10.append(showCoordListButton);	
+				colmd10.append(showPreviousLocationsButton);
 			}
 			colmd10.append(activateDeviceButton);
 			row2.append(colmd1);
@@ -280,3 +330,4 @@ function showKeylog(){
 	});
 	
 }
+

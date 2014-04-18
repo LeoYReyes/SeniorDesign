@@ -129,6 +129,11 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func signUpHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		// Handle error
+		fmt.Println("ParseForm error: ", err)
+	}
 	//TODO: check for blank inputs
 	firstName := strings.Trim(r.PostForm.Get("firstName"), " ")
 	lastName := strings.Trim(r.PostForm.Get("lastName"), " ")
@@ -140,11 +145,6 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 		// Redirect back to home if any fields are empty, someone is trying to play tricks
 		http.Redirect(w, r, "/home", http.StatusFound)
 		return
-	}
-	err := r.ParseForm()
-	if err != nil {
-		// Handle error
-		fmt.Println("ParseForm error: ", err)
 	}
 	//TODO: move hashing to database SignUp function
 	h := sha1.New()

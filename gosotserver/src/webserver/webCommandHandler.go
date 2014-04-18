@@ -132,7 +132,7 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 				OpCode: CustomProtocol.ActivateGPS, Payload: buf, Response: resCh}
 			toServer <- reqToDB
 			// Default interval 60 seconds
-			buf = append(buf, []byte("60")...)
+			buf = append(buf, []byte("140")...)
 			buf = append(buf, 0x1B)
 			reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}

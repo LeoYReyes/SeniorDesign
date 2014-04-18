@@ -136,9 +136,9 @@ func processRequest(req *CustomProtocol.Request) {
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 2 {
 			//msg := "[" + payload[0] + "]" + payload[1] + ".1.|"
-			//new sleeping method, awake for 120 seconds, asleep for 86400 (24 hours)
+			//new sleeping method, awake for 300 seconds, asleep for 86400 (24 hours)
 			//also wakes on SMS or motion
-			msg := "[" + payload[0] + "]" + payload[1] + ".5.120.86400.6.|"
+			msg := "[" + payload[0] + "]" + payload[1] + ".5.300.86400.6.|"
 			success = sendMsgToGpsHub(msg)
 		}
 
@@ -188,7 +188,7 @@ func processRequest(req *CustomProtocol.Request) {
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 2 {
 			//motion alert
-			motMsg := "[" + payload[0] + "]" + payload[1] + ".6.200." + MOTION_ALERT + ".|"
+			//motMsg := "[" + payload[0] + "]" + payload[1] + ".6.200." + MOTION_ALERT + ".|"
 
 			//hyperlink1
 			hyp1Msg := "[" + payload[0] + "]" + payload[1] + ".6.450." + HYPERLINK_1 + ".|"
@@ -200,7 +200,13 @@ func processRequest(req *CustomProtocol.Request) {
 			hyp3Msg := "[" + payload[0] + "]" + payload[1] + ".6.550." + HYPERLINK_3 + ".|"
 
 			//geofence alert
-			geoMsg := "[" + payload[0] + "]" + payload[1] + ".6.250." + GEOFENCE_ALERT + ".|"
+			//geoMsg := "[" + payload[0] + "]" + payload[1] + ".6.250." + GEOFENCE_ALERT + ".|"
+
+			//accelerometer sensitivity
+			geoMsg := "[" + payload[0] + "]" + payload[1] + ".6.166.3.|"
+
+			//accelerometer sensitivity
+			geoMsg := "[" + payload[0] + "]" + payload[1] + ".6.179.32.|"
 
 			success = sendMsgToGpsHub(motMsg) && sendMsgToGpsHub(hyp1Msg) &&
 				sendMsgToGpsHub(hyp2Msg) && sendMsgToGpsHub(hyp3Msg) &&

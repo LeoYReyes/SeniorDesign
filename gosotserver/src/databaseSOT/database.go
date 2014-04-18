@@ -1,27 +1,27 @@
 /*
-*	DATABASE.GO
-*
-* 	Created			- Steven Whaley: February 18, 2014
-*	Last updated	- Steven Whaley: April 17, 2014
-*
-* 	OVERVIEW:
-*
-*   This is the database portion of the server. It provides functionality for interacting with the database. Actions
-*   such as user sign up and login must use functions provided in this file to update and query the database.
-*   See the comments for each method for details.
-*
-*	user := "root"
-*	pass := "toor"
-*	dbname := "trackerdb"
-*	proto := "tcp"
-*	addr := "127.0.0.1:3306"
-*
-*   Useful Links:
-*
-*   Mysql driver for google go:	https://github.com/ziutek/mymysql
-*
-*   Golang documentation:			http://golang.org/doc/
-*
+ *	DATABASE.GO
+ *
+ * 	Created			- Steven Whaley: February 18, 2014
+ *	Last updated	- Steven Whaley: April 17, 2014
+ *
+ * 	OVERVIEW:
+ *
+ *  		This is the database portion of the server. It provides functionality for interacting with the database. Actions
+ *  		such as user sign up and login must use functions provided in this file to update and query the database.
+ *  		See the comments for each method for details.
+ *
+ *		user := "root"
+ *		pass := "toor"
+ *		dbname := "trackerdb"
+ *		proto := "tcp"
+ *		addr := "127.0.0.1:3306"
+ *
+ *   Useful Links:
+ *
+ *   	Mysql driver for google go	-	https://github.com/ziutek/mymysql
+ *
+ *   	Golang documentation		-	http://golang.org/doc/
+ *
  */
 
 package databaseSOT
@@ -32,13 +32,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ziutek/mymysql/mysql"
-	_ "github.com/ziutek/mymysql/thrsafe" // Thread safe engine
+	_ "github.com/ziutek/mymysql/thrsafe"
 	"strconv"
 	"strings"
 )
 
 /*
-* These structs represent tables in the database.
+ * These structs represent tables in the database.
+ *
+ *	Steven Whaley - February 2014
  */
 type Account struct {
 	CustomerId int64
@@ -110,6 +112,13 @@ func chanHandler() {
 	}
 }
 
+/*
+ *	Processes server requests and calls database functions
+ *	to perform requested functionality. Resulting response
+ *	is sent back.
+ *
+ *	Steven Whaley - March 2014
+ */
 func processRequest(req *CustomProtocol.Request) {
 
 	payload := CustomProtocol.ParsePayload(req.Payload)
@@ -227,10 +236,9 @@ func processRequest(req *CustomProtocol.Request) {
 }
 
 /*
-* Used to form connection with the database.
-*
-*
-* Steven Whaley Feb, 27 - created
+ * 	Used to form connection with the database.
+ *
+ * 	Steven Whaley Feb, 27 - created
  */
 
 func connect() (connection mysql.Conn) {
@@ -251,10 +259,9 @@ func connect() (connection mysql.Conn) {
 }
 
 /*
-* Used to close connection with the database.
-*
-*
-* Steven Whaley Feb, 27 - created
+ * 	Used to close connection with the database.
+ *
+ * 	Steven Whaley Feb, 27 - created
  */
 
 func disconnect(connection mysql.Conn) {
@@ -264,11 +271,10 @@ func disconnect(connection mysql.Conn) {
 }
 
 /*
-* Takes in user information entered on the sign up page, and creates account and customer entries
-* in the database.
-*
-*
-* Steven Whaley Feb, 26 - created
+ * 	Takes in user information entered on the sign up page, and creates account and customer entries
+ * 	in the database.
+ *
+ * 	Steven Whaley Feb, 26 - created
  */
 
 func SignUp(firstname string, lastname string, email string, phoneNumber string, password string) bool {
@@ -304,6 +310,12 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 	return output
 }
 
+/*
+ * 	Return a byte array of gps devices associated
+ *	with the email input.
+ *
+ * 	Steven Whaley March 2014 - created
+ */
 func getGpsDevices(email string) []byte {
 	var list []device.GPSDevice
 
@@ -345,10 +357,11 @@ func getGpsDevices(email string) []byte {
 }
 
 /*
-*
-*
-*
-* Steven Whaley Mar, 18 - created
+ *	Registers a new device based on the type, id, name
+ *	and user email provided.
+ *
+ *
+ *	Steven Whaley Mar, 18 - created
  */
 
 func registerNewDevice(deviceType string, deviceId string, deviceName string, email string) bool {
@@ -389,11 +402,11 @@ func registerNewDevice(deviceType string, deviceId string, deviceName string, em
 }
 
 /*
-*  IsDeviceStolen(deviceId string) (bool) takes in device id and return a
-*  boolean indicating whether that device is marked stolen.
-*
-*
-* Steven Whaley Mar, 1 - created
+ *  IsDeviceStolen(deviceId string) (bool) takes in device id and return a
+ *  boolean indicating whether that device is marked stolen.
+ *
+ *
+ *	Steven Whaley Mar, 1 - created
  */
 
 func IsDeviceStolen(deviceId string) bool {
@@ -404,21 +417,16 @@ func IsDeviceStolen(deviceId string) bool {
 
 	//TODO: < 12 temp fix
 	if len(deviceId) < 12 {
-		rows, res, err := db.Query("select isStolen from gpsDevice where deviceId = '" + deviceId + "'")
+		rows, _, err := db.Query("select isStolen from gpsDevice where deviceId = '" + deviceId + "'")
 		if err != nil {
 			fmt.Println("Database Query Error:", err)
 		}
 
-		res = res
-
 		for _, row := range rows {
-
-			var err2 error
 
 			val1 := row[0].([]byte)
 
-			temp, err2 := strconv.ParseInt(string(val1[:]), 10, 64)
-			err2 = err2
+			temp, _ := strconv.ParseInt(string(val1[:]), 10, 64)
 
 			if temp == 1 {
 				bool1 = true
@@ -428,19 +436,16 @@ func IsDeviceStolen(deviceId string) bool {
 		}
 	} else {
 
-		rows2, res2, err3 := db.Query("select isStolen from laptopDevice where deviceId = '" + deviceId + "'")
+		rows2, _, err3 := db.Query("select isStolen from laptopDevice where deviceId = '" + deviceId + "'")
 		if err3 != nil {
 			fmt.Println("Database Query Error:", err3)
 		}
-
-		res2 = res2
 
 		for _, row := range rows2 {
 
 			val2 := row[0].([]byte)
 
-			temp2, err4 := strconv.ParseInt(string(val2[:]), 10, 64)
-			err4 = err4
+			temp2, _ := strconv.ParseInt(string(val2[:]), 10, 64)
 
 			if temp2 == 1 {
 				bool1 = true
@@ -456,10 +461,10 @@ func IsDeviceStolen(deviceId string) bool {
 }
 
 /*
-*
-*
-*
-* Steven Whaley Mar, 23
+ *	Updates account fields for already existing account.
+ *
+ *
+ *	Steven Whaley Mar, 23
  */
 
 func updateAccountInfo(oldUsername string, newUsername string, newPassword string) bool {
@@ -473,9 +478,7 @@ func updateAccountInfo(oldUsername string, newUsername string, newPassword strin
 		newPassword = strings.Replace(newPassword, "'", "\\'", -1)
 	}
 
-	rows, res, err := db.Query("UPDATE account SET userName = '" + newUsername + "', password = '" + newPassword + "' WHERE userName = '" + oldUsername + "'")
-	rows = rows
-	res = res
+	_, _, err := db.Query("UPDATE account SET userName = '" + newUsername + "', password = '" + newPassword + "' WHERE userName = '" + oldUsername + "'")
 
 	if err != nil {
 		fmt.Println("Database Query Error:", err)
@@ -487,11 +490,11 @@ func updateAccountInfo(oldUsername string, newUsername string, newPassword strin
 }
 
 /*
-*
-*
-*
-* 	Steven Whaley Mar, 1 - created
-* 	Mar 17 - seems to be working
+ *  Inserts new keylog data into database.
+ *
+ *
+ * 	Steven Whaley - Mar, 1 - created
+ * 	Steven Whaley - Mar, 17 - seems to be working
  */
 
 func UpdateKeylog(deviceId string, keylog string) bool {
@@ -504,10 +507,7 @@ func UpdateKeylog(deviceId string, keylog string) bool {
 		keylog = strings.Replace(keylog, "'", "\\'", -1)
 	}
 
-	rows, res, err := db.Query("INSERT INTO keyLogs (data, deviceId) SELECT '" + keylog + "', " + "id FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
-
-	rows = rows
-	res = res
+	_, _, err := db.Query("INSERT INTO keyLogs (data, deviceId) SELECT '" + keylog + "', " + "id FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
 
 	if err != nil {
 		fmt.Println("Database Query Error:", err)
@@ -519,21 +519,17 @@ func UpdateKeylog(deviceId string, keylog string) bool {
 }
 
 /*
-*
-*
-*
-* Steven Whaley Mar, 23 - created
-*
+ *	Updates the latitude and longitude coordinates associated
+ *	with a gps device.
+ *
+ *	Steven Whaley - March 23, 2014 - created
  */
-
 func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 	bool1 := true
 
 	db := connect()
 
-	rows, res, err := db.Query("INSERT INTO coordinates(latitude, longitude, deviceId) SELECT '" + latitude + "', '" + longitude + "', id FROM gpsDevice WHERE deviceId = '" + deviceId + "'")
-	rows = rows
-	res = res
+	_, _, err := db.Query("INSERT INTO coordinates(latitude, longitude, deviceId) SELECT '" + latitude + "', '" + longitude + "', id FROM gpsDevice WHERE deviceId = '" + deviceId + "'")
 
 	if err != nil {
 		fmt.Println("Database Query Error:", err)
@@ -544,6 +540,12 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 	return bool1
 }
 
+/*
+ *	Sets isStolen to 1 in the database to indicate that a device
+ *	is stolen.
+ *
+ *	Steven Whaley - March 2014
+ */
 func flagStolen(deviceType string, deviceId string) {
 
 	db := connect()
@@ -552,6 +554,12 @@ func flagStolen(deviceType string, deviceId string) {
 	disconnect(db)
 }
 
+/*
+ *	Sets isStolen to 1 in the database to indicate that a device
+ *	is stolen.
+ *
+ *	Steven Whaley - March 2014
+ */
 func flagNotStolen(deviceType string, deviceId string) {
 
 	db := connect()
@@ -561,13 +569,10 @@ func flagNotStolen(deviceType string, deviceId string) {
 }
 
 /*
-*
-*
-*
-* Steven Whaley Mar, 17 - created
-*
+ *	UpdateTraceRoute calls parseTraceRouteString
+ *
+ *	Steven Whaley - March 2014
  */
-
 func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 
 	bool1 := true
@@ -584,9 +589,6 @@ func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 	list = parseTraceRouteString(traceRoute)
 
 	for i := 0; i < len(list); i++ {
-		/*fmt.Println("INSERT INTO ipAddress (ipAddress,listId) SELECT  '" + list[i] +
-		"', MAX(id) FROM ipList WHERE deviceId IN (SELECT id FROM laptopDevice WHERE deviceId='" + deviceId + "')")*/
-
 		db.Query("INSERT INTO ipAddress (ipAddress,listId) SELECT  '" + list[i] +
 			"', MAX(id) FROM ipList WHERE deviceId IN (SELECT id FROM laptopDevice WHERE deviceId='" + deviceId + "')")
 	}
@@ -596,12 +598,17 @@ func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 	return bool1
 }
 
+/*
+ *	The traceroute string is delimited by ~
+ *	This function parse out the the ip addresses into
+ *	an array.
+ *
+ *	Steven Whaley - March 2014
+ */
 func parseTraceRouteString(trace string) (arr []string) {
 
 	var list []string
 
-	//trace := "127.0.01231.1~123.1.1.1~123.2.23.2~123.3.3.3"
-	//print(trace + "\n")
 	num := strings.Count(trace, "~") + 1
 
 	address1 := ""
@@ -611,24 +618,20 @@ func parseTraceRouteString(trace string) (arr []string) {
 		if i != num-1 {
 			address1 = trace[0:strings.Index(trace, "~")]
 			list = append(list, address1)
-			//fmt.Println("extracted: " + list[i])
-
 			trace = trace[strings.Index(trace, "~")+1 : len(trace)]
 		} else {
 			address1 = trace
 			list = append(list, address1)
-			//fmt.Println("extracted: " + list[i])
 		}
 	}
 	return list
 }
 
 /*
-*
-*
-* Steven Whaley Mar, 1 - created
+ *	Returns True or False
+ *
+ *	Steven Whaley Mar, 1 - created
  */
-
 func IsGpsDevice(deviceId string) bool {
 
 	bool1 := false
@@ -643,13 +646,6 @@ func IsGpsDevice(deviceId string) bool {
 	res = res
 
 	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
 
 		var err2 error
 		temp := int64(-1)
@@ -672,11 +668,10 @@ func IsGpsDevice(deviceId string) bool {
 }
 
 /*
-* Takes in user information entered on the sign up page, and creates account and customer entries
-* in the database.
-*
-*
-* Steven Whaley Feb, 26 - created
+ *	Takes in user information entered on the sign up page, and creates account and customer entries
+ *	in the database.
+ *
+ *	Steven Whaley Feb, 26 - created
  */
 
 func VerifyAccountInfo(username string, password string) (bool, bool) {
@@ -695,13 +690,6 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 	res = res
 
 	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
 
 		val4 := row[2].([]byte)
 		val5 := row[3].([]byte)
@@ -723,10 +711,10 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 }
 
 /*
-* Takes in user email address, and returns a slice of strings containing the names
-* of all the devices owned by the user.
-*
-*
+ *	Takes in user email address, and returns a slice of strings containing the names
+ *	of all the devices owned by the user.
+ *
+ *	Steven Whaley
  */
 func getLaptopDevices(email string) []byte {
 
@@ -803,471 +791,4 @@ func getLaptopDevices(email string) []byte {
 	deviceListJson, _ := json.Marshal(list)
 
 	return deviceListJson
-}
-
-/*
-* Returns all the fields for a row with the id passed to the function.
-*
-*
-* Steven Whaley Feb, 22 - created
- */
-func GetAccountInfo(id_in string) string {
-
-	out := "initial"
-
-	accountInfo := new(Account)
-
-	db := connect()
-
-	rows, res, err := db.Query("select * from account where id = " + id_in)
-	if err != nil {
-		fmt.Println("Database Query Error:", err)
-	}
-
-	res = res
-
-	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
-
-		val1 := row[0].([]byte)
-		val2 := row[1].([]byte)
-		val3 := row[2].([]byte)
-		val4 := row[3].([]byte)
-		// val5 := row[4].([]byte)
-
-		var err2 error
-		var err3 error
-
-		accountInfo.CustomerId, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		accountInfo.Id, err3 = strconv.ParseInt(string(val2[:]), 10, 64)
-		accountInfo.UserName = string(val3[:])
-		accountInfo.Password = string(val4[:])
-		//accountInfo.Admin = string(val5[:])
-
-		err2 = err2
-		err3 = err3
-
-	}
-
-	out = fmt.Sprint(accountInfo.CustomerId, accountInfo.Id, accountInfo.UserName, accountInfo.Password)
-
-	disconnect(db)
-
-	return out
-}
-
-/*
-* Returns all the fields for a row with the id passed to the function.
-*
-*
-* Steven Whaley Feb, 22 - created
- */
-func GetCoordinatesInfo(id_in string) string {
-
-	out := "initial"
-
-	coordinatesInfo := new(Coordinates)
-
-	db := connect()
-
-	rows, res, err := db.Query("select * from coordinates where id = " + id_in)
-	if err != nil {
-		fmt.Println("Database Query Error:", err)
-	}
-
-	res = res
-
-	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
-
-		val1 := row[0].([]byte)
-		val2 := row[1].([]byte)
-		val3 := row[2].([]byte)
-		val4 := row[3].([]byte)
-		val5 := row[4].([]byte)
-
-		var err2 error
-		var err3 error
-		var err4 error
-		var err5 error
-
-		coordinatesInfo.DeviceId, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		coordinatesInfo.Latitude, err3 = strconv.ParseFloat(string(val2[:]), 64)
-		coordinatesInfo.Longitude, err4 = strconv.ParseFloat(string(val3[:]), 64)
-		coordinatesInfo.Timestamp = string(val4[:])
-		coordinatesInfo.Id, err5 = strconv.ParseInt(string(val5[:]), 10, 64)
-
-		err2 = err2
-		err3 = err3
-		err4 = err4
-		err5 = err5
-
-	}
-
-	out = fmt.Sprint(coordinatesInfo.DeviceId, coordinatesInfo.Latitude, coordinatesInfo.Longitude, coordinatesInfo.Timestamp, coordinatesInfo.Id)
-
-	disconnect(db)
-
-	return out
-}
-
-/*
-* Returns all the fields for a row with the id passed to the function.
-*
-*
-* Steven Whaley Feb, 22 - created
- */
-func GetCustomerInfo(id_in string) string {
-
-	out := "initial"
-
-	customerInfo := new(Customer)
-
-	db := connect()
-
-	rows, res, err := db.Query("select * from customer where id = " + id_in)
-	if err != nil {
-		fmt.Println("Database Query Error:", err)
-	}
-	res = res
-
-	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
-
-		val1 := row[0].([]byte)
-		val2 := row[1].([]byte)
-		val3 := row[2].([]byte)
-		val4 := row[3].([]byte)
-		val5 := row[4].([]byte)
-		val6 := row[5].([]byte)
-
-		var err2 error
-		var err3 error
-		var err4 error
-		var err5 error
-		var err6 error
-		var err7 error
-
-		customerInfo.Id, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		customerInfo.PhoneNumber = string(val2[:])
-		customerInfo.Address = string(val3[:])
-		customerInfo.Email = string(val4[:])
-		customerInfo.FirstName = string(val5[:])
-		customerInfo.LastName = string(val6[:])
-
-		err2 = err2
-		err3 = err3
-		err4 = err4
-		err5 = err5
-		err6 = err6
-		err7 = err7
-
-	}
-
-	out = fmt.Sprint(customerInfo.Id, customerInfo.PhoneNumber, customerInfo.Address, customerInfo.Email, customerInfo.FirstName, customerInfo.LastName)
-
-	disconnect(db)
-
-	return out
-}
-
-/*
-* Returns all the fields for a row with the id passed to the function.
-*
-*
-* Steven Whaley Feb, 22 - created
- */
-func GetGpsDeviceInfo(id_in string) string {
-
-	out := "initial"
-
-	gpsDeviceInfo := new(GpsDevice)
-
-	db := connect()
-
-	rows, res, err := db.Query("select * from gpsDevice where id = " + id_in)
-	if err != nil {
-		fmt.Println("Database Query Error:", err)
-	}
-	res = res
-
-	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
-
-		val1 := row[0].([]byte)
-		val2 := row[1].([]byte)
-		val3 := row[2].([]byte)
-		val4 := row[3].([]byte)
-
-		var err2 error
-		var err3 error
-		var err4 error
-		var err5 error
-
-		gpsDeviceInfo.Id, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		gpsDeviceInfo.Name = string(val2[:])
-		gpsDeviceInfo.CustomerId, err3 = strconv.ParseInt(string(val3[:]), 10, 64)
-		gpsDeviceInfo.IsStolen, err4 = strconv.ParseInt(string(val4[:]), 10, 64)
-
-		err2 = err2
-		err3 = err3
-		err4 = err4
-		err5 = err5
-
-	}
-
-	out = fmt.Sprint(gpsDeviceInfo.Id, gpsDeviceInfo.Name, gpsDeviceInfo.CustomerId, gpsDeviceInfo.IsStolen)
-
-	disconnect(db)
-
-	return out
-}
-
-/*
-* Returns all the fields for a row with the id passed to the function.
-*
-*
-* Steven Whaley Feb, 22 - created
- */
-func GetIpAddressInfo(id_in string) string {
-
-	out := "initial"
-
-	ipAddressInfo := new(IpAddress)
-
-	db := connect()
-
-	rows, res, err := db.Query("select * from ipAddress where id = " + id_in)
-	if err != nil {
-		fmt.Println("Database Query Error:", err)
-	}
-	res = res
-
-	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
-
-		val1 := row[0].([]byte)
-		val2 := row[1].([]byte)
-		val3 := row[2].([]byte)
-
-		var err2 error
-		var err3 error
-		var err4 error
-
-		ipAddressInfo.ListId, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		ipAddressInfo.IpAddress = string(val2[:])
-		ipAddressInfo.Id, err3 = strconv.ParseInt(string(val3[:]), 10, 64)
-
-		err2 = err2
-		err3 = err3
-		err4 = err4
-
-	}
-
-	out = fmt.Sprint(ipAddressInfo.ListId, ipAddressInfo.IpAddress, ipAddressInfo.Id)
-
-	disconnect(db)
-
-	return out
-}
-
-/*
-* Returns all the fields for a row with the id passed to the function.
-*
-*
-* Steven Whaley Feb, 22 - created
- */
-func GetIpListInfo(id_in string) string {
-
-	out := "initial"
-
-	ipListInfo := new(IpList)
-
-	db := connect()
-
-	rows, res, err := db.Query("select * from ipList where id = " + id_in)
-	if err != nil {
-		fmt.Println("Database Query Error:", err)
-	}
-
-	res = res
-
-	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
-
-		val1 := row[0].([]byte)
-		val2 := row[1].([]byte)
-		val3 := row[2].([]byte)
-
-		var err2 error
-		var err3 error
-		var err4 error
-
-		ipListInfo.Id, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		ipListInfo.DeviceId, err3 = strconv.ParseInt(string(val2[:]), 10, 64)
-		ipListInfo.Timestamp = string(val3[:])
-
-		err2 = err2
-		err3 = err3
-		err4 = err4
-	}
-
-	out = fmt.Sprint(ipListInfo.Id, ipListInfo.DeviceId, ipListInfo.Timestamp)
-
-	disconnect(db)
-
-	return out
-}
-
-/*
-* Returns all the fields for a row with the id passed to the function.
-*
-*
-* Steven Whaley Feb, 22 - created
- */
-func GetKeyLogsInfo(id_in string) string {
-
-	out := "initial"
-
-	keyLogsInfo := new(KeyLogs)
-
-	db := connect()
-
-	rows, res, err := db.Query("select * from keyLogs where id = " + id_in)
-	if err != nil {
-		fmt.Println("Database Query Error:", err)
-	}
-
-	res = res
-
-	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
-
-		val1 := row[0].([]byte)
-		val2 := row[1].([]byte)
-		val3 := row[2].([]byte)
-
-		var err2 error
-		var err3 error
-		var err4 error
-
-		keyLogsInfo.DeviceId, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		keyLogsInfo.Timestamp = string(val2[:])
-		keyLogsInfo.Data = string(val3[:])
-
-		err2 = err2
-		err3 = err3
-		err4 = err4
-
-	}
-
-	out = fmt.Sprint(keyLogsInfo.DeviceId, keyLogsInfo.Timestamp, keyLogsInfo.Data)
-
-	disconnect(db)
-
-	return out
-}
-
-/*
-* Returns all the fields for a row with the id passed to the function.
-*
-*
-* Steven Whaley Feb, 22 - created
- */
-func GetLaptopDeviceInfo(id_in string) string {
-
-	out := "initial"
-
-	laptopDeviceInfo := new(LaptopDevice)
-
-	db := connect()
-
-	rows, res, err := db.Query("select * from laptopDevice where id = " + id_in)
-	if err != nil {
-		fmt.Println("Database Query Error:", err)
-	}
-	res = res
-
-	for _, row := range rows {
-		for _, col := range row {
-			if col == nil {
-				// col has NULL value
-			} else {
-				// Do something with text in col (type []byte)
-			}
-		}
-
-		val1 := row[0].([]byte)
-		val2 := row[1].([]byte)
-		val3 := row[2].([]byte)
-		val4 := row[3].([]byte)
-		val5 := row[4].([]byte)
-
-		var err2 error
-		var err3 error
-		var err4 error
-		var err5 error
-		var err6 error
-
-		laptopDeviceInfo.Id, err2 = strconv.ParseInt(string(val1[:]), 10, 64)
-		laptopDeviceInfo.DeviceName = string(val2[:])
-		laptopDeviceInfo.CustomerId, err3 = strconv.ParseInt(string(val3[:]), 10, 64)
-		laptopDeviceInfo.MacAddress = string(val4[:])
-		laptopDeviceInfo.IsStolen, err4 = strconv.ParseInt(string(val5[:]), 10, 64)
-
-		err2 = err2
-		err3 = err3
-		err4 = err4
-		err5 = err5
-		err6 = err6
-
-	}
-
-	out = fmt.Sprint(laptopDeviceInfo.Id, laptopDeviceInfo.DeviceName, laptopDeviceInfo.CustomerId, laptopDeviceInfo.MacAddress, laptopDeviceInfo.IsStolen)
-
-	disconnect(db)
-
-	return out
 }

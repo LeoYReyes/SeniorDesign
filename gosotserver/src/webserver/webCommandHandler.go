@@ -27,7 +27,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	buf := []byte{}
+	/*buf := []byte{}
 	// Device type
 	buf = append(buf, []byte(deviceType)...)
 	buf = append(buf, 0x1B)
@@ -36,15 +36,17 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	buf = append(buf, 0x1B)
 	// Device name
 	buf = append(buf, []byte(deviceName)...)
-	buf = append(buf, 0x1B)
+	buf = append(buf, 0x1B)*/
+	buf := CustomProtocol.CreatePayload(deviceType, deviceId, deviceName)
 	// Device owner, get user account info from session
 	_, cookieErr := r.Cookie("userSession")
 	if cookieErr != nil {
 		fmt.Println("Cookie Error: ", cookieErr)
 	} else {
 		sesh, _ := store.Get(r, "userSession")
-		buf = append(buf, []byte(sesh.Values["userId"].(string))...)
-		buf = append(buf, 0x1B)
+		/*buf = append(buf, []byte(sesh.Values["userId"].(string))...)
+		buf = append(buf, 0x1B)*/
+		buf = append(buf, CustomProtocol.CreatePayload(sesh.Values["userId"].(string))...)
 		//fmt.Println("Cookie userid: ", sesh.Values["userId"])
 		//fmt.Println("Cookie isLoggedIn: ", sesh.Values["isLoggedIn"])
 	}

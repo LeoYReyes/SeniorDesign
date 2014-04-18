@@ -203,14 +203,15 @@ func processRequest(req *CustomProtocol.Request) {
 			//geoMsg := "[" + payload[0] + "]" + payload[1] + ".6.250." + GEOFENCE_ALERT + ".|"
 
 			//accelerometer sensitivity
-			geoMsg := "[" + payload[0] + "]" + payload[1] + ".6.166.3.|"
+			accel1Msg := "[" + payload[0] + "]" + payload[1] + ".6.166.3.|"
 
 			//accelerometer sensitivity
-			geoMsg := "[" + payload[0] + "]" + payload[1] + ".6.179.32.|"
+			accel2Msg := "[" + payload[0] + "]" + payload[1] + ".6.179.32.|"
 
-			success = sendMsgToGpsHub(motMsg) && sendMsgToGpsHub(hyp1Msg) &&
+			success = /*sendMsgToGpsHub(motMsg) &&*/ sendMsgToGpsHub(hyp1Msg) &&
 				sendMsgToGpsHub(hyp2Msg) && sendMsgToGpsHub(hyp3Msg) &&
-				sendMsgToGpsHub(geoMsg)
+				/*sendMsgToGpsHub(geoMsg) &&*/ sendMsgToGpsHub(accel1Msg) &&
+				sendMsgToGpsHub(accel2Msg)
 		}
 
 		if success {

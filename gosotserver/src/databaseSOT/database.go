@@ -28,7 +28,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ziutek/mymysql/mysql"
-	"os"
+	//"os"
 	"strconv"
 	"strings"
 	//_ "github.com/ziutek/mymysql/native" // Native engine
@@ -239,18 +239,6 @@ func processRequest(req *CustomProtocol.Request) {
 	}
 }
 
-func checkError(err error) {
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-}
-
-func checkedResult(rows []mysql.Row, res mysql.Result, err error) ([]mysql.Row, mysql.Result) {
-	checkError(err)
-	return rows, res
-}
-
 /*
 * Used to form connection with the database.
 *
@@ -284,7 +272,7 @@ func connect() (connection mysql.Conn) {
 
 func disconnect(connection mysql.Conn) {
 
-	checkError(connection.Close())
+	connection.Close()
 
 }
 

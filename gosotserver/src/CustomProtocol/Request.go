@@ -101,6 +101,19 @@ func ParsePayload(payload []byte) []string {
 }
 
 /**
+ * Creates a payload of strings converted to bytes
+ * and separated by escape chars
+ */
+func CreatePayload(args ...string) []byte {
+	var payload []byte
+	for _, str := range args {
+		payload = append(payload, []byte(str)...)
+		payload = append(payload, 0x1B)
+	}
+	return payload
+}
+
+/**
  * Listen to a channel with a set timeout. If there is a response in that
  * time, the function returns true, with the byte array that was sent
  * to the channel. If it does not receive a response before the timeout,

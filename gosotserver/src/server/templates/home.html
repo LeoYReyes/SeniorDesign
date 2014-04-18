@@ -36,7 +36,7 @@
 	  		<input type="email" id="loginName" name="loginName" class="form-control" placeholder="Email address" required></input>
 	  		<input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="Phone Number" onkeypress="phoneForm(this.form, event.keyCode)" required></input>	
 			<h5 id="hide" style="display:none; color:red">Passwords don't match.</h5>
-	  		<input type="password" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).*$" id="password" name="password" class="form-control" placeholder="Desired Password" onchange="testResults(this.form)" onkeyup="passStrength(this.form)" required></input>
+	  		<input type="password" id="password" name="password" class="form-control" placeholder="Desired Password" onchange="testResults(this.form)" onkeyup="passStrength(this.form)" required></input>
 			<input type="password"  id="confirmPassword" class="form-control" placeholder="Confirm Password" onchange="testResults(this.form)"  required></input>
 			
 			<h5 ><i><div id="passSt" style="display:none">Password Strength: 
@@ -73,6 +73,10 @@ function phoneForm(form, e){
 
 
 function testResults (form) {
+	var firstName = document.getElementById("firstName").value;
+	var lastName = document.getElementById("lastName").value;
+	var phoneNumber = document.getElementById("phoneNumber").value;
+	var loginName = document.getElementById("loginName").value;
     var password = document.getElementById("password").value;
 	var confirmPassword = document.getElementById("confirmPassword").value;
 	var hide = document.getElementById('hide');
@@ -83,12 +87,23 @@ function testResults (form) {
 		return false;
 	}
 	if(password != confirmPassword) {
-    	alert ("Not Equal: " + password + " and " + confirmPassword);
+    	//alert ("Not Equal: " + password + " and " + confirmPassword);
 		hide.style.display = 'block';
 		return false;	
-	}else {
-    	alert ("Equal: " + password + " and " + confirmPassword);
+	} else {
+    	//alert ("Equal: " + password + " and " + confirmPassword);
 		hide.style.display = 'none';
+		$.ajax({
+			url: "signup",
+			type: "POST",
+			data: {
+				firstName: firstName,
+				lastName: lastName,
+				loginName: loginName,
+				phoneNumber: phoneNumber,
+				password: password	
+			}
+		});
 		return true;
 	}
 	

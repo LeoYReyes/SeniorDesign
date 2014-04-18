@@ -155,7 +155,9 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 				{
 				}
 				
-				
+				// check heartbeat (ping)
+				// sends a ping to the server and expects a response to check
+				// if connection is still alive
 				try 
 				{
 					long time = System.currentTimeMillis();
@@ -243,7 +245,7 @@ public class TCPAsyncTask extends AsyncTask<String, Integer, Boolean>
 	}
 	
 	/**
-	 * Updates connection information
+	 * Updates connection information on the GUI
 	 */
 	@Override
 	protected void onProgressUpdate(Integer... progress)

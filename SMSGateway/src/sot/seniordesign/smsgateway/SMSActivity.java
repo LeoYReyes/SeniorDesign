@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 /**
  * 
- * @author Chuck
+ * @author Charles Baker
  *
  * Activity that defines the main (only) screen. Contains text fields
  * for the user to enter server info and a button to connect. Connects

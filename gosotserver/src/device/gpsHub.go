@@ -166,8 +166,9 @@ func motionAlertTimer(phoneNumber string) {
 	time.Sleep(MOTION_AWAKE_TIME)
 
 	//check if stolen
-	buf := []byte(phoneNumber)
-	buf = append(buf, 0x1B)
+	/*buf := []byte(phoneNumber)
+	buf = append(buf, 0x1B)*/
+	buf := CustomProtocol.CreatePayload(phoneNumber)
 
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
@@ -180,10 +181,11 @@ func motionAlertTimer(phoneNumber string) {
 		//send sleep command
 		pin := getPIN(phoneNumber)
 
-		payload := []byte(phoneNumber)
+		/*payload := []byte(phoneNumber)
 		payload = append(payload, 0x1B)
 		payload = append(payload, []byte(pin)...)
-		payload = append(payload, 0x1B)
+		payload = append(payload, 0x1B)*/
+		payload := CustomProtocol.CreatePayload(phoneNumber, pin)
 
 		response2 := make(chan []byte)
 		req2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
@@ -197,7 +199,8 @@ func motionAlertTimer(phoneNumber string) {
 func geofenceAlert(phoneNumber string) { //todo add functionality
 	fmt.Println(phoneNumber + " " + MOTION_ALERT)
 	//report stolen
-	payload := append([]byte(phoneNumber), 0x1B)
+	//payload := append([]byte(phoneNumber), 0x1B)
+	payload := CustomProtocol.CreatePayload(phoneNumber)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
 		Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateGPS, Payload: payload,
@@ -208,12 +211,13 @@ func geofenceAlert(phoneNumber string) { //todo add functionality
 	pin := getPIN(phoneNumber)
 	interval := INTERVAL_TIME
 
-	payload2 := []byte(phoneNumber)
+	/*payload2 := []byte(phoneNumber)
 	payload2 = append(payload2, 0x1B)
 	payload2 = append(payload2, []byte(pin)...)
 	payload2 = append(payload2, 0x1B)
 	payload2 = append(payload2, []byte(interval)...)
-	payload2 = append(payload2, 0x1B)
+	payload2 = append(payload2, 0x1B)*/
+	payload2 := CustomProtocol.CreatePayload(phoneNumber, pin, inerval)
 	response2 := make(chan []byte)
 	req2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
 		Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateIntervalGps, Payload: payload2,

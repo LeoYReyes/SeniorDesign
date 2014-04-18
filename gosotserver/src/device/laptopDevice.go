@@ -37,8 +37,9 @@ type LaptopDevice struct {
  */
 func (ld *LaptopDevice) CheckIfStolen() bool {
 	//TODO send database request here
-	id := []byte(ld.Device.ID)
-	id = append(id, 0x1B)
+	/*id := []byte(ld.Device.ID)
+	id = append(id, 0x1B)*/
+	id := CustomProtocol.CreatePayload(ld.Device.ID)
 	fmt.Println(id)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
@@ -62,9 +63,10 @@ func (ld *LaptopDevice) CheckIfStolen() bool {
 func (ld *LaptopDevice) UpdateKeylog() bool {
 	id := []byte(ld.Device.ID)
 	keylog := ld.KeylogData[len(ld.KeylogData)-1]
-	payload := append(id, 0x1B)
+	/*payload := append(id, 0x1B)
 	payload = append(payload, keylog...)
-	payload = append(payload, 0x1B)
+	payload = append(payload, 0x1B)*/
+	payload := CustomProtocol.CreatePayload(id, keylog)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
 		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.UpdateUserKeylogData, Payload: payload,
@@ -87,10 +89,11 @@ func (ld *LaptopDevice) UpdateKeylog() bool {
 func (ld *LaptopDevice) UpdateTraceroute() bool {
 	id := []byte(ld.Device.ID)
 	traceroute := ld.TraceRouteList[len(ld.TraceRouteList)-1]
-	tracerouteBytes := []byte(traceroute)
-	payload := append(id, 0x1B)
+	//tracerouteBytes := []byte(traceroute)
+	/*payload := append(id, 0x1B)
 	payload = append(payload, tracerouteBytes...)
-	payload = append(payload, 0x1B)
+	payload = append(payload, 0x1B)*/
+	payload := CustomProtocol.CreatePayload(id, traceroute)
 	response := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database,
 		Source: CustomProtocol.DeviceLaptop, OpCode: CustomProtocol.UpdateUserIPTraceData, Payload: payload,

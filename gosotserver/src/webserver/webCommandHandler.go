@@ -186,6 +186,33 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Response: ", res)
 }
 
+func pingDeviceHandler(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		// Handle error
+		fmt.Println("ParseForm error: ", err)
+	}
+
+	deviceType := strings.Trim(r.PostForm.Get("deviceType"), " ")
+	deviceId := strings.Trim(r.PostForm.Get("deviceId"), " ")
+	deviceCommand := strings.Trim(r.PostForm.Get("deviceCommand"), " ")
+
+	// Check for any empty form inputs
+	if deviceType == "" || deviceId == "" || deviceCommand == "" {
+		// Send back error response, input field is empty
+
+		return
+	}
+
+	resCh := make(chan []byte)
+	buf := []byte{}
+	buf = CustomProtocol.CreatePayload(deviceId, deviceCommand)
+
+	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
+		OpCode: CustomProtocol.FreestyleMsg, Payload: buf, Response: resCh}
+	toServer <- req
+}
+
 func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
 	buf := []byte{}
 	// Device owner, get user account info from session

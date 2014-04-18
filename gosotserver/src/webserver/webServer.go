@@ -99,30 +99,24 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(loginPassword)*/
 	hashedPass := fmt.Sprintf("%x", ha.Sum(nil))
 
-	/*buf := []byte{}
+	buf := []byte{}
 	buf = append(buf, []byte(loginName)...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(hashedPass)...)
-	buf = append(buf, 0x1B)*/
-	buf := CustomProtocol.CreatePayload(loginName, hashedPass)
+	buf = append(buf, 0x1B)
 
 	resCh := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 		OpCode: CustomProtocol.VerifyLoginCredentials, Payload: buf, Response: resCh}
 	toServer <- req
-	sucessful, res := CustomProtocol.GetResponse(resCh, 10)
-	//res := <-resCh
-	if sucessful {
-		fmt.Println("Response: ", res[0], res[1])
-		if (res[0] == 1) && (res[1] == 1) {
-			serveSession(w, r)
+	res := <-resCh
+	fmt.Println("Response: ", res[0], res[1])
+	if (res[0] == 1) && (res[1] == 1) {
+		serveSession(w, r)
 
-		} else {
-			http.Error(w, "Invalid Login", 80085)
-			return
-		}
 	} else {
-		fmt.Println("No response on login")
+		http.Error(w, "Invalid Login", 80085)
+		return
 	}
 }
 
@@ -164,7 +158,7 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	hashedPass := fmt.Sprintf("%x", h.Sum(nil))
 	//fmt.Println(hashedPass)
 
-	/*buf := []byte{}
+	buf := []byte{}
 	buf = append(buf, []byte(firstName)...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(lastName)...)
@@ -174,8 +168,7 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	buf = append(buf, []byte(phoneNumber)...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(hashedPass)...)
-	buf = append(buf, 0x1B)*/
-	buf := CustomProtocol.CreatePayload(firstName, lastName, loginName, phoneNumber, hashedPass)
+	buf = append(buf, 0x1B)
 
 	resCh := make(chan []byte)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
@@ -223,6 +216,7 @@ func StartWebServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *
 	r.HandleFunc("/newDevice", newDeviceHandler)
 	r.HandleFunc("/getDeviceInfo", deviceInfoHandler)
 	r.HandleFunc("/toggleDevice", toggleDeviceHandler)
+	r.HandleFunc("/pingDevice", pingDeviceHandler)
 
 	http.Handle("/", r)
 	// our server is one line!

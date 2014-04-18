@@ -28,7 +28,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/ziutek/mymysql/mysql"
-	//"os"
 	"strconv"
 	"strings"
 	//_ "github.com/ziutek/mymysql/native" // Native engine
@@ -374,14 +373,19 @@ func getGpsDevices(email string) []byte {
 func registerNewDevice(deviceType string, deviceId string, deviceName string, email string) bool {
 	db := connect()
 	output := true
+	var res []mysql.Row
 	if strings.Contains(deviceType, "'") || strings.Contains(deviceId, "'") || strings.Contains(deviceName, "'") || strings.Contains(email, "'") {
 		deviceType = strings.Replace(deviceType, "'", "\\'", -1)
 		deviceId = strings.Replace(deviceId, "'", "\\'", -1)
 		deviceName = strings.Replace(deviceName, "'", "\\'", -1)
 		email = strings.Replace(email, "'", "\\'", -1)
 	}
+	if deviceType == "gps" {
+		res, _, _ = db.Query("SELECT * FROM gpsDevice WHERE deviceId = '" + deviceId + "'")
+	} else if deviceType == "laptop" {
+		res, _, _ = db.Query("SELECT * FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
+	}
 
-	res, _, _ := db.Query("SELECT * FROM '" + deviceType + "'Device WHERE deviceId = '" + deviceId + "'")
 	if len(res) != 0 {
 		output = false
 		fmt.Println("check")

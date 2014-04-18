@@ -45,15 +45,12 @@ func handle(t string) (string, http.HandlerFunc) {
 					//http.NotFound(w, r)
 				}
 			} else {
-				//http.Error(w, "Not Logged In", 000)
-				/*p := &Page{}
-				err := templates.ExecuteTemplate(w, "home.html", p)
-				if err != nil {
-					http.NotFound(w, r)
-				}*/
 				http.Redirect(w, r, "home", http.StatusFound)
 			}
 		} else {
+			if sesh.Values["isLoggedIn"] == "true" {
+				http.Redirect(w, r, "/UserMapNEW", http.StatusFound)
+			}
 			p := &Page{}
 			err := templates.ExecuteTemplate(w, "home.html", p)
 			if err != nil {

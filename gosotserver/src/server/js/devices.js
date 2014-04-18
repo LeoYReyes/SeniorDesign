@@ -40,6 +40,7 @@ $(function() {
 			  }).done(function(response) {
 				alert(response);
 				$("#dialog-form").dialog("close");
+				location.reload();
 			  });
 			},
 			Cancel: function() {
@@ -239,6 +240,25 @@ $(function() {
 					
 				});
 				showCoordListButton.append(showCoordListLink);
+				
+				var pingDeviceButton = $("<div>", {id: deviceId, class: "pingButton"});
+				pingDeviceButton.text("Ping");
+				pingDeviceButton.click(function() {
+					$.ajax({
+						url: "/pingDevice",
+						type: "POST",
+						data: {
+							/*//FOR TESTING
+							deviceId: "2567978990",
+							deviceType: "gps"*/
+							deviceId: $(this).attr("id"),
+							deviceType: "gps",
+							deviceCommand: "ping"
+						}
+					}).done(function(e) {
+						//alert(e);
+					});
+				});
 			}
 			var activateDeviceButton = $("<div>", {id: deviceId, class: "activateButton"});
 			var deviceStatus = $("<h5>");
@@ -284,6 +304,7 @@ $(function() {
 			if(deviceType == "gps") {
 				colmd10.append(showCoordListButton);	
 				colmd10.append(showPreviousLocationsButton);
+				colmd10.append(pingDeviceButton);
 			}
 			colmd10.append(activateDeviceButton);
 			row2.append(colmd1);

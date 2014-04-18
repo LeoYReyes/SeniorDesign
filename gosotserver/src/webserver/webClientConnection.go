@@ -136,11 +136,12 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 	userName := string(sesh.Values["userId"].(string))
 
 	resCh := make(chan []byte)
-	buf := []byte{}
+	/*buf := []byte{}
 	buf = append(buf, []byte("gps")...)
 	buf = append(buf, 0x1B)
 	buf = append(buf, []byte(userName)...)
-	buf = append(buf, 0x1B)
+	buf = append(buf, 0x1B)*/
+	buf := CustomProtocol.CreatePayload("gps", userName)
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 		OpCode: CustomProtocol.GetDevice, Payload: buf, Response: resCh}
 

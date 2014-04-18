@@ -269,7 +269,7 @@ func connect() (connection mysql.Conn) {
 
 	err := db.Connect()
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Connection Error:", err)
 	}
 
 	return db
@@ -310,7 +310,11 @@ func SignUp(firstname string, lastname string, email string, phoneNumber string,
 		password = strings.Replace(password, "'", "\\'", -1)
 	}
 
-	res, _, _ := db.Query("SELECT * FROM customer WHERE email = '" + email + "'")
+	res, _, err := db.Query("SELECT * FROM customer WHERE email = '" + email + "'")
+
+	if err != nil {
+		fmt.Println("Database Query Error:", err)
+	}
 
 	if len(res) != 0 {
 		output = false
@@ -334,7 +338,7 @@ func getGpsDevices(email string) []byte {
 	//finding customerId to be used for selecting devices
 	rows, _, err := db.Query("select customerId from account where userName = '" + email + "'")
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	customerId := string(rows[0][0].([]byte))
@@ -342,7 +346,7 @@ func getGpsDevices(email string) []byte {
 	//adding gpsDevices to the the devices list
 	gpsRows, _, gpsErr := db.Query("select * from gpsDevice where customerId = '" + customerId + "'")
 	if gpsErr != nil {
-		panic(gpsErr)
+		fmt.Println("Database Query Error:", gpsErr)
 	}
 
 	for _, gps := range gpsRows {
@@ -389,7 +393,7 @@ func registerNewDevice(deviceType string, deviceId string, deviceName string, em
 		email = strings.Replace(email, "'", "\\'", -1)
 	}
 
-	res, _, _ := db.Query("SELECT * FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
+	res, _, _ := db.Query("SELECT * FROM '" + deviceType + "'Device WHERE deviceId = '" + deviceId + "'")
 	if len(res) != 0 {
 		output = false
 		fmt.Println("check")
@@ -426,12 +430,12 @@ func IsDeviceStolen(deviceId string) bool {
 	bool1 := false
 
 	db := connect()
-	fmt.Println("DeviceId len: ", len(deviceId))
+
 	//TODO: < 12 temp fix
 	if len(deviceId) < 12 {
 		rows, res, err := db.Query("select isStolen from gpsDevice where deviceId = '" + deviceId + "'")
 		if err != nil {
-			panic(err)
+			fmt.Println("Database Query Error:", err)
 		}
 
 		res = res
@@ -462,7 +466,7 @@ func IsDeviceStolen(deviceId string) bool {
 
 		rows2, res2, err3 := db.Query("select isStolen from laptopDevice where deviceId = '" + deviceId + "'")
 		if err3 != nil {
-			panic(err3)
+			fmt.Println("Database Query Error:", err3)
 		}
 
 		res2 = res2
@@ -517,7 +521,7 @@ func updateAccountInfo(oldUsername string, newUsername string, newPassword strin
 	res = res
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	disconnect(db)
@@ -543,14 +547,13 @@ func UpdateKeylog(deviceId string, keylog string) bool {
 		keylog = strings.Replace(keylog, "'", "\\'", -1)
 	}
 
-	fmt.Println("check1")
 	rows, res, err := db.Query("INSERT INTO keyLogs (data, deviceId) SELECT '" + keylog + "', " + "id FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
 
 	rows = rows
 	res = res
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	disconnect(db)
@@ -576,7 +579,7 @@ func updateDeviceGps(deviceId string, latitude string, longitude string) bool {
 	res = res
 
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	disconnect(db)
@@ -613,12 +616,11 @@ func UpdateTraceRoute(deviceId string, traceRoute string) bool {
 	bool1 := true
 
 	db := connect()
-	fmt.Println("Device ID: ", deviceId)
 
 	_, _, newIPListErr := db.Query("INSERT INTO ipList (deviceId) SELECT id FROM laptopDevice WHERE deviceId = '" + deviceId + "'")
 
 	if newIPListErr != nil {
-		fmt.Println("New IP List err")
+		fmt.Println("New IP List err", newIPListErr)
 	}
 	var list []string
 
@@ -678,7 +680,7 @@ func IsGpsDevice(deviceId string) bool {
 
 	rows, res, err := db.Query("select * from gpsDevice where id = '" + deviceId + "'")
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	res = res
@@ -724,17 +726,15 @@ func VerifyAccountInfo(username string, password string) (bool, bool) {
 
 	bool1 := false
 	bool2 := false
-	fmt.Println(username)
-	fmt.Println(password)
+
 	accountInfo := new(Account)
 
 	db := connect()
 
 	rows, res, err := db.Query("select * from account")
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
-
 	res = res
 
 	for _, row := range rows {
@@ -780,7 +780,7 @@ func getLaptopDevices(email string) []byte {
 	//finding customerId to be used for selecting devices
 	rows, _, err := db.Query("select customerId from account where userName = '" + email + "'")
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	customerId := string(rows[0][0].([]byte))
@@ -803,7 +803,7 @@ func getLaptopDevices(email string) []byte {
 		// Query for ip list related to laptop
 		ipListRows, _, ipListErr := db.Query("SELECT * FROM ipList WHERE deviceId ='" + laptopId + "'")
 		if ipListErr != nil {
-			panic(ipListErr)
+			fmt.Println("Database Query Error:", ipListErr)
 		}
 		for _, ipList := range ipListRows {
 			ipListId := string(ipList[0].([]byte))
@@ -864,7 +864,7 @@ func GetAccountInfo(id_in string) string {
 
 	rows, res, err := db.Query("select * from account where id = " + id_in)
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	res = res
@@ -921,7 +921,7 @@ func GetCoordinatesInfo(id_in string) string {
 
 	rows, res, err := db.Query("select * from coordinates where id = " + id_in)
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	res = res
@@ -982,9 +982,8 @@ func GetCustomerInfo(id_in string) string {
 
 	rows, res, err := db.Query("select * from customer where id = " + id_in)
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
-
 	res = res
 
 	for _, row := range rows {
@@ -1049,9 +1048,8 @@ func GetGpsDeviceInfo(id_in string) string {
 
 	rows, res, err := db.Query("select * from gpsDevice where id = " + id_in)
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
-
 	res = res
 
 	for _, row := range rows {
@@ -1108,9 +1106,8 @@ func GetIpAddressInfo(id_in string) string {
 
 	rows, res, err := db.Query("select * from ipAddress where id = " + id_in)
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
-
 	res = res
 
 	for _, row := range rows {
@@ -1163,7 +1160,7 @@ func GetIpListInfo(id_in string) string {
 
 	rows, res, err := db.Query("select * from ipList where id = " + id_in)
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	res = res
@@ -1217,7 +1214,7 @@ func GetKeyLogsInfo(id_in string) string {
 
 	rows, res, err := db.Query("select * from keyLogs where id = " + id_in)
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
 
 	res = res
@@ -1272,9 +1269,8 @@ func GetLaptopDeviceInfo(id_in string) string {
 
 	rows, res, err := db.Query("select * from laptopDevice where id = " + id_in)
 	if err != nil {
-		panic(err)
+		fmt.Println("Database Query Error:", err)
 	}
-
 	res = res
 
 	for _, row := range rows {

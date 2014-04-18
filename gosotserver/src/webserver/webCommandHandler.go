@@ -27,16 +27,6 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/*buf := []byte{}
-	// Device type
-	buf = append(buf, []byte(deviceType)...)
-	buf = append(buf, 0x1B)
-	// Device Id (phone number for Geogram, MAC Address for laptops)
-	buf = append(buf, []byte(deviceId)...)
-	buf = append(buf, 0x1B)
-	// Device name
-	buf = append(buf, []byte(deviceName)...)
-	buf = append(buf, 0x1B)*/
 	buf := CustomProtocol.CreatePayload(deviceType, deviceId, deviceName)
 	// Device owner, get user account info from session
 	_, cookieErr := r.Cookie("userSession")
@@ -59,12 +49,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	toServer <- req
 	if deviceType == "gps" {
 		//geogram setup
-		/*geogramBuf := []byte{}
-		geogramBuf = append(geogramBuf, []byte(deviceId)...)
-		geogramBuf = append(geogramBuf, 0x1B)
-		geogramBuf = append(geogramBuf, []byte("1234")...) //todo hard-coded for now
-		geogramBuf = append(geogramBuf, 0x1B)*/
-		geogramBuf := CustomProtocol.CreatePayload(deviceId, "1234") //todo hard-coded for now
+		geogramBuf := CustomProtocol.CreatePayload(deviceId, "1234") //todo hard-coded PIN for now
 		response := make(chan []byte)
 		geogramSetupReq := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 			OpCode: CustomProtocol.GeogramSetup, Payload: geogramBuf, Response: response}
@@ -72,28 +57,30 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 
 		//geogram sleep
 		response2 := make(chan []byte)
-		/*geogramBuf2 := []byte{}
-		geogramBuf2 = append(geogramBuf2, []byte(deviceId)...)
-		geogramBuf2 = append(geogramBuf2, 0x1B)
-		geogramBuf2 = append(geogramBuf2, []byte("1234")...) //todo hard-coded for now
-		geogramBuf2 = append(geogramBuf2, 0x1B)*/
-		geogramBuf2 := CustomProtocol.CreatePayload(deviceId, "1234") //todo hard-coded for now
+		geogramBuf2 := CustomProtocol.CreatePayload(deviceId, "1234") //todo hard-coded PIN for now
 		geogramSetupReq2 := &CustomProtocol.Request{Id:               CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 			OpCode: CustomProtocol.SleepGeogram, Payload: geogramBuf2, Response: response2}
 		toServer <- geogramSetupReq2
 
 		fmt.Println(deviceId + " Geogram setup complete")
 	}
-	res := <-resCh
-	// response is true if successfully registered, false if there is an error
-	fmt.Println("Response: ", res[0])
-	//TODO: notify client of the response
-	if res[0] == 0 {
-		fmt.Println("New Device Registration: Failed")
-		fmt.Fprintf(w, "failed")
+	successful, res := CustomProtocol.GetResponse(resCh, 10)
+	if successful {
+		// response is true if successfully registered, false if there is an error
+		//fmt.Println("Response: ", res[0])
+		//TODO: notify client of the response
+		if res[0] == 0 {
+			fmt.Println("New Device Registration: Failed")
+			w.Write([]byte("fail"))
+		} else {
+			fmt.Println("New Device Registration: Success")
+			w.Write([]byte("success"))
+		}
+
 	} else {
-		fmt.Fprintf(w, "success")
-		fmt.Println("New Device Registration: Success")
+		fmt.Println("No response on device registration")
+		http.Error(w, "Timeout on device registration", 666)
+		return
 	}
 
 }
@@ -120,26 +107,19 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	resCh := make(chan []byte)
-	/*buf := []byte{}
-
-	buf = append(buf, []byte(deviceId)...)
-	buf = append(buf, 0x1B)*/
 	buf := CustomProtocol.CreatePayload(deviceId)
 	fmt.Println("Device type: ", deviceType)
 
 	switch deviceType {
 	case "gps":
 		//todo Default PIN-NUMBER for Geogram One
-		/*buf = append(buf, []byte("1234")...)
-		buf = append(buf, 0x1B)*/
+
 		buf = append(buf, CustomProtocol.CreatePayload("1234")...)
 		if deviceCommand == "1" {
 			reqToDB := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.ActivateGPS, Payload: buf, Response: resCh}
 			toServer <- reqToDB
-			// Default interval 60 seconds
-			/*buf = append(buf, []byte("140")...)
-			buf = append(buf, 0x1B)*/
+			// Default interval 140 seconds
 			buf = append(buf, CustomProtocol.CreatePayload("140")...)
 			reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}
@@ -155,8 +135,6 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 			toServer <- reqToDB
 			// Deactivate command to device
 			// end tracking
-			/*buf = append(buf, []byte("0")...)
-			buf = append(buf, 0x1B)*/
 			buf = append(buf, CustomProtocol.CreatePayload("0")...)
 			reqToDevice := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.ActivateIntervalGps, Payload: buf, Response: nil}
@@ -173,17 +151,13 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 				OpCode: CustomProtocol.FlagNotStolen, Payload: buf, Response: resCh}
 			toServer <- reqToDB
 
-			res := <-resCh
-			fmt.Println("Response: ", res)
-
 			reqToDeviceHub := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceLaptop, Source: CustomProtocol.Web,
 				OpCode: CustomProtocol.FlagNotStolen, Payload: buf, Response: resCh}
 			toServer <- reqToDeviceHub
 		}
 	default:
 	}
-	res := <-resCh
-	fmt.Println("Response: ", res)
+
 }
 
 func pingDeviceHandler(w http.ResponseWriter, r *http.Request) {
@@ -233,27 +207,32 @@ func deviceInfoHandler(w http.ResponseWriter, r *http.Request) {
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 		OpCode: CustomProtocol.GetDeviceList, Payload: buf, Response: resCh}
 	toServer <- req
-	res := <-resCh
-	str := string(res)
-	finalRes := []byte{}
-	resLaptop := str[:strings.Index(str, string(0x1B))]
-	resGPS := str[strings.Index(str, string(0x1B))+1:]
-	//fmt.Println(resLaptop)
-	//fmt.Println(resGPS)
-	if len(resLaptop) > 5 {
-		if len(resGPS) > 5 {
-			resLaptop = str[:strings.Index(str, string(0x1B))-1]
-			resGPS = str[strings.Index(str, string(0x1B))+2:]
-		}
-		finalRes = append(finalRes, []byte(resLaptop)...)
-		w.Header().Set("Content-Type", "application/json")
-	}
-	if len(resGPS) > 5 {
+	successful, res := CustomProtocol.GetResponse(resCh, 10)
+	if successful {
+		str := string(res)
+		finalRes := []byte{}
+		resLaptop := str[:strings.Index(str, string(0x1B))]
+		resGPS := str[strings.Index(str, string(0x1B))+1:]
+		//fmt.Println(resLaptop)
+		//fmt.Println(resGPS)
 		if len(resLaptop) > 5 {
-			finalRes = append(finalRes, 0x2C)
+			if len(resGPS) > 5 {
+				resLaptop = str[:strings.Index(str, string(0x1B))-1]
+				resGPS = str[strings.Index(str, string(0x1B))+2:]
+			}
+			finalRes = append(finalRes, []byte(resLaptop)...)
+			w.Header().Set("Content-Type", "application/json")
 		}
-		finalRes = append(finalRes, []byte(resGPS)...)
-		w.Header().Set("Content-Type", "application/json")
+		if len(resGPS) > 5 {
+			if len(resLaptop) > 5 {
+				finalRes = append(finalRes, 0x2C)
+			}
+			finalRes = append(finalRes, []byte(resGPS)...)
+			w.Header().Set("Content-Type", "application/json")
+		}
+		w.Write(finalRes)
+	} else {
+		return
 	}
-	w.Write(finalRes)
+
 }

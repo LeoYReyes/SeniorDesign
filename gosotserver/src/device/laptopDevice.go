@@ -61,7 +61,8 @@ func (ld *LaptopDevice) CheckIfStolen() bool {
  * the function know if the write succeeded.
  */
 func (ld *LaptopDevice) UpdateKeylog() bool {
-	id := []byte(ld.Device.ID)
+	//id := []byte(ld.Device.ID)
+	id := ld.Device.ID
 	keylog := ld.KeylogData[len(ld.KeylogData)-1]
 	/*payload := append(id, 0x1B)
 	payload = append(payload, keylog...)
@@ -87,7 +88,8 @@ func (ld *LaptopDevice) UpdateKeylog() bool {
  * function know if the write succeeded.
  */
 func (ld *LaptopDevice) UpdateTraceroute() bool {
-	id := []byte(ld.Device.ID)
+	//id := []byte(ld.Device.ID)
+	id := ld.Device.ID
 	traceroute := ld.TraceRouteList[len(ld.TraceRouteList)-1]
 	//tracerouteBytes := []byte(traceroute)
 	/*payload := append(id, 0x1B)

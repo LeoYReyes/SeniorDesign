@@ -217,7 +217,7 @@ func geofenceAlert(phoneNumber string) { //todo add functionality
 	payload2 = append(payload2, 0x1B)
 	payload2 = append(payload2, []byte(interval)...)
 	payload2 = append(payload2, 0x1B)*/
-	payload2 := CustomProtocol.CreatePayload(phoneNumber, pin, inerval)
+	payload2 := CustomProtocol.CreatePayload(phoneNumber, pin, interval)
 	response2 := make(chan []byte)
 	req2 := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
 		Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.ActivateIntervalGps, Payload: payload2,

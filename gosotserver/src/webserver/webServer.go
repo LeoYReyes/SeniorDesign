@@ -112,7 +112,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 	sucessful, res := CustomProtocol.GetResponse(resCh, 10)
 	//res := <-resCh
 	if sucessful {
-		fmt.Println("Response: ", res[0], res[1])
+		//fmt.Println("Response: ", res[0], res[1])
 		if (res[0] == 1) && (res[1] == 1) {
 			serveSession(w, r)
 
@@ -121,7 +121,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		fmt.Println("No response on login")
+		//fmt.Println("No response on login")
 		http.Error(w, "Timeout on Login", 8008135)
 		return
 	}
@@ -181,11 +181,19 @@ func signUpHandler(w http.ResponseWriter, r *http.Request) {
 	req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.Web,
 		OpCode: CustomProtocol.NewAccount, Payload: buf, Response: resCh}
 	toServer <- req
-	res := <-resCh
-	fmt.Println("Response: ", res[0])
-	//databaseSOT.SignUp(r.PostForm.Get("firstName"), r.PostForm.Get("lastName"),
-	//	r.PostForm.Get("email"), r.PostForm.Get("phoneNumber"), hashedPass)
-	serveSession(w, r)
+	successful, res := CustomProtocol.GetResponse(resCh, 10)
+	if successful {
+		//fmt.Println("Response: ", res[0])
+		//databaseSOT.SignUp(r.PostForm.Get("firstName"), r.PostForm.Get("lastName"),
+		//	r.PostForm.Get("email"), r.PostForm.Get("phoneNumber"), hashedPass)
+		if res[0] == 1 {
+			serveSession(w, r)
+		} else {
+			http.Error(w, "Duplicate Account", 7000)
+		}
+	} else {
+		http.Error(w, "Timeout on Signup", 7001)
+	}
 }
 
 // Declaration of global variable

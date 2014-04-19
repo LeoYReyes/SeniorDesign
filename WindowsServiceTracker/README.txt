@@ -12,6 +12,7 @@ Additionally, in the folder that contains WindowsServiceTracker.exe, there is a 
 
 Key-logger installation
 Navigate to the directory (in Windows explorer) containing 'WTKL.exe'
+Right click 'WTKL.exe' and select 'Properties'. Select the 'Compatibility' tab, select 'Change settings for all users', select 'Run this program as an administrator', then apply changes.
 Right click 'WTKL.exe' and select create shortcut
 place the shortcut in 
 Windows 7: 'C:\Documents and Settings\All Users\Start Menu\Programs\Startup'

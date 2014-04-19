@@ -208,10 +208,13 @@ func processRequest(req *CustomProtocol.Request) {
 			//accelerometer sensitivity
 			accel2Msg := "[" + payload[0] + "]" + payload[1] + ".6.179.32.|"
 
+			//respond to sender
+			replyMsg := "[" + payload[0] + "]" + payload[1] + ".6.87.0.|"
+
 			success = /*sendMsgToGpsHub(motMsg) &&*/ sendMsgToGpsHub(hyp1Msg) &&
 				sendMsgToGpsHub(hyp2Msg) && sendMsgToGpsHub(hyp3Msg) &&
 				/*sendMsgToGpsHub(geoMsg) &&*/ sendMsgToGpsHub(accel1Msg) &&
-				sendMsgToGpsHub(accel2Msg)
+				sendMsgToGpsHub(accel2Msg) && sendMsgToGpsHub(replyMsg)
 		}
 
 		if success {

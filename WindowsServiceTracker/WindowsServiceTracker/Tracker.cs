@@ -38,7 +38,7 @@ namespace WindowsServiceTracker
         private const string ERROR_LOG_NAME = "TrackerErrorLog";
         private const string ERROR_LOG_MACHINE = "TrackerComputer";
         private const string ERROR_LOG_SOURCE = "WindowsServiceTracker";
-        public const int CHECKIN_WAIT_TIME = 900000; //tie between checkins
+        public const int CHECKIN_WAIT_TIME = 900000; //time between checkins
         private const string REG_PATH = "Software\\SOT\\WindowsServiceTracker";
         private const string REG_FIELD_STOLEN = "Stolen";
         private const string REG_FIELD_MAC = "MAC";
@@ -56,6 +56,7 @@ namespace WindowsServiceTracker
             new NetNamedPipeBinding(), new EndpointAddress("net.pipe://localhost/PipeKeylogger"));
         private KeyloggerCommInterface pipeProxy;
         private Thread tcpThread;
+        private Thread idFileThread;
         private volatile Thread retryStartKeylogger;
         private volatile bool connectionKeepAlive = true;
         private volatile bool tcpKeepAlive = true;
@@ -160,7 +161,9 @@ namespace WindowsServiceTracker
                 StartKeylogger();
             }
             macAddress = getMacAddress();
-            createIDFile();
+
+            idFileThread = new Thread(this.createIDFile);
+            idFileThread.Start();
             //StartKeylogger(); //todo remove after debugging
 
             tcpThread = new Thread(this.IpConnectionThread);
@@ -197,7 +200,7 @@ namespace WindowsServiceTracker
             {
                 return pipeProxy.StartKeylogger();
             }
-            if (retryStartKeylogger == null || !retryStartKeylogger.IsAlive/*retryStartKeylogger.ThreadState != System.Threading.ThreadState.Running*/)
+            if (retryStartKeylogger == null || !retryStartKeylogger.IsAlive)
             {
                 //WriteEventLogEntry("new keylogger thread");
                 retryStartKeylogger = new Thread(this.retryStartKeyloggerThread);
@@ -624,6 +627,14 @@ namespace WindowsServiceTracker
                 }
                 catch (Exception)
                 {
+                    //if there is no file, try to turn the key-logger back on
+                    //if the user logs out of an account then back in the key-logger will
+                    //not start logging on its own and must be told it should be on
+                    if (reportedStolen)
+                    {
+                        //CreateOpenPipe();
+                        StartKeylogger();
+                    }
                     return true;
                 }
             }
@@ -816,22 +827,34 @@ namespace WindowsServiceTracker
          */ 
         private void createIDFile()
         {
-            string tempID = "tempID";
-            try
-            {
-                StreamWriter idOut = new StreamWriter(tempID);
-                idOut.Write(macAddress);
-                idOut.Close();
-                File.Move(tempID, ID_FILE);
-            }
-            catch
+            StreamWriter idOut = null;
+            while (true)
             {
                 try
                 {
-                    File.Delete(tempID);
+                    File.Delete(ID_FILE);
+                }
+                catch (Exception)
+                { }
+
+                try
+                {
+                    idOut = new StreamWriter(ID_FILE);
+                    idOut.Write(macAddress);
+                    idOut.Close();
+                    return;
                 }
                 catch
-                { }
+                {
+                    try
+                    {
+                        // incase it opened and didn't write, it will atleast close
+                        idOut.Close();
+                    }
+                    catch
+                    { }
+                }
+                Thread.Sleep(20000);
             }
         }
     }

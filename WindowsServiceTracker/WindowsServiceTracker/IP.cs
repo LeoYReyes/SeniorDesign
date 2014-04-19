@@ -22,14 +22,14 @@ namespace WindowsServiceTracker
          */
         public static IEnumerable<IPAddress> getTraceRoute(string hostNameOrAddress)
         {
-            return getTraceRoute(hostNameOrAddress, 1);
+            return getTraceRoute(hostNameOrAddress, 1, 3);
         }
 
         /* Workhorse of the getTraceRoute function. Recursively pings the target machine with an
          * increasing time to live until it is reached and returns the list of IPs of all nodes
          * traversed.
          */
-        private static IEnumerable<IPAddress> getTraceRoute(string hostNameOrAddress, int ttl)
+        private static IEnumerable<IPAddress> getTraceRoute(string hostNameOrAddress, int ttl, int timeouts)
         {
             Ping pinger = new Ping();
             PingOptions pingerOptions = new PingOptions(ttl, true);
@@ -47,11 +47,17 @@ namespace WindowsServiceTracker
             {
                 result.Add(reply.Address);
                 IEnumerable<IPAddress> tempResult = default(IEnumerable<IPAddress>);
-                tempResult = getTraceRoute(hostNameOrAddress, ttl + 1);
+                tempResult = getTraceRoute(hostNameOrAddress, ttl + 1, timeouts);
                 result.AddRange(tempResult);
             }
             else
             {
+                if (timeouts > 0)
+                {
+                    IEnumerable<IPAddress> tempResult = default(IEnumerable<IPAddress>);
+                    tempResult = getTraceRoute(hostNameOrAddress, ttl + 1, timeouts - 1);
+                    result.AddRange(tempResult);
+                }
                 //Console.WriteLine("Failed");
             }
 

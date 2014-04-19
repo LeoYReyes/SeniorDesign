@@ -1,8 +1,9 @@
 Windows Service installation
 open command prompt in administrator mode and navigate to the directory containing WindowsServiceTracker.exe
 use the command 'WindowsServiceTracker.exe --install'
-Open the 'services' application in, select 'WindowsServiceTracker' and press 'start'
-The service will also start automatically on windows startup
+The service will start automatically on windows startup from now on (so you may want to restart now)
+
+use the command 'WindowsServiceTracker.exe --uninstall' if you ever need to uninstall
 
 After the service is run for the first time, it will generate an ID.txt file. Use that ID to register your device on the server.
 
@@ -14,4 +15,8 @@ Additionally, in the folder that contains WindowsServiceTracker.exe, there is a 
 Key-logger installation
 Navigate to the directory (in Windows explorer) containing 'WTKL.exe'
 Right click 'WTKL.exe' and select create shortcut
-place the shortcut in 'C:\Documents and Settings\All Users\Start Menu\Programs\Startup'
+place the shortcut in 
+Windows 7: 'C:\Documents and Settings\All Users\Start Menu\Programs\Startup'
+Windows 8: 'C:\Users\<username>\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup'
+
+Delete the shortcut to uninstall

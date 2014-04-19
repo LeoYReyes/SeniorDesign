@@ -12,3 +12,5 @@ keylogTEST.txt
 *.tmp
 documentation/cycle 1/~$olen Object Tracker - Cycle 1 report.docx
 gosotserver/src/server/server.exe
+WindowsServiceTracker/WTKL/bin/Release/keylog.txt
+WindowsServiceTracker/WindowsServiceTracker/bin/Release/ID.txt

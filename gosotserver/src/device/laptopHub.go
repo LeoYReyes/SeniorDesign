@@ -9,18 +9,13 @@ package device
 
 import (
 	"CustomProtocol"
-	//"container/list"
 	"fmt"
 	"net"
-	//"strconv"
 	"strings"
-	//"time"
 )
 
 type laptopHub struct {
 	connections map[string]net.Conn
-	//	DeviceBuffer
-	//mapDeviceQueue chan *deviceConnection
 }
 
 type deviceConnection struct {
@@ -29,7 +24,6 @@ type deviceConnection struct {
 }
 
 var lh = laptopHub{
-	//mapDeviceQueue: make(chan *deviceConnection, 20),
 	connections: make(map[string]net.Conn),
 }
 
@@ -88,7 +82,7 @@ func GetMessage(deviceConn deviceConnection) {
 		if index != -1 {
 			msg = msg[1:index]
 		} else {
-			fmt.Println("laptopHub.GetMessage - Bad message received")
+			fmt.Println("laptopHub.GetMessage - Bad message received: ", msg)
 		}
 		opCode := buffer[0]
 		//fmt.Println("Message byte format: ", buffer[1:bytesRead])
@@ -179,12 +173,14 @@ func GetDeviceID(conn net.Conn) {
 	deviceConn := new(deviceConnection)
 	deviceId := string(buffer)
 	index := strings.Index(deviceId, "\n")
+	fmt.Println("Index from for newline: ", index)
 	if index != -1 {
 		deviceConn.ld.ID = deviceId[:index]
 	} else {
 		deviceConn.ld.ID = ""
 		fmt.Println("laptopHub.GetDeviceID: deviceId Parse Error")
 		CloseConn(*deviceConn)
+		return
 	}
 
 	deviceConn.conn = conn
@@ -196,17 +192,20 @@ func GetDeviceID(conn net.Conn) {
 		if !sentStolen {
 			fmt.Println("Error sending stolen code. Closing connection...")
 			CloseConn(*deviceConn)
+			return
 		}
 		// SEND requests to laptop upon connection, if stolen
 		requestTraceRoute := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserIPTraceData, "")
 		if !requestTraceRoute {
 			fmt.Println("laptopHub.GetDeviceID: Error sending request traceroute. Closing connection...")
 			CloseConn(*deviceConn)
+			return
 		}
 		requestKeyLog := SendMsg(deviceConn.ld.ID, CustomProtocol.UpdateUserKeylogData, "")
 		if !requestKeyLog {
 			fmt.Println("laptopHub.GetDeviceID: Error sending request keylog. Closing connection...")
 			CloseConn(*deviceConn)
+			return
 		}
 		go GetMessage(*deviceConn)
 	} else { //if CheckIfStolen returns false
@@ -218,6 +217,7 @@ func GetDeviceID(conn net.Conn) {
 			fmt.Println("Error sending stolen code.")
 		}
 		CloseConn(*deviceConn)
+		return
 		/*err := conn.Close()
 		if err != nil {
 			fmt.Println("Error closing laptop connection.", err)

@@ -1,0 +1,11 @@
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Release\WindowsServiceTracker.exe.config
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Release\WindowsServiceTracker.exe
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Release\WindowsServiceTracker.pdb
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Release\KeyloggerCommunications.dll
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\bin\Release\KeyloggerCommunications.pdb
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\obj\Release\WindowsServiceTracker.csprojResolveAssemblyReference.cache
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\obj\Release\WindowsServiceTracker.ProjectInstaller.resources
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\obj\Release\WindowsServiceTracker.Tracker.resources
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\obj\Release\WindowsServiceTracker.csproj.GenerateResource.Cache
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\obj\Release\WindowsServiceTracker.exe
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WindowsServiceTracker\obj\Release\WindowsServiceTracker.pdb

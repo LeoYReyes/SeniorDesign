@@ -1,0 +1,8 @@
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WTKL\bin\Release\WTKL.exe.config
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WTKL\bin\Release\WTKL.exe
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WTKL\bin\Release\WTKL.pdb
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WTKL\bin\Release\KeyloggerCommunications.dll
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WTKL\bin\Release\KeyloggerCommunications.pdb
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WTKL\obj\Release\WTKL.csprojResolveAssemblyReference.cache
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WTKL\obj\Release\WTKL.exe
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\WTKL\obj\Release\WTKL.pdb

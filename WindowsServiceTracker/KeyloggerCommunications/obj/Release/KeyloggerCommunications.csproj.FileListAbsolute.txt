@@ -1,0 +1,5 @@
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\bin\Release\KeyloggerCommunications.dll
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\bin\Release\KeyloggerCommunications.pdb
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\obj\Release\KeyloggerCommunications.csprojResolveAssemblyReference.cache
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\obj\Release\KeyloggerCommunications.dll
+C:\Users\Chuck\Documents\GitHub\SeniorDesign\WindowsServiceTracker\KeyloggerCommunications\obj\Release\KeyloggerCommunications.pdb

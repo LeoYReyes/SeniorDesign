@@ -1,5 +1,4 @@
 *.pdb
-*.exe
 *.InstallLog
 *.suo
 /WindowsServiceTracker/WindowsServiceTracker/bin/Debug
@@ -12,3 +11,4 @@ keylogTEST.txt
 /bin
 *.tmp
 documentation/cycle 1/~$olen Object Tracker - Cycle 1 report.docx
+gosotserver/src/server/server.exe

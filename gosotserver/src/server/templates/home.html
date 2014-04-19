@@ -34,7 +34,8 @@
 	  		<input type="text" id="firstName" name="firstName" class="form-control" placeholder="First Name" required></input>
 	  		<input type="text" id="lastName" name="lastName" class="form-control" placeholder="Last Name" required></input>
 	  		<input type="email" id="loginName" name="loginName" class="form-control" placeholder="Email address" required></input>
-	  		<input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="Phone Number" onkeypress="phoneForm(this.form, event.keyCode)" required></input>	
+	  		<h5 id="hideTel" style="display:none; color:red">Please only use numbers.</h5>
+			<input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="Phone Number" onkeyup="phoneForm(this.form, event.keyCode)" required maxlength="13"></input>	
 			<h5 id="hide" style="display:none; color:red">Passwords don't match.</h5>
 	  		<input type="password" id="password" name="password" class="form-control" placeholder="Desired Password" onchange="testResults(this.form)" onkeyup="passStrength(this.form)" required></input>
 			<input type="password"  id="confirmPassword" class="form-control" placeholder="Confirm Password" onchange="testResults(this.form)"  required></input>
@@ -56,7 +57,14 @@
 
 function phoneForm(form, e){
 	var phoneNumberIn = document.getElementById("phoneNumber").value;
-	if(e != 8){
+	
+	if(e==8 && phoneNumberIn.length == 1){
+		phoneNumber.value = "(";
+		hideTel.style.display = 'none';	
+	}
+	
+	if(e != 8 && e>47 && e<58){
+		hideTel.style.display = 'none';
 		if(phoneNumberIn.length == 1){
 			phoneNumber.value = "(" + phoneNumberIn;
 		}
@@ -67,7 +75,15 @@ function phoneForm(form, e){
 			phoneNumber.value = phoneNumberIn + "-";
 		}	
 	}
+	
+	else {
+		hideTel.style.display = 'inline';
+		phoneNumber.value = phoneNumberIn.substring(0,phoneNumberIn.length - 1);
+
+	}
+	
 }
+
 
 
 
@@ -84,6 +100,12 @@ function testResults (form) {
 	
 	
 	if(confirmPassword.length == 0 || password.length == 0) {
+		return false;
+	}
+	if(firstName.length != 0 && lastName.length != 0 && 
+		loginName.length != 0 && phoneNumber.length == 13
+		&& password.length > 5 && confirmPassword.value == password.value)  
+	{
 		return false;
 	}
 	if(password != confirmPassword) {
@@ -155,19 +177,6 @@ function passStrength(form) {
 }
 
 
-function fieldsNotEmpty (form) {
-    var password = document.getElementById("password").value;
-	var confirmPassword = document.getElementById("confirmPassword").value;
-	var hide = document.getElementById('hide');
-	
-	if(confirmPassword.length == 0) {
-		hide.style.display = 'block';
-		return false;
-	}else {
-		hide.style.display = 'none';
-		return true;
-	}
-}
 	
 </SCRIPT>
 

@@ -8,7 +8,7 @@ package device
 
 import (
 	"CustomProtocol"
-	"fmt"
+	//"fmt"
 	"time"
 )
 

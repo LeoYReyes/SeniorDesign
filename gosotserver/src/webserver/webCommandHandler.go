@@ -14,7 +14,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("ParseForm error: ", err)
 	}
 
-	fmt.Println("Form: ", r.PostForm)
+	//fmt.Println("Form: ", r.PostForm)
 
 	deviceType := strings.Trim(r.PostForm.Get("deviceType"), " ")
 	deviceId := strings.Trim(r.PostForm.Get("deviceId"), " ")
@@ -40,7 +40,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		//fmt.Println("Cookie userid: ", sesh.Values["userId"])
 		//fmt.Println("Cookie isLoggedIn: ", sesh.Values["isLoggedIn"])
 	}
-	fmt.Println("buf: ", string(buf))
+	//fmt.Println("buf: ", string(buf))
 	// Create a response channel to receive response for the reqeust
 	resCh := make(chan []byte)
 	// Create request to register new device and send off request
@@ -62,7 +62,7 @@ func newDeviceHandler(w http.ResponseWriter, r *http.Request) {
 			OpCode: CustomProtocol.SleepGeogram, Payload: geogramBuf2, Response: response2}
 		toServer <- geogramSetupReq2
 
-		fmt.Println(deviceId + " Geogram setup complete")
+		//fmt.Println(deviceId + " Geogram setup complete")
 	}
 	successful, res := CustomProtocol.GetResponse(resCh, 10)
 	if successful {
@@ -94,7 +94,7 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("ParseForm error: ", err)
 	}
 
-	fmt.Println("Form: ", r.PostForm)
+	//fmt.Println("Form: ", r.PostForm)
 	//TODO: user input for geogram PIN
 	deviceType := strings.Trim(r.PostForm.Get("deviceType"), " ")
 	deviceId := strings.Trim(r.PostForm.Get("deviceId"), " ")
@@ -108,7 +108,7 @@ func toggleDeviceHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	resCh := make(chan []byte)
 	buf := CustomProtocol.CreatePayload(deviceId)
-	fmt.Println("Device type: ", deviceType)
+	//fmt.Println("Device type: ", deviceType)
 
 	switch deviceType {
 	case "gps":

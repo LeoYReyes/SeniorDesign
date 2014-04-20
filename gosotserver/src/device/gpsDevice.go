@@ -57,7 +57,8 @@ func UpdateMapCoords(payload string) {
 
 		if !databaseResponse {
 			select {
-			case _ := <-reqWeb.Response:
+			case dataRet := <-reqWeb.Response:
+				dataRet = dataRet
 				databaseResponse = true
 				//fmt.Println("gpsDevice: database request returned ", dataRet)
 			default:

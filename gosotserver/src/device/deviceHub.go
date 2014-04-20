@@ -69,7 +69,7 @@ func chanHandler() {
 	for {
 		select {
 		case req := <-fromServer:
-			fmt.Println("Device received request from server")
+			//fmt.Println("Device received request from server")
 			go processRequest(req) //todo go routine here may not be necessary
 		}
 	}
@@ -103,7 +103,7 @@ func processRequest(req *CustomProtocol.Request) {
 	switch req.OpCode {
 	//params: phone number, PIN
 	case CustomProtocol.ActivateGPS:
-		fmt.Println("processing activate gps")
+		//fmt.Println("processing activate gps")
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 2 {
 			msg := "[" + payload[0] + "]" + payload[1] + ".0.|"
@@ -118,7 +118,7 @@ func processRequest(req *CustomProtocol.Request) {
 	//activates geofence 1
 	//params: phone number, PIN, active/deactive (1/0), radius (feet)
 	case CustomProtocol.ActivateGeofence:
-		fmt.Println("processing activate geofence")
+		//fmt.Println("processing activate geofence")
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 4 {
 			msg := "[" + payload[0] + "]" + payload[1] + ".2." + payload[2] + ".1.0." + payload[3] + ".|"
@@ -132,7 +132,7 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 	//params: phone number, PIN
 	case CustomProtocol.SleepGeogram:
-		fmt.Println("processing sleep geogram")
+		//fmt.Println("processing sleep geogram")
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 2 {
 			//msg := "[" + payload[0] + "]" + payload[1] + ".1.|"
@@ -149,7 +149,7 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 	//params: phone number, PIN, interval (seconds) (0 to disable)
 	case CustomProtocol.ActivateIntervalGps:
-		fmt.Println("processing activate interval gps")
+		//fmt.Println("processing activate interval gps")
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 3 {
 			msg := "[" + payload[0] + "]" + payload[1] + ".4." + payload[2] + ".|"
@@ -165,7 +165,7 @@ func processRequest(req *CustomProtocol.Request) {
 	// params: phone number, PIN, latitude format ddmm.mmmm without the '.',
 	// longitude format dddmm.mmmm without the '.'
 	case CustomProtocol.SetGeofence:
-		fmt.Println("processing set geofence")
+		//fmt.Println("processing set geofence")
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 4 {
 			//lat
@@ -184,7 +184,7 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 	//params: phone number, PIN
 	case CustomProtocol.GeogramSetup:
-		fmt.Println("processing geogram setup")
+		//fmt.Println("processing geogram setup")
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 2 {
 			//motion alert
@@ -224,7 +224,7 @@ func processRequest(req *CustomProtocol.Request) {
 		}
 	//params: phone number, message
 	case CustomProtocol.FreestyleMsg:
-		fmt.Println("processing freestyle msg")
+		//fmt.Println("processing freestyle msg")
 		payload := sanitizeGPSInput(CustomProtocol.ParsePayload(req.Payload))
 		if len(payload) >= 2 {
 			msg := "[" + payload[0] + "]" + payload[1] + "|"

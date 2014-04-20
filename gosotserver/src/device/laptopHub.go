@@ -39,7 +39,7 @@ func Connect() net.Listener {
 		fmt.Println("Error listening:", err.Error())
 		return listener
 	}
-	fmt.Println("Connection created on " + CONN_TYPE + " " + CONN_PORT)
+	//fmt.Println("Connection created on " + CONN_TYPE + " " + CONN_PORT)
 	return listener
 }
 
@@ -54,7 +54,7 @@ func Listen(listener net.Listener) {
 		if err != nil {
 			fmt.Println("Error connecting with client: ", err)
 		}
-		fmt.Println("Connection established with client")
+		//fmt.Println("Connection established with client")
 		go GetDeviceID(conn)
 	}
 }
@@ -86,7 +86,7 @@ func GetMessage(deviceConn deviceConnection) {
 		}
 		opCode := buffer[0]
 		//fmt.Println("Message byte format: ", buffer[1:bytesRead])
-		fmt.Println("Message received with OP Code: ", opCode)
+		//fmt.Println("Message received with OP Code: ", opCode)
 		/*if err != nil {
 			fmt.Println("laptopHub.GetMessage - Invalid OP code", err)
 		} else {*/
@@ -135,7 +135,7 @@ func UpdateTraceroute(deviceConn deviceConnection, msg string) {
 	msg = string(msgBytes)
 	deviceConn.ld.TraceRouteList = append(deviceConn.ld.TraceRouteList, msg)
 	if deviceConn.ld.UpdateTraceroute() {
-		fmt.Println("Traceroute data has been successfully updated")
+		//fmt.Println("Traceroute data has been successfully updated")
 	} else {
 		fmt.Println("Traceroute data has NOT been successfully updated")
 	}
@@ -150,7 +150,7 @@ func UpdateKeylog(deviceConn deviceConnection, msg string) {
 	deviceConn.ld.KeylogData = append(deviceConn.ld.KeylogData, msg) //[1:len(msg)-1])
 	fmt.Println(deviceConn.ld.KeylogData[len(deviceConn.ld.KeylogData)-1])
 	if deviceConn.ld.UpdateKeylog() {
-		fmt.Println("Keylog data has been successfully updated")
+		//fmt.Println("Keylog data has been successfully updated")
 	} else {
 		fmt.Println("Keylog data has NOT been successfully updated")
 	}
@@ -173,7 +173,7 @@ func GetDeviceID(conn net.Conn) {
 	deviceConn := new(deviceConnection)
 	deviceId := string(buffer)
 	index := strings.Index(deviceId, "\n")
-	fmt.Println("Index from for newline: ", index)
+	//fmt.Println("Index from for newline: ", index)
 	if index != -1 {
 		deviceConn.ld.ID = deviceId[:index]
 	} else {
@@ -187,7 +187,7 @@ func GetDeviceID(conn net.Conn) {
 	MapDeviceID(deviceConn)
 	var sentStolen bool
 	if deviceConn.ld.CheckIfStolen() {
-		fmt.Println("CheckIfStolen request returned true")
+		//fmt.Println("CheckIfStolen request returned true")
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagStolen, "")
 		if !sentStolen {
 			fmt.Println("Error sending stolen code. Closing connection...")
@@ -209,7 +209,7 @@ func GetDeviceID(conn net.Conn) {
 		}
 		go GetMessage(*deviceConn)
 	} else { //if CheckIfStolen returns false
-		fmt.Println("CheckIfStolen request returned false")
+		//fmt.Println("CheckIfStolen request returned false")
 		ipAddr := conn.RemoteAddr()
 		fmt.Println(ipAddr)
 		sentStolen = SendMsg(deviceConn.ld.ID, CustomProtocol.FlagNotStolen, "")
@@ -222,7 +222,7 @@ func GetDeviceID(conn net.Conn) {
 		if err != nil {
 			fmt.Println("Error closing laptop connection.", err)
 		}*/
-		fmt.Println("Connection sucks-s-foli closed")
+		//fmt.Println("Connection sucks-s-foli closed")
 		//todo close connection and laptop goes into sleep mode
 	}
 	//TODO have GetMessage be called in response to sending messages
@@ -248,7 +248,7 @@ func SendMsg(id string, opcode byte, payload string) bool {
 		fmt.Println("SendMsg: Error sending message to device with ID " + id)
 		return false
 	}
-	fmt.Printf("Message %d"+payload+" sent to device with ID "+id+"\n", opcode)
+	//fmt.Printf("Message %d"+payload+" sent to device with ID "+id+"\n", opcode)
 	return true
 }
 
@@ -307,5 +307,5 @@ func CloseConn(dc deviceConnection) {
 	if dc.ld.ID != "" {
 		lh.connections[dc.ld.ID] = nil
 	}
-	fmt.Println(dc.ld.ID + ": connection closed and removed")
+	//fmt.Println(dc.ld.ID + ": connection closed and removed")
 }

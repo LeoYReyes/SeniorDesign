@@ -39,7 +39,7 @@ func GPSConnect() net.Listener {
 	} else {
 
 	}
-	fmt.Println("Connection created on " + CONN_TYPE + " " + CONN_PORT_SMS)
+	//fmt.Println("Connection created on " + CONN_TYPE + " " + CONN_PORT_SMS)
 	return listener
 }
 
@@ -74,7 +74,7 @@ func GPSCommunicate(conn net.Conn) {
 		remaining := ""
 		select {
 		case m := <-smsCh:
-			fmt.Println("smsCh: " + m)
+			//fmt.Println("smsCh: " + m)
 			conn.Write([]byte(m))
 			break
 		default:
@@ -95,12 +95,12 @@ func GPSCommunicate(conn net.Conn) {
 					} else {
 						remaining = ""
 					}
-					fmt.Println("Received msg: ", received)
+					//fmt.Println("Received msg: ", received)
 					number := parsePhoneNumber(received)
 					msg = googleMapLinkParser(received)
 					//react based on message
 					if msg != "" { //try to parse it to coords first, if it fails it is another type of message
-						fmt.Println("parsed msg: ", msg)
+						//fmt.Println("parsed msg: ", msg)
 						msg = strings.Replace(msg, ",", string(0x1B), -1)
 						msg = number + string(0x1B) + msg + string(0x1B)
 						go UpdateMapCoords(msg)
@@ -109,7 +109,7 @@ func GPSCommunicate(conn net.Conn) {
 					} else if strings.Contains(received, GEOFENCE_ALERT) {
 						//geofenceAlert(number)
 					} else {
-						fmt.Println("Message format not recognized")
+						fmt.Println("Message format not recognized: ", received)
 					}
 				}
 			}
@@ -210,7 +210,7 @@ func motionAlertTimer(phoneNumber string) {
 			Source: CustomProtocol.DeviceGPS, OpCode: CustomProtocol.SleepGeogram, Payload: payload,
 			Response: response2}
 		toServer <- req2
-		fmt.Println(phoneNumber + " has not left geofence. Sleeping")
+		//fmt.Println(phoneNumber + " has not left geofence. Sleeping")
 	}
 }
 

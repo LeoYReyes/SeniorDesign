@@ -256,7 +256,7 @@ func processRequest(req *CustomProtocol.Request) {
 func sendMsgToGpsHub(msg string) bool {
 	select {
 	case smsCh <- msg:
-		fmt.Println("Message processed: ", msg)
+		//fmt.Println("Message processed: ", msg)
 		return true
 	default:
 		fmt.Println("Message failed to process: ", msg)

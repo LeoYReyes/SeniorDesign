@@ -36,13 +36,13 @@ func UpdateMapCoords(payload string) {
 	reqWeb := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Web, Source: CustomProtocol.DeviceGPS,
 		OpCode: CustomProtocol.UpdateWebMap, Payload: []byte(payload), Response: webResponseChan}
 	toServer <- reqWeb
-	fmt.Println("gpsDevice: Req sent to server")
+	//fmt.Println("gpsDevice: Req sent to server")
 
 	dataResponseChan := make(chan []byte)
 	reqData := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.Database, Source: CustomProtocol.DeviceGPS,
 		OpCode: CustomProtocol.UpdateDeviceGPS, Payload: []byte(payload), Response: dataResponseChan}
 	toServer <- reqData
-	fmt.Println("gpsDevice: Req sent to database")
+	//fmt.Println("gpsDevice: Req sent to database")
 	// todo enable this if we need to wait for a response and add handling here
 	for !webResponse /* || !databaseResponse */ { /*
 			if !webResponse {
@@ -59,7 +59,7 @@ func UpdateMapCoords(payload string) {
 			select {
 			case dataRet := <-reqWeb.Response:
 				databaseResponse = true
-				fmt.Println("gpsDevice: database request returned ", dataRet)
+				//fmt.Println("gpsDevice: database request returned ", dataRet)
 			default:
 				time.Sleep(10000 * time.Millisecond)
 			}

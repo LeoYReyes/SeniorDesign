@@ -67,7 +67,7 @@ func formHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("ParseForm error: ", err)
 	}
 
-	fmt.Println(r.PostForm)
+	//fmt.Println(r.PostForm)
 	if err != nil {
 		// Handle error
 		fmt.Println("decoder error: ", err)
@@ -107,7 +107,6 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		OpCode: CustomProtocol.VerifyLoginCredentials, Payload: buf, Response: resCh}
 	toServer <- req
 	sucessful, res := CustomProtocol.GetResponse(resCh, 10)
-	//res := <-resCh
 	if sucessful {
 		//fmt.Println("Response: ", res[0], res[1])
 		if (res[0] == 1) && (res[1] == 1) {
@@ -236,29 +235,12 @@ func StartWebServer(toServerIn chan *CustomProtocol.Request, fromServerIn chan *
 
 }
 
-//TODO: make chan handler in webClientHub
 func chanHandler() {
 	fmt.Println("web chan handler started")
 	for {
 		select {
 		case req := <-fromServer:
-			fmt.Println("web server received: ", req.Payload)
-			//TODO: parse payload and send coordinates to correct ws session
-			//TODO: create process request
-			//parsedPayload := CustomProtocol.ParsePayload(req.Payload)
-
-			/*msg := []byte{}
-			// DeviceId, Phone Number
-			msg = append(msg, []byte(parsedPayload[0])...)
-			msg = append(msg, 0x1B)
-			// Latitude
-			msg = append(msg, []byte(parsedPayload[1])...)
-			msg = append(msg, 0x1B)
-			// Longitude
-			msg = append(msg, []byte(parsedPayload[2])...)
-			msg = append(msg, 0x1B)
-
-			fmt.Println(msg)*/
+			//fmt.Println("web server received: ", req.Payload)
 
 			h.broadcast <- req.Payload
 		}

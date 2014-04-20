@@ -65,14 +65,14 @@ func (c *connection) readPump() {
 		if err != nil {
 			break
 		}
-		fmt.Println(string(message))
+		//fmt.Println(string(message))
 		// Creates request from message and send off
 		// Currently only sending msg to GPS device
 		response := make(chan []byte)
 		req := &CustomProtocol.Request{Id: CustomProtocol.AssignRequestId(), Destination: CustomProtocol.DeviceGPS,
 			Source: CustomProtocol.Web, OpCode: CustomProtocol.ActivateGPS, Payload: message, Response: response}
 		toServer <- req
-		fmt.Println("Response received: ", <-response)
+		//fmt.Println("Response received: ", <-response)
 	}
 }
 
@@ -175,12 +175,12 @@ func serveSession(w http.ResponseWriter, r *http.Request) {
 	// existing session: Get() always returns a session, even if empty.
 	session, _ := store.Get(r, "userSession")
 	if session.IsNew {
-		fmt.Println("New session created")
+		//fmt.Println("New session created")
 		session.Values["userId"] = r.PostForm.Get("loginName")
 		// Check to see if user is an admin
 		//session.Values["isAdmin"] = true
 	} else {
-		fmt.Println("Existing session loaded")
+		//fmt.Println("Existing session loaded")
 	}
 	session.Values["isLoggedIn"] = "true"
 	//TODO: Request database for device IDs associated with account
@@ -195,7 +195,7 @@ func serveSession(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   86400,
 		HttpOnly: true,
 	}
-	fmt.Println("Session store: ", store.Codecs)
+	//fmt.Println("Session store: ", store.Codecs)
 	// Save it.
 	err := session.Save(r, w)
 	if err != nil {

@@ -45,12 +45,12 @@ func reRoute(req *CustomProtocol.Request) {
 	switch req.Destination {
 	case CustomProtocol.Database:
 		toDatabaseCh <- req
-		fmt.Println("Reroute to database")
+		//fmt.Println("Reroute to database")
 	case CustomProtocol.Web:
 		toWebCh <- req
-		fmt.Println("Reroute to web")
+		//fmt.Println("Reroute to web")
 	case CustomProtocol.DeviceGPS, CustomProtocol.DeviceLaptop:
 		toDeviceCh <- req
-		fmt.Println("Reroute to device")
+		//fmt.Println("Reroute to device")
 	}
 }

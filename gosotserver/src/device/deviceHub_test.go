@@ -17,7 +17,7 @@ import (
 )
 
 // use a phone number to manually test if the output was correct
-var phoneNumber = "2565414217"
+var phoneNumber = "Put Phone Number Here"
 var pin = "1234"
 var toDeviceCh = make(chan *CustomProtocol.Request)
 var fromDeviceCh = make(chan *CustomProtocol.Request)

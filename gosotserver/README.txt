@@ -60,3 +60,15 @@ Accessing Website:
 		hostname:8080
 
 ---------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------
+Known bugs/issues:
+
+	* Device registration request:
+		- The server is currently checking the device ID using only length
+		  to determine what type of device the request was sent as. Anything 
+		  less than 12 characters is recognized as a GPS device and anything
+		  greater is a laptop device. Any IDs that aren’t of length 10(GPS)
+		  or 12(laptop) could cause a problem.
+
+---------------------------------------------------------------------------------

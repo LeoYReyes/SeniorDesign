@@ -1,0 +1,12 @@
+By the end of cycle two we had many features working, and beyond simply working- the features were working together. The entire focus of cycle two had been tying all of our components together under regular use and input.  What we hadn’t yet accomplished was ensuring that our system could recover and continue running correctly when given incorrect user input, or fed corrupt data. 
+
+During the first week, we met with our group to decide the goals for this cycle. We decided our top priorities would be to implement error handling and exhaustively test our system. We also needed to update the UI display to accurately depict the user’s data.
+
+We began the process of implementing methods checking for invalid information and for error handing and catching for the server. For the windows service, we hid the tray icon. We also begin adding a web socket connection that could be mapped to the deviceIDs.  The WebUI was updated to to display the coordinates of the devices on the map with the creation of a query to retrieve device coordinates.
+
+The second week was spent mostly in testing.  The laptop hub, windows service connections, signup form input acceptance, and database special character checks were the focus of our testing.  A new feature implemented was setting the Geogram to be woken by SMS messages and sleep on a timer.
+
+The third week has been spent fine-tuning our project.  This was the last week we have to work on the project.  Our cutoff date was Saturday, April 19. From this point on, until the end of the semester we were focusing on finishing documentation and preparing for our presentation.
+
+  
+

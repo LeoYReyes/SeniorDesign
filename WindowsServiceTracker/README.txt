@@ -1,3 +1,11 @@
+General Notes:
+The Windows Service Tracker has only been fully tested on a Windows 7 operating system.
+*The service runs on a Windows 8 with a few issues.
+	- WTKL(key logger) will not start properly upon login. We believe it’s a issue
+	with scheduling a third-party application to start with administrative rights on 
+	login. The WTKL process has to be killed and reopened with administrative rights.
+	Then the service has to be restarted.
+
 Windows Service installation:
 Open command prompt in administrator mode and navigate to the directory containing WindowsServiceTracker.exe
 Use the command 'WindowsServiceTracker.exe --install'
@@ -26,3 +34,4 @@ Restart you're computer.
 
 Uninstallation:
 Delete the shortcut to uninstall
+

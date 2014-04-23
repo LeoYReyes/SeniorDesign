@@ -37,7 +37,7 @@ Install Instructions:
 Server Setup Instructions:
 
 	NOTE: The server executable can be in any directory, but the directories
-	      in step 2 must also be in the directory that the executable is.
+	      in step 2 must also be in the same directory as the executable.
 
 	1. Make sure that the database is running before running the server
 	2. Copy the following directories to the same directory that the
@@ -48,7 +48,7 @@ Server Setup Instructions:
 		* /templates
 	3. Run the SMS gateway application and connect to the server's IP 
 	   address using port 10016.
-	4. Once the database and the SMS gateway is running, you can now execute
+	4. Once the database and the SMS gateway are running, you can now execute
 	   the server executable.
 	
 ---------------------------------------------------------------------------------

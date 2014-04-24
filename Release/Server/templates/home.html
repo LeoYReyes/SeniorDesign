@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="US-ASCII"></meta>
+<meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+<title>SeniorDesign</title>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css"></link>
+<link rel="stylesheet" type="text/css" href="css/default.css"></link>
+<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css"></link>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"></link>
+<script src="js/jquery-2.1.0.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/signup.js"></script>
+<script src="js/login.js"></script>
+
+</head>
+
+
+<body>
+
+<div class="jumbotron">
+  <h1>Stolen Object Tracker</h1>
+</div>
+
+	
+<div class="row">
+  <div class="col-md-1"></div>
+  <div class="col-md-5">
+  		<h1> Sign Up </h1>
+  		<br></br>
+  		<form id="signup-form" action="signup" method="POST">
+	  		<input type="text" id="firstName" name="firstName" class="form-control" placeholder="First Name" required></input>
+	  		<input type="text" id="lastName" name="lastName" class="form-control" placeholder="Last Name" required></input>
+	  		<input type="email" id="loginName" name="loginName" class="form-control" placeholder="Email address" required></input>
+	  		<h5 id="hideTel" style="display:none; color:red">Please only use numbers.</h5>
+			<input type="tel" id="phoneNumber" name="phoneNumber" class="form-control" placeholder="Phone Number" onkeyup="phoneForm(this.form, event.keyCode)" required maxlength="13"></input>	
+			<h5 id="hide" style="display:none; color:red">Passwords don't match.</h5>
+	  		<input type="password" id="password" name="password" class="form-control" placeholder="Desired Password" onchange="testResults(this.form)" onkeyup="passStrength(this.form)" required></input>
+			<input type="password"  id="confirmPassword" class="form-control" placeholder="Confirm Password" onchange="testResults(this.form)"  required></input>
+			
+			<h5 ><i><div id="passSt" style="display:none">Password Strength: 
+			<div id="short" style="display:none; color:red">Too Short (6 character minimum)</div>
+			<div id="weak" style="display:none; color:red">Weak (use uppercase, lowercase and numbers)</div>
+			<div id="good" style="display:none; color:orange">Good (use uppercase, lowercase and numbers)</div>
+			<div id="excellent" style="display:none; color:green">Excellent</div></div></i></h5>
+			
+	        <button id="signUp" class="btn btn-lg btn-priority btn-block" type="submit" onclick="testResults(this.form)" >Sign Up!</button>
+	        <br></br>
+		</form>
+  </div>
+  
+<SCRIPT LANGUAGE="JavaScript">
+
+
+
+function phoneForm(form, e){
+	var phoneNumberIn = document.getElementById("phoneNumber").value;
+	
+	if(e==8 && phoneNumberIn.length == 1){
+		phoneNumber.value = "(";
+		hideTel.style.display = 'none';	
+	}
+	
+	if(e != 8 && e>47 && e<58){
+		hideTel.style.display = 'none';
+		if(phoneNumberIn.length == 1){
+			phoneNumber.value = "(" + phoneNumberIn;
+		}
+		if(phoneNumberIn.length == 4){
+			phoneNumber.value = phoneNumberIn + ")";
+		}
+		if(phoneNumberIn.length == 8){
+			phoneNumber.value = phoneNumberIn + "-";
+		}	
+	}
+	
+	else {
+		hideTel.style.display = 'inline';
+		phoneNumber.value = phoneNumberIn.substring(0,phoneNumberIn.length - 1);
+
+	}
+	
+}
+
+
+
+
+
+function testResults (form) {
+	var firstName = document.getElementById("firstName").value;
+	var lastName = document.getElementById("lastName").value;
+	var phoneNumber = document.getElementById("phoneNumber").value;
+	var loginName = document.getElementById("loginName").value;
+    var password = document.getElementById("password").value;
+	var confirmPassword = document.getElementById("confirmPassword").value;
+	var hide = document.getElementById('hide');
+	
+	
+	
+	if(confirmPassword.length == 0 || password.length == 0) {
+		return false;
+	}
+	if(firstName.length != 0 && lastName.length != 0 && 
+		loginName.length != 0 && phoneNumber.length == 13
+		&& password.length > 5 && confirmPassword.value == password.value)  
+	{
+		return false;
+	}
+	if(password != confirmPassword) {
+    	//alert ("Not Equal: " + password + " and " + confirmPassword);
+		hide.style.display = 'block';
+		return false;	
+	} else {
+    	//alert ("Equal: " + password + " and " + confirmPassword);
+		hide.style.display = 'none';
+		$.ajax({
+			url: "signup",
+			type: "POST",
+			data: {
+				firstName: firstName,
+				lastName: lastName,
+				loginName: loginName,
+				phoneNumber: phoneNumber,
+				password: password	
+			}
+		});
+		return true;
+	}
+	
+}
+
+function passStrength(form) {
+    var password = document.getElementById("password").value;
+	var confirmPassword = document.getElementById("confirmPassword").value;
+	var hide = document.getElementById('hide');
+	var weakPass = /(?=.{6,}).*/;
+	var goodPass1 = /^(?=\S*?[a-z])(?=\S*?[A-Z])\S{6,}$/;
+	var goodPass2 = /^(?=\S*?[a-z])(?=\S*?[0-9])\S{6,}$/;
+	var goodPass3 = /^(?=\S*?[0-9])(?=\S*?[A-Z])\S{6,}$/;
+	var excellentPass = /^(?=\S*?[A-Z])(?=\S*?[a-z])(?=\S*?[0-9])\S{6,}$/;
+	
+	passSt.style.display = 'inline';
+	
+
+	if(excellentPass.test(password)) {
+		short.style.display = 'none';
+		weak.style.display = 'none';
+		good.style.display = 'none';
+		excellent.style.display = 'inline';
+		return true;
+	}
+	else if(goodPass1.test(password) || goodPass2.test(password) || goodPass3.test(password)) {
+		short.style.display = 'none';
+		weak.style.display = 'none';
+		good.style.display = 'inline';
+		excellent.style.display = 'none';
+		return false;
+	}
+	else if(weakPass.test(password)) {
+		short.style.display = 'none';
+		weak.style.display = 'inline';
+		good.style.display = 'none';
+		excellent.style.display = 'none';
+		return false;
+	}
+	else{
+		short.style.display = 'inline';
+		weak.style.display = 'none';
+		good.style.display = 'none';
+		excellent.style.display = 'none';
+		return false;
+	}
+	
+	
+}
+
+
+	
+</SCRIPT>
+
+  <div class="col-md-1"></div>
+  
+  <div class="col-md-4">
+		<form id="login-form" action="login" method="POST">
+  		<h1> Login </h1>
+  		<br></br>
+        	<input id="loginName" name="loginName" type="email" class="form-control" placeholder="Email address" required= "autofocus"></input>
+        	<br></br>
+        	<input id="loginPassword" name="loginPassword" type="password" class="form-control" placeholder="Password" required= "autofocus"></input>
+        	<br></br>
+        	<input type="checkbox" value="remember-me"> Remember me</input>
+        	<br></br>
+        	<button class="btn btn-lg btn-success btn-block" type="submit">Login</button>
+		</form>
+	</div> 
+	
+	<div class="col-md-1"></div>
+</div>
+
+</body>
+
+
+</html>
+
+
+
+
+
+
+
+	

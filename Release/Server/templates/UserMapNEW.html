@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap-theme.min.css"></link>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css"></link>
+	<script src="http://code.jquery.com/jquery.js"></script>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+	<script src="//code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/devices.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/default.css"></link>
+	<script type="text/javascript" src="js/swfobject.js"></script>
+	<script type="text/javascript" src="js/downloadify.min.js"></script>
+</head>
+<body>
+
+<div id="dialog-form" title="New Device">
+	<!--<p class="validateTips">All form fields are required.</p>-->
+	<form method="post" action="/newDevice">
+		<fieldset>
+			<div class="form-group">
+				<input type="radio" name="deviceType" id="deviceType" value="gps">GPS Device<br>
+				<input type="radio" name="deviceType" id="deviceType" value="laptop">Laptop Device<br>
+			</div>
+			
+
+			
+			<div class="form-group">
+				<label for="name">Device Name:</label><br>
+				<input type="text" name="deviceName" id="deviceName" class="form-control" placeholder="Device Name">
+			</div>
+			<div class="form-group">
+				<label for="id">ID:</label><br>
+				<input type="text" name="deviceId" id="deviceId" class="form-control" placeholder="ID">			
+			</div>
+		</fieldset>
+	</form>
+</div>	
+
+
+	
+<div id="wrapper" style="position: relative; height: 100%;">
+	<!-- The bottom layer of elements.  Contains Google Map. -->
+	<div id="google_map">
+		<div id="map-canvas">
+			<script type="text/javascript" src="js/map.js"></script>  
+	 </div>	
+	</div> <!-- END #google_map -->
+   		
+   		<!-- Navigation Bar -->
+		<nav class="navbar navbar-default" role="navigation">
+			<div class="container-fluid">
+				<div class="navbar-header">
+
+					<!-- Website Name -->
+					<a class="navbar-brand" href="#">Stolen Object Tracker</a>
+				</div>
+    			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      				<!-- Items in the nav-bar to the LEFT. -->
+      				<ul class="nav navbar-nav">
+	              		<li class="dropdown">
+          				<a href="#" class="dropdown-toggle" data-toggle="dropdown">Devices<b class="caret"></b></a>
+          					<ul id="deviceMenu" class="dropdown-menu">
+          						<li><a href="#" style="padding:9px;">All Devices</a></li>
+          					</ul>
+        				</li>
+					</ul> 
+
+					<!-- Items in the nav-bar to the RIGHT. -->
+      				<ul class="nav navbar-nav navbar-right">
+      					<li class="dropdown">
+      					<li><a href="#">{{.UserName}}</a></li></li>
+        				<li><a href="/logout">Logout</a></li>
+      				</ul>
+				</div><!-- /.navbar-collapse -->
+			</div><!-- /.container-fluid -->
+		</nav> <!-- End of Navigation Bar -->
+
+		<!-- SHOW right side of screen code -->
+		<div id="deviceBox" class="container">
+	
+			<div id="deviceBoxRow" class='row'>
+				<!-- Left side w/o map code -->
+				
+                
+                
+				<!--<div class='col-md-1'></div>--> <!-- /'col-md-1' -->
+			</div> <!-- /row -->
+		</div> <!-- /Container -->
+
+
+
+
+
+<!-- Modals: -->
+
+	<!-- IP LIST -->
+	<div class="modal fade" id="modalIPList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  		<div class="modal-lg" style="margin: 30px auto; margin-top: 80px">
+    		<div class="modal-content">
+      			<div class="modal-body">
+        			<h3 class="modal-title" id="myModalLabel"><!--{{.DeviceName}}--> IP List:</h3>
+        			<h5 class="modal-title"><!--{{.KeyloggerText}}--></h5>
+      			</div>
+      			<div class="modal-footer">
+        			
+      			</div>
+    		</div>
+  		</div>
+	</div>
+    
+    <!-- COORDINATE LIST -->
+	<div class="modal fade" id="modalCoordList" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  		<div class="modal-lg" style="margin: 30px auto; margin-top: 80px">
+    		<div class="modal-content">
+      			<div class="modal-body">
+        			<h3 class="modal-title" id="myModalLabel"><!--{{.DeviceName}}--> Coordinate List:</h3>
+        			<h5 class="modal-title"><!--{{.KeyloggerText}}--></h5>
+      			</div>
+      			<div class="modal-footer">
+        			
+      			</div>
+    		</div>
+  		</div>
+	</div> 
+
+	<!-- Rename Device PopOut -->
+	<div class="modal fade" id="modalRename" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<div class="modal-dialog" style="margin: 30px auto; margin-top: 80px">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        			<h4 class="modal-title" id="myModalLabel">Rename Device: <!--{{.DeviceName}}--></h4>
+      			</div>
+      			<div class="row" >
+      				<div class="col-md-2"></div>
+      					<div class="col-md-8">
+      						<br></br>
+      						<input type="text" class="form-control" placeholder="New Device Name" required="autofocus"></input>
+      					</div>
+      				<div class="col-md-2"></div>
+      			</div>
+      			<div class="modal-footer">
+        			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+       				<button type="button" class="btn btn-primary">Save changes</button>
+      			</div>
+    		</div>
+  		</div>
+	</div>
+	
+	
+	
+	<!-- Keylogger PopOut -->
+	<div class="modal fade" id="modalKeylogger" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  		<div class="modal-lg" style="margin: 30px auto; margin-top: 80px">
+    		<div class="modal-content">
+      			<div class="modal-body">
+        			<h3 class="modal-title" id="myModalLabel"><!--{{.DeviceName}}--> Keylog:</h3>
+        			<h5 class="modal-title"><!--{{.KeyloggerText}}--></h5>
+      			</div>
+      			<div class="modal-footer">
+        			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        			<button type="button" class="btn btn-primary">Download File</button>
+      			</div>
+    		</div>
+  		</div>
+	</div> 
+	
+	
+	
+	<!-- Delete Device PopOut -->
+	<div class="modal fade" id="modalDelete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  		<div class="modal-dialog" style="margin: 30px auto; margin-top: 80px">
+    		<div class="modal-content">
+      			<div class="modal-header">
+        			<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        			<h4 class="modal-title" id="myModalLabel"><!--{{.DeviceName}}--></h4>
+     			</div>
+      			<div class="modal-body" onload="showKeylog();">
+					<form>
+						<p>
+							<input type="text" name="filename" id="filename" value="Keylogger" style="border: none" />
+						</p>
+						<p>
+							<label for="data">File Contents</label><br />
+							<input type="text" name="data" id="data" value="keylogger" disabled></input>
+						</p>
+			
+						<p id="downloadify">
+							Somethings not set up right...
+						</p>
+					</form>
+					<div class="modal-body">
+        			<h4 class="modal-title" id="myModalLabel">Are you sure you want to delete device "<!--{{.DeviceName}}-->"?</h4>
+      			</div>
+      			<div class="modal-footer">
+        			<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        			<button type="button" class="btn btn-danger">Delete</button>
+      			</div>
+    		</div>
+  		</div>
+	</div> 
+    </div>
+</div> <!-- END #wrapper -->
+	</body>
+</html>
